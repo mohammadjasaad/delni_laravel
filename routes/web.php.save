@@ -1,0 +1,33 @@
+
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// مسار لعرض جميع الإعلانات (هذا هو السطر الجديد)
+Route::get('/ads', [AdController::class, 'index']);
+Route::get('/ads/create', [AdController::class, 'create'])->name('ads.create');
+Route::post('/ads', [AdController::class, 'store'])->name('ads.store');
+Route::get('/dashboard/myinfo', [AdController::class, 'myInfo']);
+Route::get('/dashboard/ads', [AdController::class, 'myAds'])->name('dashboard.myAds');
+Route::get('/test-view', function () {
+    return view('dashboard.ads');
+});
+Route::get("/test-view", function () {
+    return view("test.index");
+});
+Route::get('/dashboard/ads/create', [AdController::class, 'create']);
+Route::post('/dashboard/ads', [AdController::class, 'store']);
+Route::get('/dashboard/ads/create', [AdController::class, 'create'])->name('dashboard.ads.create');
+Route::post('/dashboard/ads', [AdController::class, 'store'])->name('ads.store');
