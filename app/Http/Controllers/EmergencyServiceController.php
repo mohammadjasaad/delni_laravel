@@ -20,7 +20,7 @@ class EmergencyServiceController extends Controller
             $query->where('type', $request->type);
         }
 
-        $services = $query->latest()->get();
+        $services = $query->orderBy('id','desc')->get();
 
         return view('emergency_services.index', compact('services'));
     }
@@ -64,8 +64,8 @@ class EmergencyServiceController extends Controller
             'name' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'type' => 'required|string',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
+            'lat' => 'required|numeric',
+            'lng' => 'required|numeric',
         ]);
 
         $service = EmergencyService::findOrFail($id);
@@ -73,11 +73,11 @@ class EmergencyServiceController extends Controller
             'name' => $request->name,
             'city' => $request->city,
             'type' => $request->type,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
+            'lat' => $request->latitude,
+            'lng' => $request->longitude,
         ]);
 
-        return redirect()->route('emergency.index')->with('success', '✅ تم تعديل المركز بنجاح!');
+        return redirect()->route('emergency_services.index')->with('success', '✅ تم تعديل المركز بنجاح!');
     }
 
     // ✅ صفحة إضافة مركز جديد
@@ -108,6 +108,6 @@ class EmergencyServiceController extends Controller
         $service = EmergencyService::findOrFail($id);
         $service->delete();
 
-        return redirect()->route('emergency.index')->with('success', '✅ تم حذف المركز بنجاح.');
+        return redirect()->route('emergency_services.index')->with('success', '✅ تم حذف المركز بنجاح.');
     }
 }

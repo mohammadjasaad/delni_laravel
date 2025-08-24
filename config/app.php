@@ -168,6 +168,9 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+      Illuminate\View\ViewServiceProvider::class,
+      Illuminate\Filesystem\FilesystemServiceProvider::class,
+      Illuminate\Session\SessionServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -183,6 +186,9 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
+      Illuminate\View\ViewServiceProvider::class,
+      Illuminate\Filesystem\FilesystemServiceProvider::class,
+      Illuminate\Session\SessionServiceProvider::class,
     ])->toArray(),
 
 ];
