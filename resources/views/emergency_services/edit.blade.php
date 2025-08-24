@@ -35,13 +35,16 @@
             </div>
 
             <div class="mb-4">
-                <label class="block font-semibold mb-1">🌍 خط العرض</label>
-                <input type="text" name="latitude" value="{{ $service->latitude }}" class="w-full border-gray-300 rounded px-4 py-2" required>
+                <label class="block font-semibold mb-1">📞 رقم الموبايل</label>
+                <input type="text" name="phone" value="{{ $service->phone }}" class="w-full border-gray-300 rounded px-4 py-2">
             </div>
 
             <div class="mb-4">
-                <label class="block font-semibold mb-1">🌍 خط الطول</label>
-                <input type="text" name="longitude" value="{{ $service->longitude }}" class="w-full border-gray-300 rounded px-4 py-2" required>
+                <label class="block font-semibold mb-1">🌍 حدد موقع المركز على الخريطة</label>
+                <div id="map" style="height: 300px;" class="rounded shadow mb-2"></div>
+                <button type="button" onclick="getLocation()" class="bg-blue-500 text-white px-4 py-1 rounded text-sm">📍 حدد موقعي تلقائيًا</button>
+                <input type="hidden" name="lat" id="lat" value="{{ $service->lat }}" required>
+                <input type="hidden" name="lng" id="lng" value="{{ $service->lng }}" required>
             </div>
 
             <button type="submit" class="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600">
@@ -49,4 +52,53 @@
             </button>
         </form>
     </div>
+
+    {{-- Leaflet --}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView({{ $service->lat }}, {{ $service->lng }}], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© Delni'
+        }).addTo(map);
+
+        var marker = L.marker({{ $service->lat }}, {{ $service->lng }}]).addTo(map);
+
+        map.on('click', function(e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker(lat, lng]).addTo(map);
+
+            document.getElementById('lat').value = lat;
+            document.getElementById('lng').value = lng;
+        });
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+
+                    marker = L.marker(lat, lng]).addTo(map);
+                    map.setView(lat, lng], 15);
+
+                    document.getElementById('lat').value = lat;
+                    document.getElementById('lng').value = lng;
+                });
+            } else {
+                alert("المتصفح لا يدعم تحديد الموقع الجغرافي.");
+            }
+        }
+    </script>
 </x-app-layout>

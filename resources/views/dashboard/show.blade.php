@@ -23,16 +23,43 @@
         </div>
 
         {{-- ✅ أزرار التحكم --}}
-        <div class="mt-6 flex gap-4">
+        <div class="mt-6 flex flex-wrap gap-4">
+
+            <!-- ✏️ تعديل الإعلان -->
             <a href="{{ route('dashboard.ads.edit', $ad->id) }}"
                class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">
                 ✏️ {{ __('messages.edit_ad') }}
             </a>
 
+            <!-- 🔙 رجوع -->
             <a href="{{ route('dashboard.ads') }}"
                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
                 {{ __('messages.back_to_ads') }}
             </a>
+
+            <!-- 📋 زر نسخ رابط الإعلان -->
+            <button onclick="copyToClipboard('{{ route('ads.show', $ad->id) }}')"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded">
+                📋 {{ __('messages.copy_link') }}
+            </button>
+
+            <!-- 📲 زر واتساب -->
+            <a href="https://wa.me/?text={{ urlencode('👋 مرحبًا، شاهد هذا الإعلان: ' . $ad->title . ' - ' . route('ads.show', $ad->id)) }}"
+               target="_blank"
+               class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                📲 {{ __('messages.contact_on_whatsapp') }}
+            </a>
         </div>
     </div>
+
+    {{-- ✅ سكربت النسخ --}}
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function () {
+                alert("✅ تم نسخ رابط الإعلان إلى الحافظة!");
+            }, function () {
+                alert("❌ فشل في نسخ الرابط.");
+            });
+        }
+    </script>
 </x-app-layout>

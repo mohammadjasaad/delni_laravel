@@ -137,4 +137,32 @@ public function editPassword()
 
         return view('dashboard.myorders', compact('taxiOrders', 'emergencyReports'));
     }
+public function accountSettings()
+{
+    $user = auth()->user();
+    return view('dashboard.account-settings', compact('user'));
+}
+
+public function updateAccountSettings(Request $request)
+{
+    $user = auth()->user();
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,'.$user->id,
+        'password' => 'nullable|min:8|confirmed',
+    ]);
+
+    $user->name = $request->name;
+    $user->email = $request->email;
+
+    if ($request->filled('password')) {
+        $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+    }
+
+    $user->save();
+
+    return redirect()->route('dashboard.settings')->with('success', '✅ تم تحديث إعدادات الحساب بنجاح.');
+}
+
 }

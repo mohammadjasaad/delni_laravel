@@ -78,11 +78,11 @@
             if (mapDiv.classList.contains('hidden')) {
                 mapDiv.classList.remove('hidden');
                 if (!window.mapInitialized) {
-                    const map = L.map('map').setView([{{ $report->service->latitude }}, {{ $report->service->longitude }}], 14);
+                    const map = L.map('map').setView({{ $report->service->latitude }}, {{ $report->service->longitude }}], 14);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         maxZoom: 19,
                     }).addTo(map);
-                    L.marker([{{ $report->service->latitude }}, {{ $report->service->longitude }}]).addTo(map)
+                    L.marker({{ $report->service->latitude }}, {{ $report->service->longitude }}]).addTo(map)
                         .bindPopup("📍 مركز الطوارئ: {{ $report->service->name }}").openPopup();
                     window.mapInitialized = true;
                 }

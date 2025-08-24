@@ -1,4 +1,4 @@
-@props(['disabled' => false, 'type' => 'text'])
+(['disabled' => false, 'type' => 'text'])
 
 <input 
     {{ $disabled ? 'disabled' : '' }} 

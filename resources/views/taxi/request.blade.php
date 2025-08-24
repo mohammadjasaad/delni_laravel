@@ -29,7 +29,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // الموقع الافتراضي (دمشق)
-            var map = L.map('map').setView([33.5138, 36.2765], 13);
+            var map = L.map('map').setView(33.5138, 36.2765], 13);
 
             // الخلفية
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -41,17 +41,17 @@
                 navigator.geolocation.getCurrentPosition(function (position) {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
-                    map.setView([lat, lng], 15);
+                    map.setView(lat, lng], 15);
 
                     // 🔵 موقع المستخدم
-                    L.marker([lat, lng])
+                    L.marker(lat, lng])
                         .addTo(map)
                         .bindPopup('📍 موقعك الحالي').openPopup();
 
                     // 🟢 سائق وهمي قريب
                     const driverLat = lat + 0.002;
                     const driverLng = lng + 0.002;
-                    const driverMarker = L.marker([driverLat, driverLng], {
+                    const driverMarker = L.marker(driverLat, driverLng], {
                         icon: L.icon({
                             iconUrl: '/taxi-icon.png',
                             iconSize: [32, 32],

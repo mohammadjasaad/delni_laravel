@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Leaflet overrides: ألغِ تأثير preflight على صور البلاطات فقط */
+.leaflet-container img { max-width: none !important; }
+img.leaflet-tile { max-width: none !important; width: 256px !important; height: 256px !important; }
+.leaflet-tile { width: 256px !important; height: 256px !important; }

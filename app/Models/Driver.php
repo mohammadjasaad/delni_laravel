@@ -3,19 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable; // يجعل Driver قابل للمصادقة
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 
-class Driver extends Model
+class Driver extends Authenticatable
 {
-    use HasFactory;
+    use HasApiTokens, HasFactory, Notifiable;
+
+    protected $table = 'drivers'; // جدول السائقين
 
     protected $fillable = [
         'name',
+        'phone',
         'car_number',
         'status',
         'latitude',
         'longitude',
-        'phone' // تأكد من أن الحقل موجود إذا أضفته للموديل
+        'is_active',
+        'password',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -24,5 +35,13 @@ class Driver extends Model
     public function orders()
     {
         return $this->hasMany(TaxiOrder::class);
+    }
+
+    /**
+     * ✅ تأكد أن الـ guard الخاص بالسائق
+     */
+    public function guardName(): string
+    {
+        return 'driver';
     }
 }

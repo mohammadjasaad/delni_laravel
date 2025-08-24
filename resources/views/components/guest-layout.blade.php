@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Delni - {{ __('Register') }}</title>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+    (['resources/css/app.css','resources/js/app.js'])</head>
 <body class="bg-gray-100 text-gray-900 antialiased">
 
     <div class="min-h-screen flex flex-col items-center justify-center">

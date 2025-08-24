@@ -28,7 +28,7 @@
         let nearestDriver = null;
 
         document.addEventListener("DOMContentLoaded", function () {
-            const map = L.map('map').setView([33.5138, 36.2765], 13);
+            const map = L.map('map').setView(33.5138, 36.2765], 13);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
@@ -49,7 +49,7 @@
 
             // عرض السائقين
             drivers.forEach(driver => {
-                L.marker([driver.lat, driver.lon], { icon: taxiIcon })
+                L.marker(driver.lat, driver.lon], { icon: taxiIcon })
                     .addTo(map)
                     .bindPopup(`🚖 ${driver.name}<br>🚗 ${driver.car}`);
             });
@@ -60,7 +60,7 @@
                     const userLat = position.coords.latitude;
                     const userLon = position.coords.longitude;
 
-                    L.circleMarker([userLat, userLon], {
+                    L.circleMarker(userLat, userLon], {
                         radius: 8,
                         fillColor: "#007BFF",
                         color: "#fff",
@@ -69,7 +69,7 @@
                         fillOpacity: 0.9
                     }).addTo(map).bindPopup("📍 أنت هنا").openPopup();
 
-                    map.setView([userLat, userLon], 14);
+                    map.setView(userLat, userLon], 14);
 
                     // تحديد أقرب سائق
                     let minDistance = Infinity;
@@ -84,13 +84,13 @@
 
                     if (nearestDriver) {
                         // خط إلى السائق
-                        L.polyline([
+                        L.polyline(
                             [userLat, userLon],
                             [nearestDriver.lat, nearestDriver.lon]
                         ], { color: 'red', dashArray: '5, 5' }).addTo(map);
 
                         L.popup()
-                            .setLatLng([(userLat + nearestDriver.lat) / 2, (userLon + nearestDriver.lon) / 2])
+                            .setLatLng((userLat + nearestDriver.lat) / 2, (userLon + nearestDriver.lon) / 2])
                             .setContent(`🚕 أقرب سائق: ${nearestDriver.name} يبعد ${minDistance.toFixed(2)} كم`)
                             .openOn(map);
 

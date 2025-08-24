@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delni.co - قريبًا</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+    (['resources/css/app.css','resources/js/app.js'])</head>
 <body class="bg-yellow-100 flex items-center justify-center min-h-screen font-sans">
 
     <div class="text-center p-8 bg-white shadow-lg rounded-2xl max-w-xl w-full">

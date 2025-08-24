@@ -17,7 +17,15 @@ return [
     'delete' => 'Delete',
     'update' => 'Update',
     'back' => 'Back',
+'all_rights_reserved' => 'All rights reserved',
 
+'home' => 'Home',
+'ads' => 'Ads',
+'about' => 'About',
+'contact' => 'Contact',
+'add_ad' => 'Add Ad',
+'my_account' => 'My Account',
+'login' => 'Login',
 
     // ✅ Ads
     'ads' => 'Ads',

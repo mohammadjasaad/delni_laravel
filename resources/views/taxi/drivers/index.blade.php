@@ -59,7 +59,7 @@
     <form action="{{ route('drivers.updateStatus', $driver->id) }}" method="POST">
         @csrf
         <select name="status" onchange="this.form.submit()" class="text-sm px-2 py-1 border rounded bg-gray-50 font-semibold {{ $statusColors[$driver->status] ?? 'text-gray-600' }}">
-            @foreach(['متاح', 'مشغول', 'غير متصل'] as $status)
+             (['متاح', 'مشغول', 'غير متصل'] as $status)
                 <option value="{{ $status }}" {{ $driver->status === $status ? 'selected' : '' }}>
                     {{ $status }}
                 </option>

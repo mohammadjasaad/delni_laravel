@@ -31,7 +31,7 @@
 <div class="mb-4">
     <label class="block text-gray-700 font-semibold mb-1">⚙️ حالة السائق:</label>
     <select name="status" class="w-full border border-gray-300 rounded px-3 py-2">
-        @foreach(['متاح', 'مشغول', 'غير متصل'] as $status)
+         (['متاح', 'مشغول', 'غير متصل'] as $status)
             <option value="{{ $status }}" {{ $driver->status === $status ? 'selected' : '' }}>
                 {{ $status }}
             </option>

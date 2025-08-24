@@ -41,7 +41,7 @@
                 <x-label for="city" :value="__('messages.city')" />
                 <select id="city" name="city" class="block mt-1 w-full border-gray-300 rounded" required>
                     <option value="">{{ __('messages.choose_city') }}</option>
-                    @foreach(['دمشق','ريف دمشق','حلب','حمص','حماة','اللاذقية','طرطوس','السويداء','درعا','القنيطرة','إدلب','الرقة','دير الزور','الحسكة'] as $city)
+                     (['دمشق','ريف دمشق','حلب','حمص','حماة','اللاذقية','طرطوس','السويداء','درعا','القنيطرة','إدلب','الرقة','دير الزور','الحسكة'] as $city)
                         <option value="{{ $city }}" {{ old('city') == $city ? 'selected' : '' }}>{{ $city }}</option>
                     @endforeach
                 </select>
@@ -79,13 +79,13 @@
                     const defaultLat = 33.5138;
                     const defaultLng = 36.2765;
 
-                    const map = L.map('map').setView([defaultLat, defaultLng], 13);
+                    const map = L.map('map').setView(defaultLat, defaultLng], 13);
 
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; OpenStreetMap contributors',
                     }).addTo(map);
 
-                    let marker = L.marker([defaultLat, defaultLng], {draggable: true}).addTo(map);
+                    let marker = L.marker(defaultLat, defaultLng], {draggable: true}).addTo(map);
 
                     marker.on('dragend', function (e) {
                         const position = marker.getLatLng();
@@ -97,8 +97,8 @@
                         navigator.geolocation.getCurrentPosition(function (position) {
                             const lat = position.coords.latitude;
                             const lng = position.coords.longitude;
-                            map.setView([lat, lng], 15);
-                            marker.setLatLng([lat, lng]);
+                            map.setView(lat, lng], 15);
+                            marker.setLatLng(lat, lng]);
                             document.getElementById('lat').value = lat;
                             document.getElementById('lng').value = lng;
                         });

@@ -1,4 +1,4 @@
-@props(['errors'])
+(['errors'])
 
 @if ($errors->any())
     <div {{ $attributes->merge(['class' => 'mb-4']) }}>

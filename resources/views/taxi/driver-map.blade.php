@@ -14,7 +14,7 @@
         crossorigin="" />
 
     <script>
-        var map = L.map('map').setView([33.5138, 36.2765], 12); // دمشق كموقع افتراضي
+        var map = L.map('map').setView(33.5138, 36.2765], 12); // دمشق كموقع افتراضي
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
@@ -33,7 +33,7 @@ drivers.forEach(driver => {
             popupAnchor: [0, -30]
         });
 
-        const marker = L.marker([driver.latitude, driver.longitude], { icon: customIcon }).addTo(map)
+        const marker = L.marker(driver.latitude, driver.longitude], { icon: customIcon }).addTo(map)
             .bindPopup(`<strong>${driver.name}</strong><br>🚗 ${driver.car_number}<br>📍 ${driver.status}`);
     }
 });

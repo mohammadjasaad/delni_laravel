@@ -44,17 +44,27 @@ public function index(Request $request)
 {
     $query = Ad::query();
 
-    // فلترة حسب المدينة
+    // 🔍 فلترة بالكلمة المفتاحية (بحث عام)
+    if ($request->filled('q')) {
+        $query->where(function ($subquery) use ($request) {
+            $subquery->where('title', 'like', '%' . $request->q . '%')
+                     ->orWhere('description', 'like', '%' . $request->q . '%')
+                     ->orWhere('city', 'like', '%' . $request->q . '%')
+                     ->orWhere('category', 'like', '%' . $request->q . '%');
+        });
+    }
+
+    // 🔎 فلترة حسب المدينة
     if ($request->filled('city')) {
         $query->where('city', $request->city);
     }
 
-    // فلترة حسب التصنيف
+    // 🔎 فلترة حسب التصنيف
     if ($request->filled('category')) {
         $query->where('category', $request->category);
     }
 
-    // فلترة حسب السعر
+    // 💰 فلترة حسب السعر
     if ($request->filled('min_price')) {
         $query->where('price', '>=', $request->min_price);
     }
@@ -62,10 +72,13 @@ public function index(Request $request)
         $query->where('price', '<=', $request->max_price);
     }
 
-    // ترتيب الإعلانات المميزة أولاً، ثم حسب الأحدث
-    $ads = $query->orderBy('is_featured', 'desc')
-                 ->orderBy('created_at', 'desc')
-                 ->paginate(12);
+    // 🌟 فلترة الإعلانات المميزة فقط
+    if ($request->filled('is_featured')) {
+        $query->where('is_featured', $request->is_featured);
+    }
+
+    // 📄 جلب الإعلانات مع ترتيبها الأحدث أولًا
+    $ads = $query->latest()->paginate(12);
 
     return view('ads.index', compact('ads'));
 }
@@ -89,7 +102,7 @@ public function store(Request $request)
         'category' => 'required|string',
         'lat' => 'nullable|numeric',
         'lng' => 'nullable|numeric',
-        'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:4096',
+        'images.*' => 'image|max:10240',
     ]);
 
     $imagePaths = [];

@@ -10,7 +10,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        const map = L.map('map').setView([34.8021, 38.9968], 7); // تمركز على سوريا
+        const map = L.map('map').setView(34.8021, 38.9968], 7); // تمركز على سوريا
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -28,7 +28,7 @@
 
                     // إضافة علامات جديدة
                     drivers.forEach(driver => {
-                        const marker = L.marker([driver.latitude, driver.longitude]).addTo(map);
+                        const marker = L.marker(driver.latitude, driver.longitude]).addTo(map);
                         marker.bindPopup(
                             `<strong>👤 ${driver.name}</strong><br>🚗 ${driver.car_number}<br>📍 الحالة: ${driver.status}`
                         );

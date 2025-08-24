@@ -1,72 +1,117 @@
-{{-- resources/views/ads/show.blade.php --}}
-<x-main-layout>
-    <div class="max-w-6xl mx-auto px-4 py-10">
 
-        {{-- 🔙 زر الرجوع --}}
-        <div class="mb-6">
-            <a href="{{ route('ads.index') }}" class="text-yellow-600 hover:underline text-sm">
-                ← {{ __('messages.back_to_ads') }}
-            </a>
+<x-main-layout>
+    <div class="max-w-6xl mx-auto px-4 py-8">
+
+        {{-- 🔙 رجوع --}}
+        <div class="mb-4">
+            <a href="{{ route('ads.index') }}" class="text-yellow-600 hover:underline text-sm">← {{ __('messages.back_to_ads') }}</a>
         </div>
 
-        {{-- 🏷️ عنوان الإعلان --}}
-        <h1 class="text-3xl font-extrabold text-center text-gray-800 mb-4">{{ $ad->title }}</h1>
+        {{-- 🏷️ العنوان --}}
+        <h1 class="text-3xl font-extrabold text-center text-gray-800 mb-2">{{ $ad->title }}</h1>
 
         {{-- ⭐ إعلان مميز --}}
         @if($ad->is_featured)
-            <div class="text-center mb-6">
-                <span class="inline-block bg-yellow-400 text-white font-bold px-4 py-2 rounded-full shadow">
-                    ⭐ {{ __('messages.featured_ad') }}
-                </span>
+            <div class="text-center mb-4">
+                <span class="inline-block bg-yellow-500 text-white font-bold px-4 py-2 rounded-full shadow">⭐ {{ __('messages.featured_ad') }}</span>
             </div>
         @endif
 
-        {{-- 🖼️ صور الإعلان --}}
-        @php
-            $images = is_array($ad->images) ? $ad->images : json_decode($ad->images, true);
-        @endphp
-
+        {{-- 🖼️ صورة رئيسية --}}
+        @php $images = is_array($ad->images) ? $ad->images : json_decode($ad->images, true); @endphp
         @if($images && count($images) > 0)
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                @foreach($images as $image)
-                    <img src="{{ asset('storage/' . $image) }}" alt="Ad Image"
-                         class="rounded-xl shadow-md h-64 w-full object-cover hover:scale-105 transition duration-300">
-                @endforeach
+            <div class="relative mb-6">
+                <img src="{{ \Illuminate\Support\Str::startsWith($images[0], 'http') ? $images[0] : asset($images[0]) }}"
+                     class="w-full h-72 sm:h-[400px] object-cover rounded-xl shadow" alt="Main Image">
             </div>
-        @else
-            <img src="/placeholder.png" alt="No Image"
-                 class="rounded-xl shadow-md h-64 w-full object-cover mb-6 opacity-60">
         @endif
 
-        {{-- 📋 تفاصيل الإعلان --}}
-        <div class="bg-white rounded-2xl shadow-md p-6 grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-gray-700 text-lg">
-            <p><strong class="text-gray-900">{{ __('messages.price') }}:</strong>
-                <span class="text-yellow-600 font-bold">💰 {{ number_format($ad->price) }} {{ __('messages.currency') }}</span>
-            </p>
-            <p><strong class="text-gray-900">{{ __('messages.city') }}:</strong> 📍 {{ $ad->city }}</p>
-            <p><strong class="text-gray-900">{{ __('messages.category') }}:</strong> 🗂️ {{ $ad->category }}</p>
-            <p><strong class="text-gray-900">{{ __('messages.created_at') }}:</strong> ⏰ {{ $ad->created_at->format('Y-m-d H:i') }}</p>
+        {{-- 🔁 التبويبات --}}
+        <div class="border-b border-gray-200 mb-6">
+            <nav class="-mb-px flex justify-center gap-8 text-sm sm:text-base font-semibold text-gray-500">
+                <button onclick="showTab('details')" class="tab-btn border-b-2 px-3 py-2 text-gray-700 border-yellow-500">📋 {{ __('messages.details') }}</button>
+                <button onclick="showTab('description')" class="tab-btn border-b-2 px-3 py-2 hover:text-yellow-600">📝 {{ __('messages.description') }}</button>
+                <button onclick="showTab('map')" class="tab-btn border-b-2 px-3 py-2 hover:text-yellow-600">📍 {{ __('messages.ad_location') }}</button>
+            </nav>
         </div>
 
-        {{-- ❤️ زر المفضلة --}}
+        {{-- ✅ التفاصيل --}}
+        <div id="details" class="tab-content">
+            <div class="bg-white rounded-xl shadow-md p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700 text-sm sm:text-base">
+                <p><strong>{{ __('messages.price') }}:</strong> 💰 {{ number_format($ad->price) }} {{ __('messages.currency') }}</p>
+                <p><strong>{{ __('messages.city') }}:</strong> 📍 {{ $ad->city }}</p>
+                <p><strong>{{ __('messages.category') }}:</strong> 🗂️ {{ $ad->category }}</p>
+                <p><strong>{{ __('messages.created_at') }}:</strong> ⏰ {{ $ad->created_at->format('Y-m-d H:i') }}</p>
+            </div>
+        </div>
+
+        {{-- 📝 وصف --}}
+        <div id="description" class="tab-content hidden">
+            <div class="bg-white rounded-xl shadow-md p-6 text-gray-700 leading-relaxed text-sm sm:text-base whitespace-pre-line">
+                {{ $ad->description }}
+            </div>
+        </div>
+
+        {{-- 🗺️ الخريطة --}}
+        <div id="map" class="tab-content hidden">
+            @if ($ad->lat && $ad->lng)
+                <div id="adMap" class="w-full h-[400px] rounded-xl shadow mt-2"></div>
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const map = L.map('adMap').setView({{ $ad->lat }}, {{ $ad->lng }}], 15);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; Delni.co'
+                        }).addTo(map);
+                        L.marker({{ $ad->lat }}, {{ $ad->lng }}]).addTo(map)
+                            .bindPopup(`<strong>{{ $ad->title }}</strong><br>📍 {{ $ad->city }}<br>💰 {{ number_format($ad->price) }} {{ __('messages.currency') }}`);
+                    });
+                </script>
+            @endif
+        </div>
+
+        {{-- 📞 التواصل --}}
+        @if($ad->phone)
+            <div class="mt-10 flex flex-wrap gap-4 justify-center">
+                <a href="tel:{{ preg_replace('/[^0-9]/', '', $ad->phone) }}"
+                   class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full shadow text-sm">
+                    📞 {{ __('messages.direct_call') }}
+                </a>
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $ad->phone) }}"
+                   target="_blank"
+                   class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full shadow text-sm">
+                    🟢 {{ __('messages.whatsapp') }}
+                </a>
+            </div>
+        @endif
+
+        {{-- ❤️ مفضلة --}}
         @auth
-            <form method="POST" action="{{ route('favorites.store', $ad->id) }}" class="text-center mb-8">
+            <form method="POST" action="{{ route('favorites.store', $ad->id) }}" class="text-center mt-6">
                 @csrf
                 <button type="submit"
-                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-full shadow-md">
+                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-8 rounded-full shadow text-sm">
                     ❤️ {{ __('messages.add_to_favorite') }}
                 </button>
             </form>
         @endauth
 
-        {{-- 📝 وصف الإعلان --}}
-        <div class="bg-white rounded-2xl shadow-md p-6 mb-8">
-            <h2 class="text-2xl font-extrabold text-gray-800 mb-4">📝 {{ __('messages.description') }}</h2>
-            <p class="text-base text-gray-700 leading-relaxed whitespace-pre-line">{{ $ad->description }}</p>
+        {{-- 🔗 مشاركة --}}
+        <div class="mt-8 text-center flex flex-wrap justify-center gap-4">
+            <button onclick="copyToClipboard('{{ route('ads.show', $ad->id) }}')"
+                    class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-2 rounded-full shadow text-sm">
+                📋 {{ __('messages.copy_link') }}
+            </button>
+            <a href="https://wa.me/?text={{ urlencode('👋 مرحبًا، شاهد هذا الإعلان: ' . $ad->title . ' - ' . route('ads.show', $ad->id)) }}"
+               target="_blank"
+               class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full shadow text-sm">
+                📲 {{ __('messages.share_on_whatsapp') }}
+            </a>
         </div>
 
-        {{-- 🚨 نموذج الإبلاغ --}}
-        <div class="bg-white rounded-2xl shadow-md p-6 mb-8">
+        {{-- 🚨 بلاغ --}}
+        <div class="bg-white rounded-xl shadow-md p-6 mt-10">
             <h2 class="text-xl font-bold text-red-600 mb-4">🚨 {{ __('messages.report_ad') }}</h2>
             @auth
                 <form method="POST" action="{{ route('ads.report', $ad->id) }}">
@@ -83,55 +128,19 @@
             @endauth
         </div>
 
-        {{-- 📞 تواصل مع البائع --}}
-        <div class="text-center mt-8">
-            <a href="https://wa.me/?text={{ urlencode('مرحبا، أنا مهتم بالإعلان: ' . $ad->title . ' على موقع Delni.co. الرابط: ' . url()->current()) }}"
-               target="_blank"
-               class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow transition">
-                📲 {{ __('messages.contact_on_whatsapp') }}
-            </a>
-        </div>
-
-        {{-- 🗺️ خريطة الموقع --}}
-        @if ($ad->lat && $ad->lng)
-            <div class="mt-16">
-                <h2 class="text-2xl font-bold text-yellow-600 mb-4 text-center">📍 {{ __('messages.ad_location') }}</h2>
-                <div id="adMap" class="w-full h-[400px] rounded-lg shadow"></div>
-            </div>
-
-            {{-- Leaflet CSS/JS --}}
-            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-            <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    const map = L.map('adMap').setView([{{ $ad->lat }}, {{ $ad->lng }}], 15);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; Delni.co'
-                    }).addTo(map);
-                    const marker = L.marker([{{ $ad->lat }}, {{ $ad->lng }}]).addTo(map);
-                    marker.bindPopup(`
-                        <strong>{{ $ad->title }}</strong><br>
-                        📍 {{ $ad->city }}<br>
-                        💰 {{ number_format($ad->price) }} {{ __('messages.currency') }}
-                    `);
-                });
-            </script>
-        @endif
-
         {{-- 🧭 إعلانات مشابهة --}}
         @if($relatedAds->count())
-            <div class="mt-20">
+            <div class="mt-16">
                 <h2 class="text-2xl font-bold text-yellow-600 mb-6 text-center">🧭 {{ __('messages.related_ads') }}</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     @foreach($relatedAds as $related)
                         @php
                             $images = is_array($related->images) ? $related->images : json_decode($related->images, true);
+                            $relatedImage = $images && isset($images[0]) ? (\Illuminate\Support\Str::startsWith($images[0], 'http') ? $images[0] : asset($images[0])) : asset('placeholder.png');
                         @endphp
                         <a href="{{ route('ads.show', $related->id) }}"
                            class="block bg-white rounded-xl shadow hover:shadow-xl overflow-hidden transition duration-300">
-                            <img src="{{ asset('storage/' . ($images[0] ?? 'placeholder.png')) }}"
-                                 alt="Ad Image" class="w-full h-48 object-cover">
+                            <img src="{{ $relatedImage }}" alt="Ad Image" class="w-full h-48 object-cover">
                             <div class="p-4">
                                 <h3 class="font-bold text-base truncate mb-1">{{ $related->title }}</h3>
                                 <p class="text-gray-600 text-sm">📍 {{ $related->city }}</p>
@@ -144,4 +153,18 @@
         @endif
 
     </div>
+
+    {{-- ✅ سكربت تبويبات ونسخ --}}
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => alert("✅ {{ __('messages.link_copied') }}"));
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('text-gray-700', 'border-yellow-500'));
+            event.target.classList.add('text-gray-700', 'border-yellow-500');
+        }
+    </script>
 </x-main-layout>

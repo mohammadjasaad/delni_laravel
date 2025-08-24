@@ -38,7 +38,7 @@
             <div>
                 <x-label for="city" :value="__('messages.city')" />
                 <select id="city" name="city" class="block mt-1 w-full border-gray-300 rounded">
-                    @foreach(['دمشق','ريف دمشق','حلب','حمص','حماة','اللاذقية','طرطوس','السويداء','درعا','القنيطرة','إدلب','الرقة','دير الزور','الحسكة'] as $city)
+                     (['دمشق','ريف دمشق','حلب','حمص','حماة','اللاذقية','طرطوس','السويداء','درعا','القنيطرة','إدلب','الرقة','دير الزور','الحسكة'] as $city)
                         <option value="{{ $city }}" {{ (old('city', $ad->city) == $city) ? 'selected' : '' }}>{{ $city }}</option>
                     @endforeach
                 </select>

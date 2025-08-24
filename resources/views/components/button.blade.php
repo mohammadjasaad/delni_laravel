@@ -1,4 +1,4 @@
-@props(['type' => 'submit'])
+(['type' => 'submit'])
 
 <button 
     type="{{ $type }}" 

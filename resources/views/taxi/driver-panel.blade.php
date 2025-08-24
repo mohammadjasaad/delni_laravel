@@ -59,7 +59,7 @@
                 const counter = document.getElementById("messageCount");
 
                 // ✅ صوت عند وصول رسالة جديدة
-                if (messages.length > lastMessageCount) {
+                if ('messages.length > lastMessageCount') {
                     document.getElementById("newMessageSound").play();
                 }
 

@@ -1,36 +1,21 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="rtl">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale()==='ar' ? 'rtl' : 'ltr' }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'Delni.co') }}</title>
-
-    <!-- Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
-    
-    <!-- Styles -->
-    @vite('resources/css/app.css')
-
-    <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>@yield('title', config('app.name'))</title>
+  <!-- اختياري: إن كان لديك CSS في public/css/app.css -->
+  <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#f8fafc;margin:0}
+    .container{max-width:960px;margin:2rem auto;padding:1rem}
+    .card{background:#fff;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.06);padding:1.25rem}
+    .rtl *{text-align:right}
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
-
-    {{-- ✅ الشريط العلوي للتنبيه --}}
-    <div class="bg-yellow-100 text-center py-2 text-sm text-yellow-900 font-semibold">
-        🚧 هذا الموقع في نسخته التجريبية - نعمل على تطويره وتحسينه يومياً. شكراً لدعمكم ❤️
-    </div>
-
-    {{-- ✅ الشريط العلوي الرئيسي --}}
-    @include('components.navbar')
-
-    {{-- ✅ محتوى الصفحة --}}
-    <main class="py-8">
-        {{ $slot }}
-    </main>
-
+<body class="{{ app()->getLocale()==='ar' ? 'rtl' : '' }}">
+  <div class="container">
+    @yield('content')
+  </div>
 </body>
 </html>
