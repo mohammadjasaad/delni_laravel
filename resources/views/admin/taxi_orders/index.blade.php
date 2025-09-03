@@ -1,4 +1,5 @@
-<x-app-layout>
+{{-- resources/views/admin/taxi_orders/index.blade.php --}}
+<x-app-layout :isAdmin="true">
     <div class="max-w-6xl mx-auto py-10 px-4">
         <h1 class="text-2xl font-bold mb-6 text-gray-800">🚖 قائمة طلبات Delni Taxi</h1>
 

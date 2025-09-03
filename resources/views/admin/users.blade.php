@@ -1,5 +1,5 @@
 {{-- resources/views/admin/users.blade.php --}}
-<x-app-layout>
+<x-app-layout :isAdmin="true">
     <div class="max-w-6xl mx-auto py-10 px-4">
         <h1 class="text-3xl font-bold text-yellow-600 mb-8 text-center">👥 إدارة المستخدمين</h1>
 

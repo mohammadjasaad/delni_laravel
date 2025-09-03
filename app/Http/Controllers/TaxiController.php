@@ -27,7 +27,7 @@ public function index()
     if (auth()->check()) {
         $activeOrder = \App\Models\TaxiOrder::where('user_id', auth()->id())
                         ->whereIn('status', ['قيد التنفيذ', 'بانتظار السائق'])
-                        ->latest()
+                        ->orderBy("created_at","desc")
                         ->first();
     }
 
@@ -98,7 +98,7 @@ public function showDelniTaxi()
     if (auth()->check()) {
         $activeOrder = \App\Models\TaxiOrder::where('user_id', auth()->id())
                         ->whereIn('status', ['قيد التنفيذ', 'بانتظار السائق'])
-                        ->latest()
+                        ->orderBy("created_at","desc")
                         ->first();
     }
 

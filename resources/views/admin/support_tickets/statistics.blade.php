@@ -1,43 +1,81 @@
-<x-app-layout>
-    <div class="max-w-6xl mx-auto py-10 px-6">
-        <h1 class="text-3xl font-bold text-gray-800 mb-8">📊 إحصائيات تذاكر الدعم الفني</h1>
+{{-- resources/views/admin/support_tickets/statistics.blade.php --}}
+<x-app-layout :isAdmin="true">
+    <div class="max-w-7xl mx-auto py-10 px-6">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            {{-- 🔢 إجمالي التذاكر --}}
-            <div class="bg-white shadow rounded-lg p-6 text-center">
-                <h2 class="text-sm text-gray-500 mb-2">📦 إجمالي التذاكر</h2>
-                <div class="text-3xl font-bold text-gray-800">{{ $total }}</div>
+        {{-- 🟡 العنوان --}}
+        <h1 class="text-3xl font-extrabold text-yellow-600 mb-8 text-center">
+            🎫 {{ __('messages.support_tickets_statistics') }}
+        </h1>
+
+        {{-- ✅ بطاقات إحصائية --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 mb-10">
+            <div class="bg-white p-6 rounded-xl shadow text-center">
+                <h2 class="text-lg font-bold text-gray-700">📊 {{ __('messages.total_tickets') }}</h2>
+                <p class="text-3xl font-extrabold text-blue-600">{{ $total }}</p>
             </div>
 
-            {{-- 🆕 جديد --}}
-            <div class="bg-blue-100 shadow rounded-lg p-6 text-center">
-                <h2 class="text-sm text-gray-700 mb-2">🆕 جديد</h2>
-                <div class="text-2xl font-bold text-blue-800">{{ $new }}</div>
+            <div class="bg-white p-6 rounded-xl shadow text-center">
+                <h2 class="text-lg font-bold text-gray-700">🆕 {{ __('messages.ticket_status_new') }}</h2>
+                <p class="text-3xl font-extrabold text-yellow-600">{{ $new }}</p>
             </div>
 
-            {{-- 🔄 قيد المعالجة --}}
-            <div class="bg-yellow-100 shadow rounded-lg p-6 text-center">
-                <h2 class="text-sm text-gray-700 mb-2">🔄 قيد المعالجة</h2>
-                <div class="text-2xl font-bold text-yellow-700">{{ $processing }}</div>
+            <div class="bg-white p-6 rounded-xl shadow text-center">
+                <h2 class="text-lg font-bold text-gray-700">⚙️ {{ __('messages.ticket_status_processing') }}</h2>
+                <p class="text-3xl font-extrabold text-orange-600">{{ $processing }}</p>
             </div>
 
-            {{-- ✅ تم الرد --}}
-            <div class="bg-green-100 shadow rounded-lg p-6 text-center">
-                <h2 class="text-sm text-gray-700 mb-2">✅ تم الرد</h2>
-                <div class="text-2xl font-bold text-green-700">{{ $answered }}</div>
+            <div class="bg-white p-6 rounded-xl shadow text-center">
+                <h2 class="text-lg font-bold text-gray-700">✅ {{ __('messages.ticket_status_answered') }}</h2>
+                <p class="text-3xl font-extrabold text-green-600">{{ $answered }}</p>
             </div>
 
-            {{-- ❌ مغلق --}}
-            <div class="bg-gray-200 shadow rounded-lg p-6 text-center">
-                <h2 class="text-sm text-gray-700 mb-2">❌ مغلق</h2>
-                <div class="text-2xl font-bold text-gray-800">{{ $closed }}</div>
+            <div class="bg-white p-6 rounded-xl shadow text-center">
+                <h2 class="text-lg font-bold text-gray-700">🚫 {{ __('messages.ticket_status_closed') }}</h2>
+                <p class="text-3xl font-extrabold text-red-600">{{ $closed }}</p>
             </div>
         </div>
 
-        <div class="mt-10">
-            <a href="{{ route('admin.support_tickets.index') }}"
-               class="text-sm text-gray-600 hover:underline">⬅️ العودة إلى إدارة التذاكر</a>
+        {{-- 📊 الرسم البياني --}}
+        <div class="bg-white p-6 rounded-xl shadow mb-10">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">📈 {{ __('messages.tickets_distribution') }}</h2>
+            <canvas id="ticketsChart" height="100"></canvas>
+        </div>
+
+        {{-- 📜 آخر 5 تذاكر --}}
+        <div class="bg-white p-6 rounded-xl shadow">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">📜 {{ __('messages.latest_tickets') }}</h2>
+            <ul class="divide-y divide-gray-200">
+                @forelse($latestTickets as $ticket)
+                    <li class="py-3 flex justify-between items-center">
+                        <span class="text-gray-700">#{{ $ticket->id }} - {{ $ticket->subject }}</span>
+                        <a href="{{ route('admin.support_tickets.show', $ticket->id) }}"
+                           class="text-sm text-yellow-600 hover:underline">👁️ {{ __('messages.view_details') }}</a>
+                    </li>
+                @empty
+                    <li class="py-3 text-gray-500">{{ __('messages.no_tickets') }}</li>
+                @endforelse
+            </ul>
         </div>
     </div>
-</x-app-layout>
 
+    {{-- 📊 Chart.js --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('ticketsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: [
+                    '{{ __("messages.ticket_status_new") }}',
+                    '{{ __("messages.ticket_status_processing") }}',
+                    '{{ __("messages.ticket_status_answered") }}',
+                    '{{ __("messages.ticket_status_closed") }}'
+                ],
+                datasets: [{
+                    data: [{{ $new }}, {{ $processing }}, {{ $answered }}, {{ $closed }}],
+                    backgroundColor: ['#facc15', '#fb923c', '#22c55e', '#ef4444'],
+                }]
+            }
+        });
+    </script>
+</x-app-layout>

@@ -8,9 +8,8 @@
 </head>
 <body class="bg-gray-100 font-sans antialiased">
 
-    {{-- ✅ الشريط العلوي --}}
-    {{-- ✅ شريط التنقل الموحد --}}
-@include('components.navbar')
+    {{-- ✅ الهيدر الموحد --}}
+    @include('partials.header')
 
     {{-- ✅ محتوى الصفحة --}}
     <main>
@@ -18,9 +17,7 @@
     </main>
 
     {{-- ✅ الفوتر --}}
-    <footer class="bg-white mt-10 text-center text-gray-600 py-6 text-sm">
-        © 2025 Delni.co — جميع الحقوق محفوظة
-    </footer>
+    @include('partials.footer')
 
 </body>
 </html>

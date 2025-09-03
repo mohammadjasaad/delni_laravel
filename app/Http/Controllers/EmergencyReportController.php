@@ -30,7 +30,7 @@ class EmergencyReportController extends Controller
     // ✅ عرض البلاغات في لوحة تحكم المستخدم
     public function manageReports()
     {
-        $reports = EmergencyReport::with('service')->latest()->get();
+        $reports = EmergencyReport::with('service')->orderBy("id","desc")->get();
         return view('dashboard.reports.index', compact('reports'));
     }
 
@@ -39,7 +39,7 @@ class EmergencyReportController extends Controller
      */
     public function index()
     {
-        $reports = EmergencyReport::with('service')->latest()->get();
+        $reports = EmergencyReport::with('service')->orderBy("id","desc")->get();
         return view('dashboard.emergency_reports.index', compact('reports'));
     }
 

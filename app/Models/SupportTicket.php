@@ -16,9 +16,19 @@ class SupportTicket extends Model
         'status',
     ];
 
-public function user()
-{
-    return $this->belongsTo(\App\Models\User::class);
-}
+    /**
+     * 🔗 التذكرة مرتبطة بمستخدم واحد
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
+    /**
+     * 🔗 التذكرة تحتوي عدة ردود
+     */
+    public function replies()
+    {
+        return $this->hasMany(SupportTicketReply::class, 'ticket_id');
+    }
 }

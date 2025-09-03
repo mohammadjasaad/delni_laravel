@@ -17,7 +17,7 @@ class AdApiController extends Controller
                 ->orWhere('description', 'like', "%$query%")
                 ->orWhere('city', 'like', "%$query%")
                 ->orWhere('category', 'like', "%$query%")
-                ->latest()
+                ->orderBy("created_at","desc")
                 ->get();
         } else {
             $ads = \App\Models\Ad::latest()->get();

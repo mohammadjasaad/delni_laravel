@@ -1,4 +1,5 @@
-<x-app-layout>
+{{-- resources/views/admin/support_tickets/index.blade.php --}}
+<x-app-layout :isAdmin="true">
     <div class="max-w-7xl mx-auto py-10 px-6">
         <h1 class="text-3xl font-bold mb-6 text-gray-800">🎫 إدارة تذاكر الدعم الفني</h1>
 

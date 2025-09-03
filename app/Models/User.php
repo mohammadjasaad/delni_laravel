@@ -12,49 +12,72 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // 🟡 الحقول القابلة للتعبئة
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
+        'role', // 🆕 (user / admin)
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+    // 🟡 الحقول المخفية
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
+    // 🟡 التحويلات
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'password'          => 'hashed',
     ];
-public function orders()
-{
-    return $this->hasMany(Order::class);
-}
 
-public function ads()
-{
-    return $this->hasMany(\App\Models\Ad::class);
-}
-public function favorites()
-{
-    return $this->hasMany(\App\Models\Favorite::class);
-}
+    // 🏠 إعلانات
+    public function ads()
+    {
+        return $this->hasMany(Ad::class);
+    }
 
-}
+    // ❤️ المفضلة
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
 
+    // 🚖 الطلبات
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    // 🚨 بلاغات الطوارئ
+    public function emergencyReports()
+    {
+        return $this->hasMany(EmergencyReport::class);
+    }
+
+    // 🎫 تذاكر الدعم الفني
+    public function supportTickets()
+    {
+        return $this->hasMany(SupportTicket::class, 'user_id');
+    }
+
+    // 💬 ردود التذاكر
+    public function supportTicketReplies()
+    {
+        return $this->hasMany(SupportTicketReply::class, 'user_id');
+    }
+
+    // 🔔 إشعارات
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable');
+    }
+
+    // 🆔 التحقق من الدور
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+}

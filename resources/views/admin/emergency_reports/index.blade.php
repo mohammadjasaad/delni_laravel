@@ -1,5 +1,5 @@
 {{-- resources/views/admin/emergency_reports/index.blade.php --}}
-<x-app-layout>
+<x-app-layout :isAdmin="true">
     <div class="max-w-7xl mx-auto py-10 px-4">
         <h1 class="text-3xl font-bold text-yellow-600 mb-8 text-center">🚨 إدارة بلاغات مراكز الطوارئ</h1>
 
@@ -22,24 +22,35 @@
                             <th class="py-3 px-4 text-right">اسم المركز</th>
                             <th class="py-3 px-4 text-right">المدينة</th>
                             <th class="py-3 px-4 text-right">النوع</th>
-                            <th class="py-3 px-4 text-right">حالة البلاغ</th>
+                            <th class="py-3 px-4 text-right">الحالة</th>
                             <th class="py-3 px-4 text-right">تاريخ البلاغ</th>
                             <th class="py-3 px-4 text-right">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($reports as $index => $report)
+                            @php
+                                $statusColors = [
+                                    'pending' => 'bg-yellow-500',
+                                    'processing' => 'bg-blue-500',
+                                    'resolved' => 'bg-green-600',
+                                    'closed' => 'bg-gray-500',
+                                ];
+                                $statusLabels = [
+                                    'pending' => 'قيد المراجعة',
+                                    'processing' => 'جارٍ المعالجة',
+                                    'resolved' => 'تم الحل',
+                                    'closed' => 'مغلق',
+                                ];
+                            @endphp
                             <tr class="border-t hover:bg-gray-50 text-sm">
                                 <td class="py-2 px-4">{{ $index + 1 }}</td>
                                 <td class="py-2 px-4">{{ $report->service->name ?? 'غير متوفر' }}</td>
                                 <td class="py-2 px-4">{{ $report->service->city ?? '—' }}</td>
                                 <td class="py-2 px-4">{{ $report->service->type ?? '—' }}</td>
                                 <td class="py-2 px-4">
-                                    <span class="px-2 py-1 rounded text-white text-xs font-semibold
-                                        {{ $report->status === 'جديد' ? 'bg-yellow-500' : 
-                                           ($report->status === 'جارٍ المعالجة' ? 'bg-blue-500' : 
-                                           ($report->status === 'تم الحل' ? 'bg-green-600' : 'bg-gray-400')) }}">
-                                        {{ $report->status }}
+                                    <span class="px-2 py-1 rounded text-white text-xs font-semibold {{ $statusColors[$report->status] ?? 'bg-gray-400' }}">
+                                        {{ $statusLabels[$report->status] ?? $report->status }}
                                     </span>
                                 </td>
                                 <td class="py-2 px-4">{{ $report->created_at->format('Y-m-d H:i') }}</td>
@@ -60,6 +71,11 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            {{-- ✅ روابط الصفحات --}}
+            <div class="mt-6">
+                {{ $reports->links() }}
             </div>
         @endif
     </div>

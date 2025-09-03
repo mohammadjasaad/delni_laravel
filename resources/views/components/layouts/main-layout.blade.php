@@ -7,15 +7,24 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ $title }}</title>
+
+    {{-- ✅ ملفات ستايل وجافاسكربت --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- ✅ إضافة AlpineJS --}}
+    <script src="//unpkg.com/alpinejs" defer></script>
+
+    {{-- ✅ الخط العربي Cairo --}}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
+    <style> body { font-family: 'Cairo', sans-serif; } </style>
 </head>
 <body class="bg-gray-100 font-sans antialiased">
 
-    {{-- ✅ الهيدر --}}
+    {{-- ✅ الهيدر الموحد --}}
     @include('partials.header')
 
     {{-- ✅ المحتوى الرئيسي --}}
-    <main>
+    <main class="py-8">
         {{ $slot }}
     </main>
 

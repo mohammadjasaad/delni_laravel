@@ -1,46 +1,73 @@
 {{-- resources/views/admin/dashboard.blade.php --}}
-<x-app-layout>
+<x-app-layout :isAdmin="true">
     <div class="max-w-7xl mx-auto py-10 px-4">
-        <h1 class="text-3xl font-bold text-yellow-600 mb-8 text-center">🛡️ لوحة تحكم المشرف</h1>
+        <h1 class="text-3xl font-bold text-yellow-600 mb-10 text-center">
+            🛡️ {{ __('messages.admin_dashboard') }}
+        </h1>
 
-        {{-- الروابط الثلاثة --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-<a href="{{ route('admin.reports.index') }}" class="bg-white shadow hover:shadow-lg p-6 rounded-xl text-center relative">
-    <div class="text-4xl mb-2">🚨</div>
-    <div class="text-lg font-bold text-gray-800">بلاغات الطوارئ</div>
+        {{-- 🔗 روابط رئيسية --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
 
-    @if($newReportsCount > 0)
-        <div class="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-            {{ $newReportsCount }} جديد
-        </div>
-    @endif
-</a>
+            {{-- 🚨 البلاغات --}}
+            <a href="{{ route('admin.emergency_reports.index') }}"
+               class="bg-red-100 hover:bg-red-200 shadow p-6 rounded-xl text-center relative transition">
+                <div class="text-4xl mb-2">🚨</div>
+                <div class="text-lg font-bold text-gray-800">{{ __('messages.emergency_reports') }}</div>
+                @if(!empty($newReportsCount) && $newReportsCount > 0)
+                    <div class="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                        {{ $newReportsCount }} {{ __('messages.new') }}
+                    </div>
+                @endif
+            </a>
 
-            <a href="{{ route('dashboard.statistics') }}" class="bg-white shadow hover:shadow-lg p-6 rounded-xl text-center">
+            {{-- 📊 الإحصائيات --}}
+            <a href="{{ route('admin.statistics') }}"
+               class="bg-blue-100 hover:bg-blue-200 shadow p-6 rounded-xl text-center transition">
                 <div class="text-4xl mb-2">📊</div>
-                <div class="text-lg font-bold text-gray-800">إحصائيات الموقع</div>
+                <div class="text-lg font-bold text-gray-800">{{ __('messages.statistics') }}</div>
             </a>
 
-            <a href="{{ route('users.index') }}" class="bg-white shadow hover:shadow-lg p-6 rounded-xl text-center">
+            {{-- 👥 إدارة المستخدمين --}}
+            <a href="{{ route('admin.users.index') }}"
+               class="bg-green-100 hover:bg-green-200 shadow p-6 rounded-xl text-center transition">
                 <div class="text-4xl mb-2">👥</div>
-                <div class="text-lg font-bold text-gray-800">إدارة المستخدمين</div>
+                <div class="text-lg font-bold text-gray-800">{{ __('messages.manage_users') }}</div>
+            </a>
+
+            {{-- 🔔 الإشعارات --}}
+            <a href="{{ route('admin.notifications') }}"
+               class="bg-yellow-100 hover:bg-yellow-200 shadow p-6 rounded-xl text-center transition">
+                <div class="text-4xl mb-2">🔔</div>
+                <div class="text-lg font-bold text-gray-800">{{ __('messages.notifications') }}</div>
+            </a>
+
+            {{-- 🛠️ تذاكر الدعم الفني --}}
+            <a href="{{ route('admin.support_tickets.index') }}"
+               class="bg-purple-100 hover:bg-purple-200 shadow p-6 rounded-xl text-center transition">
+                <div class="text-4xl mb-2">🛠️</div>
+                <div class="text-lg font-bold text-gray-800">{{ __('messages.support_tickets') }}</div>
             </a>
         </div>
 
-        {{-- الإحصائيات الحية --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div class="bg-white rounded shadow p-6">
-                <p class="text-gray-500">عدد الإعلانات</p>
-                <h2 class="text-2xl font-bold text-gray-800">{{ $adsCount }}</h2>
+        {{-- 📈 إحصائيات حية --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+            <div class="bg-white rounded-xl shadow p-6">
+                <p class="text-gray-500">{{ __('messages.ads_count') }}</p>
+                <h2 class="text-2xl font-bold text-gray-800">{{ $adCount }}</h2>
             </div>
-            <div class="bg-white rounded shadow p-6">
-                <p class="text-gray-500">عدد المستخدمين</p>
-                <h2 class="text-2xl font-bold text-gray-800">{{ $usersCount }}</h2>
+            <div class="bg-white rounded-xl shadow p-6">
+                <p class="text-gray-500">{{ __('messages.users_count') }}</p>
+                <h2 class="text-2xl font-bold text-gray-800">{{ $userCount }}</h2>
             </div>
-            <div class="bg-white rounded shadow p-6">
-                <p class="text-gray-500">عدد البلاغات الطارئة</p>
-                <h2 class="text-2xl font-bold text-gray-800">{{ $reportsCount }}</h2>
+            <div class="bg-white rounded-xl shadow p-6">
+                <p class="text-gray-500">{{ __('messages.emergency_reports_count') }}</p>
+                <h2 class="text-2xl font-bold text-gray-800">{{ $reportCount }}</h2>
+            </div>
+            <div class="bg-white rounded-xl shadow p-6">
+                <p class="text-gray-500">{{ __('messages.visitors_count') }}</p>
+                <h2 class="text-2xl font-bold text-gray-800">{{ $visitorsCount }}</h2>
             </div>
         </div>
     </div>
 </x-app-layout>
+

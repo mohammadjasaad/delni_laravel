@@ -1,4 +1,5 @@
-<x-app-layout>
+{{-- resources/views/admin/emergency_centers/index.blade.php --}}
+<x-app-layout :isAdmin="true">
     <div class="max-w-7xl mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold text-yellow-600 mb-6">🛠️ إدارة مراكز الطوارئ</h1>
 

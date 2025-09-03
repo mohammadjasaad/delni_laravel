@@ -1,6 +1,5 @@
-<x-guest-layout>
-    @include('partials.header')
-
+{{-- resources/views/privacy.blade.php --}}
+<x-app-layout title="Delni.co - {{ __('messages.privacy_policy') }}">
     <div class="max-w-3xl mx-auto py-12 px-6">
         <h1 class="text-3xl font-bold text-yellow-500 text-center mb-6">
             {{ __('messages.privacy_policy') }}
@@ -19,7 +18,4 @@
             <p>• {{ __('messages.privacy_contact') }}</p>
         </div>
     </div>
-
-    @include('partials.footer')
-</x-guest-layout>
-
+</x-app-layout>

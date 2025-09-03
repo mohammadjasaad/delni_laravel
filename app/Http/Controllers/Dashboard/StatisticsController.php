@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\Ad;
 use App\Models\EmergencyService;
 use App\Models\EmergencyReport;
-use App\Models\TaxiDriver;
+use App\Models\Driver;
 
 class StatisticsController extends Controller
 {
@@ -18,7 +18,7 @@ class StatisticsController extends Controller
         $adCount = Ad::count();
         $emergencyCount = EmergencyService::count();
         $reportCount = EmergencyReport::count();
-        $driverCount = TaxiDriver::count();
+        $driverCount = Driver::count();
 
         // 🔝 أكثر 3 مدن تحتوي إعلانات
         $topAdCities = Ad::select('city', DB::raw('COUNT(*) as total'))

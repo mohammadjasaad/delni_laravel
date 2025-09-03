@@ -10,23 +10,16 @@ class Ad extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
-        'description',
-        'price',
-        'city',
-        'category',
-        'images',
-        'user_id',
-        'lat',
-        'lng',
-        'is_featured', // ✅ أضفنا هذا الحقل لدعمه في عمليات create/update
+        'title', 'description', 'price', 'city', 'category',
+        'images', 'user_id', 'lat', 'lng', 'is_featured'
     ];
 
     protected $casts = [
-        'is_featured' => 'boolean', // ✅ نحوله إلى true/false تلقائيًا
+        'images'      => 'array',   // ✅ JSON → Array
+        'is_featured' => 'boolean',
+        'price'       => 'float',
     ];
 
-    // 🔗 العلاقة مع المستخدم
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -37,4 +30,3 @@ class Ad extends Model
         return $this->hasMany(Favorite::class);
     }
 }
-

@@ -4,21 +4,31 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\EmergencyService;
 
 class EmergencyReport extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'service_id',
+        'emergency_service_id',
+        'user_id',
         'reason',
+        'status',
     ];
 
-    // ✅ العلاقة مع مركز الطوارئ
-public function service()
-{
-    return $this->belongsTo(\App\Models\EmergencyService::class, 'emergency_service_id');
-}
+    /**
+     * 🔗 البلاغ يخص مركز طوارئ
+     */
+    public function service()
+    {
+        return $this->belongsTo(EmergencyService::class, 'emergency_service_id');
+    }
 
+    /**
+     * 🔗 البلاغ يخص مستخدم
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

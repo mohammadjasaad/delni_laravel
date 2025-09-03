@@ -8,7 +8,7 @@ use App\Models\User;
 
 class UserController extends Controller
 {
-    // عرض قائمة المستخدمين
+    // ✅ عرض قائمة المستخدمين مع فلترة وترقيم
     public function index(Request $request)
     {
         $query = User::query();
@@ -17,18 +17,19 @@ class UserController extends Controller
             $query->where('role', $request->role);
         }
 
-        $users = $query->latest()->get();
+        // ✅ استخدام paginate بدل get
+        $users = $query->orderBy("created_at","desc")->paginate(15);
 
-        return view('admin.users', compact('users'));
+        return view('admin.users.index', compact('users'));
     }
 
-    // ترقية المستخدم إلى مشرف
+    // ✅ ترقية المستخدم إلى مشرف
     public function promote($id)
     {
         $user = User::findOrFail($id);
         $user->role = 'admin';
         $user->save();
 
-        return back()->with('success', 'تمت ترقية المستخدم إلى مشرف.');
+        return back()->with('success', __('messages.promote_success'));
     }
 }

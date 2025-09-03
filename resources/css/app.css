@@ -1,3 +1,77 @@
+@import "@fortawesome/fontawesome-free/css/all.min.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 🌍 خلفية عامة */
+body {
+    @apply bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100;
+}
+
+/* ✅ التبويبات */
+.tab-link { @apply flex items-center gap-2 px-6 py-2.5 rounded-full font-medium bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 hover:text-gray-900 hover:shadow transition-all duration-200 ease-in-out dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700; }
+.tab-link.active { @apply bg-gradient-to-r from-yellow-400 to-yellow-500 text-black border-yellow-400 shadow-lg; }
+
+/* ✅ الفلترة */
+.sub-tab { @apply px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 hover:text-gray-900 hover:shadow transition-all duration-200 ease-in-out dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700; }
+.sub-tab.active { @apply bg-gradient-to-r from-yellow-400 to-yellow-500 text-black border-yellow-400 shadow-lg; }
+
+/* ✅ الحقول */
+.input { @apply w-full p-3 border rounded-xl text-sm focus:ring-yellow-500 focus:border-yellow-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600; }
+
+/* ✅ الأزرار */
+.btn-yellow { @apply bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg font-semibold transition transform duration-200 flex items-center justify-center gap-2 shadow hover:scale-105 active:scale-95; }
+.btn-blue   { @apply bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1 shadow hover:scale-105 active:scale-95; }
+.btn-red    { @apply bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1 shadow hover:scale-105 active:scale-95; }
+.btn-gray   { @apply bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm flex items-center gap-1 shadow hover:scale-105 active:scale-95; }
+
+/* ✅ بطاقات إحصائيات */
+.stat-card { padding:1rem; @apply rounded-xl text-center shadow text-gray-800 dark:text-white dark:bg-gray-800 dark:border dark:border-gray-700 bg-gradient-to-br from-gray-50 to-gray-100; }
+.stat-card h3 { @apply font-bold text-lg mt-2; }
+.stat-card p  { @apply text-2xl font-extrabold; }
+
+/* ✅ بطاقة الإعلان */
+.ad-card { @apply relative flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-2xl hover:scale-105 hover:translate-y-1 transition transform duration-200 ease-in-out overflow-hidden border h-full; }
+.ad-card img { @apply w-full h-48 object-cover transition group-hover:opacity-90; }
+.price { @apply text-rose-600 dark:text-rose-400 font-bold text-sm mt-1; }
+.ad-card:hover .price { @apply text-red-700 dark:text-rose-300; }
+
+/* ✅ شارة الإعلان المميز */
+.badge-featured { @apply absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow animate-pulse; }
+
+/* ✅ Grid View */
+.grid-view { @apply block; }
+
+/* 📋 List View */
+.list-view { 
+    display: flex; flex-direction: row; align-items: center; gap: 1rem; padding: 0.75rem;
+    border-radius: 0.75rem; border: 1px solid rgb(229 231 235); background-color: white;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.dark .list-view { border-color: rgb(55 65 81); background-color: rgb(31 41 55); }
+.list-view img { width: 8rem; height: 6rem; object-fit: cover; border-radius: 0.5rem; }
+.list-view .content { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 0 1rem; }
+.list-view h2 { font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgb(17 24 39); }
+.dark .list-view h2 { color: white; }
+.list-view p { font-size: 0.875rem; color: rgb(107 114 128); }
+.dark .list-view p { color: rgb(156 163 175); }
+.list-view .actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem; }
+
+/* 🛠️ منع أي فراغ أسفل الموقع */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background-color: #111827; /* نفس لون الفوتر (dark:bg-gray-900) */
+}
+
+/* 🛠️ لو الفوتر أصغر من الشاشة، يلتصق بالأسفل */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}

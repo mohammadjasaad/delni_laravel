@@ -1,4 +1,5 @@
-<x-app-layout>
+{{-- resources/views/admin/index.blade.php --}}
+<x-app-layout :isAdmin="true">
     <div class="max-w-6xl mx-auto py-10 px-4">
         <h1 class="text-2xl font-bold text-gray-800 mb-6">👑 لوحة تحكم المشرف</h1>
 

@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
+    // ✅ عرض إشعارات المشرف
     public function notifications()
     {
-        // ✅ تأكد أن المستخدم مشرف
-        abort_unless(auth()->user()->role === 'admin', 403);
+        $admin = Auth::user();
 
-        // ✅ جلب كل الإشعارات
-        $notifications = DatabaseNotification::latest()->paginate(20);
+        // فقط لو كان المشرف
+        if ($admin->role !== 'admin') {
+            abort(403, __('messages.access_denied'));
+        }
+
+        // جلب الإشعارات (صفحة 20 إشعار لكل صفحة)
+        $notifications = $admin->notifications()->latest()->paginate(20);
 
         return view('admin.notifications', compact('notifications'));
     }

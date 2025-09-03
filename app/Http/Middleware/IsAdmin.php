@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class IsAdmin
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next)
+    {
+        // ✅ تحقق أن المستخدم مسجل دخول
+        if (!Auth::check()) {
+            return redirect()->route('login')->withErrors([
+                'auth' => __('messages.not_logged_in'),
+            ]);
+        }
+
+        // ✅ تحقق من صلاحية الأدمن
+        if (Auth::user()->role !== 'admin') {
+            abort(403, __('messages.access_denied'));
+        }
+
+        return $next($request);
+    }
+}

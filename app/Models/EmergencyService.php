@@ -9,5 +9,16 @@ class EmergencyService extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'city', 'type', 'lat', 'lng'];
+protected $fillable = [
+    'name',
+    'city',
+    'type',
+    'lat',
+    'lng',
+    'phone',
+    'description',
+    'whatsapp',
+    'email',
+];
+
 }

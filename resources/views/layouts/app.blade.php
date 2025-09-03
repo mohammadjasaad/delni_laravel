@@ -5,32 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'Delni.co') }}</title>
 
-    <!-- Fonts -->
+    <!-- ✅ خط Cairo -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
-    
-    <!-- Styles -->
-    @vite('resources/css/app.css')
+
+    <!-- ✅ ستايلات -->
+    @vite(['resources/css/app.css'])
+
+    <!-- ✅ إضافة AlpineJS -->
+    <script src="//unpkg.com/alpinejs" defer></script>
 
     <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-        }
+        body { font-family: 'Cairo', sans-serif; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex flex-col min-h-screen">
 
-    {{-- ✅ الشريط العلوي للتنبيه --}}
-    <div class="bg-yellow-100 text-center py-2 text-sm text-yellow-900 font-semibold">
-        🚧 هذا الموقع في نسخته التجريبية - نعمل على تطويره وتحسينه يومياً. شكراً لدعمكم ❤️
-    </div>
-
-    {{-- ✅ الشريط العلوي الرئيسي --}}
-    @include('components.navbar')
+    {{-- ✅ الهيدر الموحد --}}
+    @include('partials.header')
 
     {{-- ✅ محتوى الصفحة --}}
-    <main class="py-8">
-        {{ $slot }}
+    <main class="flex-1 py-8">
+        @isset($slot)
+            {{ $slot }}
+        @endisset
+
+        @yield('content')
     </main>
 
+    {{-- ✅ الفوتر --}}
+    @include('partials.footer')
+
+    {{-- ✅ ملف JS --}}
+    @vite(['resources/js/app.js'])
 </body>
 </html>

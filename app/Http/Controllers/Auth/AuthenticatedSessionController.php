@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +12,7 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * عرض صفحة تسجيل الدخول
      */
     public function create(): View
     {
@@ -21,7 +20,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     * تنفيذ عملية تسجيل الدخول
      */
     public function store(LoginRequest $request): RedirectResponse
     {
@@ -29,21 +28,29 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        // ✅ إعادة التوجيه حسب الدور
+        if (Auth::user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('dashboard.index');
     }
 
     /**
-     * Destroy an authenticated session.
+     * تنفيذ عملية تسجيل الخروج
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // ✅ تسجيل الخروج
         Auth::guard('web')->logout();
 
+        // ✅ إبطال الجلسة
         $request->session()->invalidate();
 
+        // ✅ إعادة إنشاء التوكين
         $request->session()->regenerateToken();
 
-      return view('auth.logged-out');
-
+        // ✅ تحويل المستخدم إلى صفحة "تم تسجيل الخروج"
+        return redirect()->route('logged-out');
     }
 }

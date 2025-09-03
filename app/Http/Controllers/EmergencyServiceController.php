@@ -3,111 +3,156 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use App\Models\EmergencyService;
 
 class EmergencyServiceController extends Controller
 {
-    // ✅ عرض كل الخدمات الطارئة على الخريطة
+    // عرض القائمة + الخريطة
     public function index(Request $request)
     {
         $query = EmergencyService::query();
 
         if ($request->filled('city')) {
-            $query->where('city', $request->city);
+            $query->where('city', 'like', '%' . $request->city . '%');
         }
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        $services = $query->orderBy('id','desc')->get();
+        // ✅ إذا المستخدم أرسل موقعه نحسب المسافة
+        if ($request->filled('lat') && $request->filled('lng')) {
+            $lat = $request->lat;
+            $lng = $request->lng;
+
+            $query->selectRaw("*, 
+                (6371 * acos(cos(radians(?)) * cos(radians(lat)) 
+                * cos(radians(lng) - radians(?)) 
+                + sin(radians(?)) * sin(radians(lat)))) AS distance",
+                [$lat, $lng, $lat]
+            )->orderBy('distance', 'asc');
+        } else {
+            // آمن لو جدولك ما فيه created_at
+            if (Schema::hasColumn('emergency_services', 'created_at')) {
+                $query->orderBy("created_at", "desc");
+            } else {
+                $query->orderBy('id', 'desc');
+            }
+        }
+
+        $services = $query->get();
 
         return view('emergency_services.index', compact('services'));
     }
 
-    // ✅ API لإرجاع بيانات المواقع بصيغة JSON للخريطة
+    // بيانات الخريطة بصيغة JSON
     public function mapData(Request $request)
     {
         $query = EmergencyService::query();
 
         if ($request->filled('city')) {
-            $query->where('city', $request->city);
+            $query->where('city', 'like', '%' . $request->city . '%');
         }
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        $data = $query->get(['name', 'city', 'type', 'lat', 'lng']);
-
-        return response()->json($data);
+        return response()->json(
+            $query->get(['id', 'name', 'city', 'type', 'lat', 'lng', 'phone', 'description', 'whatsapp', 'email'])
+        );
     }
 
-    // ✅ صفحة عرض مركز معين
-    public function show($id)
+    // عرض تفاصيل مركز + المراكز القريبة
+    public function show($id, Request $request)
     {
         $service = EmergencyService::findOrFail($id);
-        return view('emergency_services.show', compact('service'));
+
+        // ✅ المراكز القريبة من هذا المركز
+        $nearby = EmergencyService::selectRaw("*, 
+            (6371 * acos(cos(radians(?)) * cos(radians(lat)) 
+            * cos(radians(lng) - radians(?)) 
+            + sin(radians(?)) * sin(radians(lat)))) AS distance",
+            [$service->lat, $service->lng, $service->lat]
+        )
+        ->where('id', '!=', $service->id)
+        ->orderBy('distance', 'asc')
+        ->limit(5)
+        ->get();
+
+        return view('emergency_services.show', compact('service', 'nearby'));
     }
 
-    // ✅ صفحة تعديل مركز طوارئ
+    // تعديل مركز
     public function edit($id)
     {
         $service = EmergencyService::findOrFail($id);
         return view('emergency_services.edit', compact('service'));
     }
 
-    // ✅ حفظ التعديلات
+    // تحديث مركز
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'type' => 'required|string',
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
+            'name'       => 'required|string|max:255',
+            'city'       => 'required|string|max:255',
+            'type'       => 'required|string|max:255',
+            'lat'        => 'required|numeric',
+            'lng'        => 'required|numeric',
+            'phone'      => 'nullable|string|max:255',
+            'description'=> 'nullable|string',
+            'whatsapp'   => 'nullable|string|max:20',
+            'email'      => 'nullable|email|max:255',
         ]);
 
         $service = EmergencyService::findOrFail($id);
-        $service->update([
-            'name' => $request->name,
-            'city' => $request->city,
-            'type' => $request->type,
-            'lat' => $request->latitude,
-            'lng' => $request->longitude,
-        ]);
+        $service->update($request->only([
+            'name', 'city', 'type', 'lat', 'lng',
+            'phone', 'description', 'whatsapp', 'email'
+        ]));
 
-        return redirect()->route('emergency_services.index')->with('success', '✅ تم تعديل المركز بنجاح!');
+        return redirect()->route('emergency_services.show', $service->id)
+            ->with('success', '✅ تم تعديل المركز بنجاح!');
     }
 
-    // ✅ صفحة إضافة مركز جديد
+    // إنشاء مركز جديد
     public function create()
     {
         return view('emergency_services.create');
     }
 
-    // ✅ حفظ مركز جديد
+    // تخزين مركز جديد
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
+            'name'       => 'required|string|max:255',
+            'type'       => 'required|string|max:255',
+            'city'       => 'required|string|max:255',
+            'lat'        => 'required|numeric',
+            'lng'        => 'required|numeric',
+            'phone'      => 'nullable|string|max:255',
+            'description'=> 'nullable|string',
+            'whatsapp'   => 'nullable|string|max:20',
+            'email'      => 'nullable|email|max:255',
         ]);
 
-        EmergencyService::create($request->only(['name', 'city', 'type', 'lat', 'lng']));
+        EmergencyService::create($request->only([
+            'name', 'city', 'type', 'lat', 'lng',
+            'phone', 'description', 'whatsapp', 'email'
+        ]));
 
-        return redirect()->route('emergency_services.create')->with('success', '✅ تم إضافة المركز بنجاح!');
+        return redirect()->route('emergency_services.create')
+            ->with('success', '✅ تم إضافة المركز بنجاح!');
     }
 
-    // ✅ حذف مركز طوارئ
+    // حذف مركز
     public function destroy($id)
     {
         $service = EmergencyService::findOrFail($id);
         $service->delete();
 
-        return redirect()->route('emergency_services.index')->with('success', '✅ تم حذف المركز بنجاح.');
+        return redirect()->route('emergency_services.index')
+            ->with('success', '✅ تم حذف المركز بنجاح.');
     }
 }

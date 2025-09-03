@@ -1,4 +1,4 @@
-{{-- components/main-layout.blade.php --}}
+{{-- resources/views/components/main-layout.blade.php --}}
 @props(['title' => config('app.name')])
 
 <!DOCTYPE html>
@@ -10,20 +10,17 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-100 font-sans antialiased">
-<div class="bg-yellow-100 text-yellow-900 text-center py-2 text-sm">
-    🚧 هذا الموقع في نسخته التجريبية - نعمل على تطويره وتحسينه يوميًا. شكرًا لدعمكم 
-</div>
 
-    {{-- ✅ الهيدر --}}
-    @include('layouts.partials.header')
+    {{-- ✅ الهيدر الموحد --}}
+    @include('partials.header')
 
     {{-- ✅ المحتوى --}}
-    <main class="min-h-screen">
+    <main class="min-h-screen py-6">
         {{ $slot }}
     </main>
 
     {{-- ✅ الفوتر --}}
-    @include('layouts.partials.footer')
+    @include('partials.footer')
 
 </body>
 </html>

@@ -1,4 +1,3 @@
-
 <?php if (isset($component)) { $__componentOriginal66d7cfd03cd343304d81fe1e21646540 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal66d7cfd03cd343304d81fe1e21646540 = $attributes; } ?>
 <?php $component = App\View\Components\MainLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
@@ -16,26 +15,14 @@
 
         </h1>
 
-        <div class="bg-white rounded-lg shadow p-6 space-y-4 leading-relaxed">
-            <p>
-                منصة <strong>دلني Delni.co</strong> هي وجهتك الأولى للإعلانات المبوبة في سوريا، نقدم لك طريقة سهلة وموثوقة لنشر وبيع العقارات والسيارات بكل احترافية.
-            </p>
+<div class="bg-white rounded-lg shadow p-6 space-y-4 leading-relaxed text-lg">
+    <?php echo nl2br(e(__('messages.about_full'))); ?>
 
-            <p>
-                مهمتنا هي ربط البائعين بالمشترين من خلال واجهة بسيطة وسريعة، دون وسطاء، وبأقصى درجات الأمان والراحة.
-            </p>
-
-            <p>
-                يمكنك تصفح آلاف الإعلانات، أو نشر إعلانك الخاص خلال دقائق فقط.
-            </p>
-
-            <p>
-                دلني هو مشروع مستقل تم تطويره بخبرة وشغف لتقديم تجربة رقمية فريدة لكل السوريين في الداخل والخارج.
-            </p>
-        </div>
+</div>
 
         <div class="mt-8 text-center">
-            <a href="<?php echo e(route('ads.index')); ?>" class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded">
+            <a href="<?php echo e(route('ads.index')); ?>" 
+               class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded">
                 <?php echo e(__('messages.browse_ads')); ?>
 
             </a>

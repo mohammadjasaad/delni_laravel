@@ -31,7 +31,7 @@ class HomeController extends Controller
             $ads->where('category', $request->category);
         }
 
-        $ads = $ads->latest()->get();
+        $ads = $ads->orderBy("created_at","desc")->get();
 
         return view('home', compact('ads', 'featuredAds'));
     }

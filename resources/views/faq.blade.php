@@ -1,6 +1,5 @@
-<x-guest-layout>
-    @include('partials.header')
-
+{{-- resources/views/faq.blade.php --}}
+<x-app-layout title="Delni.co - {{ __('messages.faq_title') }}">
     <div class="max-w-4xl mx-auto py-12 px-4">
         <h1 class="text-3xl font-bold text-yellow-500 text-center mb-6">
             {{ __('messages.faq_title') }}
@@ -28,6 +27,4 @@
             </div>
         </div>
     </div>
-
-    @include('partials.footer')
-</x-guest-layout>
+</x-app-layout>

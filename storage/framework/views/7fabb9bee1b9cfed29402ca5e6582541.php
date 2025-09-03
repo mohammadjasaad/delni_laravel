@@ -1,172 +1,188 @@
 
-<?php if (isset($component)) { $__componentOriginal66d7cfd03cd343304d81fe1e21646540 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal66d7cfd03cd343304d81fe1e21646540 = $attributes; } ?>
-<?php $component = App\View\Components\MainLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
-<?php $component->withName('main-layout'); ?>
+<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
+<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('app-layout'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(App\View\Components\MainLayout::class))->getConstructor()): ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(App\View\Components\AppLayout::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
-    <div class="max-w-6xl mx-auto px-4 py-10">
+<div class="max-w-6xl mx-auto px-4 py-8">
 
+    
+    <?php
+        $images = is_array($ad->images) ? $ad->images : json_decode($ad->images, true);
+        $mainImage = !empty($images[0]) ? asset('storage/'.$images[0]) : asset('storage/placeholder.png');
+    ?>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        <div class="mb-6">
-            <a href="<?php echo e(route('ads.index')); ?>" class="text-yellow-600 hover:underline text-sm">
-                ← <?php echo e(__('messages.back_to_ads')); ?>
-
-            </a>
-        </div>
-
-        
-        <h1 class="text-3xl font-extrabold text-center text-gray-800 mb-4"><?php echo e($ad->title); ?></h1>
-
-        
-        <?php if($ad->is_featured): ?>
-            <div class="text-center mb-6">
-                <span class="inline-block bg-yellow-400 text-white font-bold px-4 py-2 rounded-full shadow">
-                    ⭐ <?php echo e(__('messages.featured_ad')); ?>
-
-                </span>
-            </div>
-        <?php endif; ?>
-
-        
-        <?php
-            $images = is_array($ad->images) ? $ad->images : json_decode($ad->images, true);
-        ?>
-
-        <?php if($images && count($images) > 0): ?>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                <?php $__currentLoopData = $images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <img src="<?php echo e(asset('storage/' . $image)); ?>" alt="Ad Image"
-                         class="rounded-xl shadow-md h-64 w-full object-cover hover:scale-105 transition duration-300">
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </div>
-        <?php else: ?>
-            <img src="/placeholder.png" alt="No Image"
-                 class="rounded-xl shadow-md h-64 w-full object-cover mb-6 opacity-60">
-        <?php endif; ?>
-
-        
-        <div class="bg-white rounded-2xl shadow-md p-6 grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-gray-700 text-lg">
-            <p><strong class="text-gray-900"><?php echo e(__('messages.price')); ?>:</strong>
-                <span class="text-yellow-600 font-bold">💰 <?php echo e(number_format($ad->price)); ?> <?php echo e(__('messages.currency')); ?></span>
-            </p>
-            <p><strong class="text-gray-900"><?php echo e(__('messages.city')); ?>:</strong> 📍 <?php echo e($ad->city); ?></p>
-            <p><strong class="text-gray-900"><?php echo e(__('messages.category')); ?>:</strong> 🗂️ <?php echo e($ad->category); ?></p>
-            <p><strong class="text-gray-900"><?php echo e(__('messages.created_at')); ?>:</strong> ⏰ <?php echo e($ad->created_at->format('Y-m-d H:i')); ?></p>
-        </div>
-
-        
-        <?php if(auth()->guard()->check()): ?>
-            <form method="POST" action="<?php echo e(route('favorites.store', $ad->id)); ?>" class="text-center mb-8">
-                <?php echo csrf_field(); ?>
-                <button type="submit"
-                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-full shadow-md">
-                    ❤️ <?php echo e(__('messages.add_to_favorite')); ?>
-
-                </button>
-            </form>
-        <?php endif; ?>
-
-        
-        <div class="bg-white rounded-2xl shadow-md p-6 mb-8">
-            <h2 class="text-2xl font-extrabold text-gray-800 mb-4">📝 <?php echo e(__('messages.description')); ?></h2>
-            <p class="text-base text-gray-700 leading-relaxed whitespace-pre-line"><?php echo e($ad->description); ?></p>
-        </div>
-
-        
-        <div class="bg-white rounded-2xl shadow-md p-6 mb-8">
-            <h2 class="text-xl font-bold text-red-600 mb-4">🚨 <?php echo e(__('messages.report_ad')); ?></h2>
-            <?php if(auth()->guard()->check()): ?>
-                <form method="POST" action="<?php echo e(route('ads.report', $ad->id)); ?>">
-                    <?php echo csrf_field(); ?>
-                    <textarea name="message" rows="3" class="w-full p-3 border rounded-xl text-sm mb-3"
-                              placeholder="<?php echo e(__('messages.report_message_placeholder')); ?>"></textarea>
-                    <button type="submit"
-                            class="bg-red-500 hover:bg-red-600 text-white font-semibold px-5 py-2 rounded-lg text-sm shadow">
-                        <?php echo e(__('messages.submit_report')); ?>
-
-                    </button>
-                </form>
-            <?php else: ?>
-                <p class="text-sm text-gray-600"><?php echo e(__('messages.login_to_report')); ?></p>
+        <div>
+            <img src="<?php echo e($mainImage); ?>" class="w-full h-96 object-cover rounded-xl shadow" alt="ad">
+            <?php if($images && count($images) > 1): ?>
+                <div class="flex gap-2 mt-3 overflow-x-auto">
+                    <?php $__currentLoopData = array_slice($images,1); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $img): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <img src="<?php echo e(asset('storage/'.$img)); ?>" 
+                             class="w-28 h-20 object-cover rounded border hover:scale-105 transition" alt="thumb">
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
             <?php endif; ?>
         </div>
 
         
-        <div class="text-center mt-8">
-            <a href="https://wa.me/?text=<?php echo e(urlencode('مرحبا، أنا مهتم بالإعلان: ' . $ad->title . ' على موقع Delni.co. الرابط: ' . url()->current())); ?>"
-               target="_blank"
-               class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow transition">
-                📲 <?php echo e(__('messages.contact_on_whatsapp')); ?>
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 mb-3"><i class="fas fa-bullhorn"></i> <?php echo e($ad->title); ?></h1>
+            <p class="text-gray-500 mb-2"><i class="fas fa-map-marker-alt text-red-500"></i> <?php echo e($ad->city); ?></p>
+            <p class="text-red-600 text-xl font-bold mb-4"><i class="fas fa-dollar-sign"></i> <?php echo e(number_format($ad->price)); ?> <?php echo e(__('messages.currency')); ?></p>
 
-            </a>
-        </div>
+            
+            <?php if($ad->is_featured): ?>
+                <span class="inline-block bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full mb-4">
+                    <i class="fas fa-star"></i> <?php echo e(__('messages.featured')); ?>
 
-        
-        <?php if($ad->lat && $ad->lng): ?>
-            <div class="mt-16">
-                <h2 class="text-2xl font-bold text-yellow-600 mb-4 text-center">📍 <?php echo e(__('messages.ad_location')); ?></h2>
-                <div id="adMap" class="w-full h-[400px] rounded-lg shadow"></div>
+                </span>
+            <?php endif; ?>
+
+            
+            <div x-data="{ tab: 'details' }" class="mt-4">
+                <div class="flex gap-6 border-b mb-4">
+                    <button @click="tab='details'" :class="tab==='details' ? 'border-b-2 border-yellow-500 font-bold text-yellow-600' : ''" class="pb-2 flex items-center gap-1">
+                        <i class="fas fa-info-circle"></i> <?php echo e(__('messages.details')); ?>
+
+                    </button>
+                    <button @click="tab='description'" :class="tab==='description' ? 'border-b-2 border-yellow-500 font-bold text-yellow-600' : ''" class="pb-2 flex items-center gap-1">
+                        <i class="fas fa-align-left"></i> <?php echo e(__('messages.description')); ?>
+
+                    </button>
+                    <button @click="tab='map'" :class="tab==='map' ? 'border-b-2 border-yellow-500 font-bold text-yellow-600' : ''" class="pb-2 flex items-center gap-1">
+                        <i class="fas fa-map"></i> <?php echo e(__('messages.location')); ?>
+
+                    </button>
+                </div>
+
+                
+                <div x-show="tab==='details'" class="space-y-4">
+                    <?php if($ad->category === 'عقارات' || $ad->category === 'realestate'): ?>
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <h2 class="text-lg font-bold mb-4"><i class="fas fa-home"></i> <?php echo e(__('messages.real_estate_details')); ?></h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <p><i class="fas fa-tag text-gray-500"></i> <?php echo e(__('messages.subcategory')); ?>: <?php echo e($ad->subcategory ?? '-'); ?></p>
+                                <p><i class="fas fa-bed text-gray-500"></i> <?php echo e(__('messages.rooms')); ?>: <?php echo e($ad->rooms ?? '-'); ?></p>
+                                <p><i class="fas fa-bath text-gray-500"></i> <?php echo e(__('messages.bathrooms')); ?>: <?php echo e($ad->bathrooms ?? '-'); ?></p>
+                                <p><i class="fas fa-ruler-combined text-gray-500"></i> <?php echo e(__('messages.area')); ?>: <?php echo e($ad->area ?? '-'); ?> م²</p>
+                                <p><i class="fas fa-building text-gray-500"></i> <?php echo e(__('messages.floor')); ?>: <?php echo e($ad->floor ?? '-'); ?></p>
+                                <p><i class="fas fa-industry text-gray-500"></i> <?php echo e(__('messages.building_age')); ?>: <?php echo e($ad->building_age ?? '-'); ?></p>
+                                <p><i class="fas fa-elevator text-gray-500"></i> <?php echo e(__('messages.elevator')); ?>: <?php echo e($ad->has_elevator ? __('messages.yes') : __('messages.no')); ?></p>
+                                <p><i class="fas fa-parking text-gray-500"></i> <?php echo e(__('messages.parking')); ?>: <?php echo e($ad->has_parking ? __('messages.yes') : __('messages.no')); ?></p>
+                                <p><i class="fas fa-fire text-gray-500"></i> <?php echo e(__('messages.heating')); ?>: <?php echo e($ad->heating_type ?? '-'); ?></p>
+                            </div>
+                        </div>
+
+                    <?php elseif($ad->category === 'سيارات' || $ad->category === 'cars'): ?>
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <h2 class="text-lg font-bold mb-4"><i class="fas fa-car"></i> <?php echo e(__('messages.car_details')); ?></h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <p><i class="fas fa-car-side text-gray-500"></i> <?php echo e(__('messages.car_model')); ?>: <?php echo e($ad->car_model ?? '-'); ?></p>
+                                <p><i class="fas fa-calendar-alt text-gray-500"></i> <?php echo e(__('messages.car_year')); ?>: <?php echo e($ad->car_year ?? '-'); ?></p>
+                                <p><i class="fas fa-tachometer-alt text-gray-500"></i> <?php echo e(__('messages.car_km')); ?>: <?php echo e($ad->car_km ?? '-'); ?> كم</p>
+                                <p><i class="fas fa-gas-pump text-gray-500"></i> <?php echo e(__('messages.fuel')); ?>: <?php echo e($ad->fuel ?? '-'); ?></p>
+                                <p><i class="fas fa-cogs text-gray-500"></i> <?php echo e(__('messages.gearbox')); ?>: <?php echo e($ad->gearbox ?? '-'); ?></p>
+                                <p><i class="fas fa-palette text-gray-500"></i> <?php echo e(__('messages.color')); ?>: <?php echo e($ad->car_color ?? '-'); ?></p>
+                                <p><i class="fas fa-check-circle text-gray-500"></i> <?php echo e(__('messages.condition')); ?>: <?php echo e($ad->is_new ? __('messages.new') : __('messages.used')); ?></p>
+                            </div>
+                        </div>
+
+                    <?php elseif($ad->category === 'خدمات' || $ad->category === 'services'): ?>
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <h2 class="text-lg font-bold mb-4"><i class="fas fa-tools"></i> <?php echo e(__('messages.service_details')); ?></h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <p><i class="fas fa-wrench text-gray-500"></i> <?php echo e(__('messages.service_type')); ?>: <?php echo e($ad->service_type ?? '-'); ?></p>
+                                <p><i class="fas fa-user-tie text-gray-500"></i> <?php echo e(__('messages.provider_name')); ?>: <?php echo e($ad->provider_name ?? '-'); ?></p>
+                            </div>
+                        </div>
+
+                    <?php else: ?>
+                        <p><i class="fas fa-folder-open text-gray-500"></i> <?php echo e($ad->category); ?></p>
+                    <?php endif; ?>
+                </div>
+
+                
+                <div x-show="tab==='description'" class="text-gray-700 leading-relaxed">
+                    <?php echo e($ad->description ?: __('messages.no_description')); ?>
+
+                </div>
+
+                
+                <div x-show="tab==='map'" class="mt-4">
+                  <div id="map" class="w-full h-[400px] md:h-[500px] rounded-lg shadow"></div>
+                </div>
             </div>
 
             
-            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            <div class="flex gap-3 mt-6">
+                <a href="tel:+963988779548" class="btn-yellow bg-green-500 hover:bg-green-600">
+                    <i class="fas fa-phone"></i> <?php echo e(__('messages.call')); ?>
 
-            <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    const map = L.map('adMap').setView([<?php echo e($ad->lat); ?>, <?php echo e($ad->lng); ?>], 15);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; Delni.co'
-                    }).addTo(map);
-                    const marker = L.marker([<?php echo e($ad->lat); ?>, <?php echo e($ad->lng); ?>]).addTo(map);
-                    marker.bindPopup(`
-                        <strong><?php echo e($ad->title); ?></strong><br>
-                        📍 <?php echo e($ad->city); ?><br>
-                        💰 <?php echo e(number_format($ad->price)); ?> <?php echo e(__('messages.currency')); ?>
+                </a>
+                <form method="POST" action="<?php echo e(route('ads.favorite', $ad->id)); ?>">
+                    <?php echo csrf_field(); ?>
+                    <button type="submit" class="btn-yellow bg-yellow-500 hover:bg-yellow-600">
+                        <i class="fas fa-heart"></i> <?php echo e(__('messages.add_to_favorite')); ?>
 
-                    `);
-                });
-            </script>
-        <?php endif; ?>
-
-        
-        <?php if($relatedAds->count()): ?>
-            <div class="mt-20">
-                <h2 class="text-2xl font-bold text-yellow-600 mb-6 text-center">🧭 <?php echo e(__('messages.related_ads')); ?></h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    <?php $__currentLoopData = $relatedAds; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $related): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <?php
-                            $images = is_array($related->images) ? $related->images : json_decode($related->images, true);
-                        ?>
-                        <a href="<?php echo e(route('ads.show', $related->id)); ?>"
-                           class="block bg-white rounded-xl shadow hover:shadow-xl overflow-hidden transition duration-300">
-                            <img src="<?php echo e(asset('storage/' . ($images[0] ?? 'placeholder.png'))); ?>"
-                                 alt="Ad Image" class="w-full h-48 object-cover">
-                            <div class="p-4">
-                                <h3 class="font-bold text-base truncate mb-1"><?php echo e($related->title); ?></h3>
-                                <p class="text-gray-600 text-sm">📍 <?php echo e($related->city); ?></p>
-                                <p class="text-yellow-600 font-bold text-sm mt-2">💰 <?php echo e(number_format($related->price)); ?> <?php echo e(__('messages.currency')); ?></p>
-                            </div>
-                        </a>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </div>
+                    </button>
+                </form>
             </div>
-        <?php endif; ?>
-
+        </div>
     </div>
+
+    
+    <div class="mt-12">
+        <h2 class="text-xl font-bold mb-4"><i class="fas fa-search"></i> <?php echo e(__('messages.related_ads')); ?></h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <?php $__currentLoopData = $relatedAds; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php
+                    $imgs = is_array($item->images) ? $item->images : json_decode($item->images, true);
+                    $img  = !empty($imgs[0]) ? asset('storage/'.$imgs[0]) : asset('storage/placeholder.png');
+                ?>
+                <a href="<?php echo e(route('ads.show', $item->id)); ?>" class="block bg-white rounded-xl shadow hover:shadow-lg overflow-hidden">
+                    <img src="<?php echo e($img); ?>" class="w-full h-40 object-cover" alt="related">
+                    <div class="p-3">
+                        <h3 class="font-bold truncate"><?php echo e($item->title); ?></h3>
+                        <p class="text-sm text-gray-500"><i class="fas fa-map-marker-alt"></i> <?php echo e($item->city); ?></p>
+                        <p class="text-red-600 font-bold text-sm"><i class="fas fa-dollar-sign"></i> <?php echo e(number_format($item->price)); ?> <?php echo e(__('messages.currency')); ?></p>
+                    </div>
+                </a>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+    </div>
+
+</div>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const lat = <?php echo e($ad->lat ?? 33.5138); ?>;
+        const lng = <?php echo e($ad->lng ?? 36.2765); ?>;
+        const map = L.map('map').setView([lat, lng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; Delni.co'
+        }).addTo(map);
+        L.marker([lat, lng]).addTo(map).bindPopup("<?php echo e($ad->title); ?>");
+    });
+</script>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal66d7cfd03cd343304d81fe1e21646540)): ?>
-<?php $attributes = $__attributesOriginal66d7cfd03cd343304d81fe1e21646540; ?>
-<?php unset($__attributesOriginal66d7cfd03cd343304d81fe1e21646540); ?>
+<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal66d7cfd03cd343304d81fe1e21646540)): ?>
-<?php $component = $__componentOriginal66d7cfd03cd343304d81fe1e21646540; ?>
-<?php unset($__componentOriginal66d7cfd03cd343304d81fe1e21646540); ?>
+<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
 <?php endif; ?>
 <?php /**PATH /home/delni_user/delni/resources/views/ads/show.blade.php ENDPATH**/ ?>

@@ -1,18 +1,22 @@
-{{-- layouts/admin.blade.php --}}
+{{-- resources/views/layouts/admin.blade.php --}}
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة تحكم المشرف - @yield('title')</title>
+    <title>{{ __('messages.admin_panel') }} - @yield('title', config('app.name', 'Delni.co'))</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    @vite('resources/css/app.css')
-</head>
-<body class="bg-gray-100 font-sans">
 
-    {{-- ✅ الهيدر --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="//unpkg.com/alpinejs" defer></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
+    <style> body { font-family: 'Cairo', sans-serif; } </style>
+</head>
+<body class="bg-gray-100 font-sans antialiased">
+
     <header class="bg-white shadow py-4 px-6 flex justify-between items-center border-b">
         <div class="text-xl font-bold text-yellow-600">
-            🛠️ لوحة المشرف
+            🛠️ {{ __('messages.admin_panel') }}
         </div>
 
         <div class="flex items-center gap-6">
@@ -28,20 +32,23 @@
             </a>
 
             {{-- 🏠 الصفحة الرئيسية --}}
-            <a href="{{ route('home') }}" class="text-sm text-gray-600 hover:text-yellow-600 font-semibold">🏠 الموقع</a>
+            <a href="{{ route('home') }}" class="text-sm text-gray-600 hover:text-yellow-600 font-semibold">
+                🏠 {{ __('messages.home') }}
+            </a>
 
             {{-- 🚪 تسجيل الخروج --}}
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button class="text-sm text-red-600 hover:underline">🚪 خروج</button>
+                <button class="text-sm text-red-600 hover:underline">🚪 {{ __('messages.logout') }}</button>
             </form>
         </div>
     </header>
 
-    {{-- ✅ محتوى الصفحة --}}
-    <main class="p-6">
-        @yield('content')
-    </main>
+    <main class="p-6">@yield('content')</main>
+
+    <footer class="bg-white shadow-inner text-center py-4 text-sm text-gray-500 mt-10">
+        © {{ date('Y') }} Delni.co - {{ __('messages.admin_panel') }}
+    </footer>
 
 </body>
 </html>

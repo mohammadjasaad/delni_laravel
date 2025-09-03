@@ -1,35 +1,43 @@
 <x-guest-layout>
-    <div class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-        <div class="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+    <div class="flex justify-center items-center min-h-screen bg-gray-100 px-4">
+        <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
 
-            <h1 class="text-2xl font-bold text-center text-yellow-600 mb-6">
-                {{ __('messages.verify_email') }}
+            <!-- 🖼️ شعار -->
+            <div class="flex justify-center mb-6">
+                <img src="{{ asset('images/delnilogo.png') }}" alt="Delni Logo" class="w-24 h-24">
+            </div>
+
+            <!-- ✉️ العنوان -->
+            <h1 class="text-3xl font-extrabold text-center text-gray-800 mb-4">
+                ✉️ {{ __('messages.verify_email_title') }}
             </h1>
 
-            @if (session('status') === 'verification-link-sent')
-                <div class="mb-4 text-green-600 text-sm text-center font-semibold">
-                    {{ __('messages.verification_link_sent') }}
+            <!-- 📝 الوصف -->
+            <p class="text-gray-600 text-sm text-center mb-6 leading-relaxed">
+                {{ __('messages.verify_email_message') }}
+            </p>
+
+            <!-- ✅ إشعار نجاح عند إعادة إرسال الرابط -->
+            @if (session('status') == 'verification-link-sent')
+                <div class="bg-green-100 text-green-800 px-4 py-3 rounded-lg mb-4 text-sm text-center shadow">
+                    ✅ {{ __('messages.verification_link_sent') }}
                 </div>
             @endif
 
-            <p class="text-gray-600 text-sm text-center mb-6 leading-relaxed">
-                {{ __('messages.verify_email_instruction') }}
-            </p>
-
-            <form method="POST" action="{{ route('verification.send') }}">
+            <!-- 🔁 إعادة إرسال رابط التفعيل -->
+            <form method="POST" action="{{ route('verification.send') }}" class="mb-4">
                 @csrf
-                <div class="flex items-center justify-center">
-                    <x-button class="bg-yellow-500 hover:bg-yellow-600">
-                        {{ __('messages.resend_verification_email') }}
-                    </x-button>
-                </div>
+                <x-button class="w-full justify-center bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-lg shadow-md">
+                    {{ __('messages.resend_verification_email') }}
+                </x-button>
             </form>
 
-            <form method="POST" action="{{ route('logout') }}" class="mt-4 text-center">
+            <!-- 🔙 تسجيل الخروج -->
+            <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="text-sm text-gray-500 underline hover:text-gray-700">
+                <x-button class="w-full justify-center bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg shadow-md">
                     {{ __('messages.logout') }}
-                </button>
+                </x-button>
             </form>
 
         </div>

@@ -1,5 +1,5 @@
 {{-- resources/views/admin/emergency_reports/dashboard.blade.php --}}
-<x-app-layout>
+<x-app-layout :isAdmin="true">
     <div class="max-w-7xl mx-auto py-10 px-4">
         <h1 class="text-3xl font-bold text-yellow-600 mb-8 text-center">📊 لوحة إحصائيات الطوارئ</h1>
 
