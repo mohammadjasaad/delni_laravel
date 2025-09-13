@@ -59,15 +59,15 @@ Route::prefix('ads')->group(function () {
     # 🗺️ بيانات الإعلانات للخريطة (لازم قبل {id})
     Route::get('/map-data', [AdController::class, 'mapData'])->name('ads.mapData');
 
-    # 👁️ عرض إعلان
-    Route::get('/{id}', [AdController::class, 'show'])->name('ads.show');
+# 👁️ عرض إعلان (بالـ slug)
+Route::get('/{slug}', [AdController::class, 'show'])->name('ads.show');
 
-    # ❤️ المفضلة
-    Route::post('/{id}/favorite', [AdController::class, 'addFavorite'])->middleware('auth')->name('ads.favorite');
-    Route::delete('/{id}/unfavorite', [AdController::class, 'removeFavorite'])->middleware('auth')->name('ads.unfavorite');
+# ❤️ المفضلة
+Route::post('/{slug}/favorite', [AdController::class, 'addFavorite'])->middleware('auth')->name('ads.favorite');
+Route::delete('/{slug}/unfavorite', [AdController::class, 'removeFavorite'])->middleware('auth')->name('ads.unfavorite');
 
-    # 🚨 بلاغ عن إعلان
-    Route::post('/{id}/report', [ReportController::class, 'store'])->middleware('auth')->name('ads.report');
+# 🚨 بلاغ عن إعلان
+Route::post('/{slug}/report', [ReportController::class, 'store'])->middleware('auth')->name('ads.report');
 });
 
 # ------------------ 🚨 خدمات الطوارئ ------------------
@@ -153,6 +153,8 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
     Route::get('/ads/{id}/edit', [AdController::class, 'edit'])->name('dashboard.ads.edit');
     Route::put('/ads/{id}', [AdController::class, 'update'])->name('dashboard.ads.update');
     Route::delete('/ads/{id}', [AdController::class, 'destroy'])->name('dashboard.ads.destroy');
+    // 🧑 عرض إعلانات مستخدم محدد
+    Route::get('/user/{id}/ads', [App\Http\Controllers\UserController::class, 'ads'])->name('user.ads');
 
     # ⭐ التمييز
     Route::post('/ads/{id}/feature', [AdController::class, 'makeFeatured'])->name('dashboard.ads.feature');

@@ -19,17 +19,49 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        <div>
-            <img src="<?php echo e($mainImage); ?>" class="w-full h-96 object-cover rounded-xl shadow" alt="ad">
-            <?php if($images && count($images) > 1): ?>
-                <div class="flex gap-2 mt-3 overflow-x-auto">
-                    <?php $__currentLoopData = array_slice($images,1); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $img): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <img src="<?php echo e(asset('storage/'.$img)); ?>" 
-                             class="w-28 h-20 object-cover rounded border hover:scale-105 transition" alt="thumb">
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </div>
-            <?php endif; ?>
+
+<div x-data="{ mainImage: '<?php echo e($mainImage); ?>' }">
+    <a :href="mainImage" data-lightbox="ad-main" data-title="<?php echo e($ad->title); ?>">
+        <img :src="mainImage" class="w-full h-96 object-cover rounded-xl shadow cursor-pointer" alt="ad">
+    </a>
+
+    
+    <?php if($images && count($images) > 1): ?>
+        <div class="flex gap-2 mt-3 overflow-x-auto">
+            <?php $__currentLoopData = $images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $img): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <img src="<?php echo e(asset('storage/'.$img)); ?>"
+                     class="w-28 h-20 object-cover rounded border hover:scale-105 transition cursor-pointer"
+                     alt="thumb"
+                     @click="mainImage='<?php echo e(asset('storage/'.$img)); ?>'">
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
+    <?php endif; ?>
+</div>
+
+<div class="bg-white shadow rounded-xl p-6 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+    
+    <div class="flex items-center gap-4">
+        <img src="<?php echo e($ad->user->avatar ? asset('storage/'.$ad->user->avatar) : asset('images/default-user.png')); ?>" 
+             alt="avatar" class="w-16 h-16 rounded-full object-cover border">
+        <div>
+            <h2 class="font-bold text-lg"><?php echo e($ad->user->name); ?></h2>
+            <p class="text-gray-600 flex items-center gap-1">
+                <i class="fas fa-phone text-green-500"></i> <?php echo e($ad->user->phone ?? 'غير متوفر'); ?>
+
+            </p>
+            <p class="text-sm text-gray-500 flex items-center gap-1">
+                <i class="fas fa-bullhorn text-yellow-500"></i> <?php echo e($ad->user->ads()->count()); ?> إعلان
+            </p>
+        </div>
+    </div>
+
+    
+    <a href="<?php echo e(route('user.ads', $ad->user->id)); ?>" 
+       class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg shadow w-full sm:w-auto text-center">
+        <i class="fas fa-list"></i> <?php echo e(__('messages.view_all_ads')); ?>
+
+    </a>
+</div>
 
         
         <div>
@@ -120,22 +152,45 @@
                 </div>
             </div>
 
-            
-            <div class="flex gap-3 mt-6">
-                <a href="tel:+963988779548" class="btn-yellow bg-green-500 hover:bg-green-600">
-                    <i class="fas fa-phone"></i> <?php echo e(__('messages.call')); ?>
 
-                </a>
-                <form method="POST" action="<?php echo e(route('ads.favorite', $ad->id)); ?>">
-                    <?php echo csrf_field(); ?>
-                    <button type="submit" class="btn-yellow bg-yellow-500 hover:bg-yellow-600">
-                        <i class="fas fa-heart"></i> <?php echo e(__('messages.add_to_favorite')); ?>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
+    
+    <a href="tel:<?php echo e($ad->user->phone ?? ''); ?>" 
+       class="btn-yellow bg-green-500 hover:bg-green-600 w-full text-center">
+        <i class="fas fa-phone"></i> <?php echo e(__('messages.call')); ?>
 
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+    </a>
+    
+    <form method="POST" action="<?php echo e(route('ads.favorite', $ad->id)); ?>" class="w-full">
+        <?php echo csrf_field(); ?>
+        <button type="submit" class="btn-yellow bg-yellow-500 hover:bg-yellow-600 w-full text-center">
+            <i class="fas fa-heart"></i> <?php echo e(__('messages.add_to_favorite')); ?>
+
+        </button>
+    </form>
+
+
+    <button onclick="shareAd('<?php echo e(route('ads.show', $ad->slug)); ?>')" 
+            class="btn-yellow bg-yellow-500 hover:bg-yellow-600 w-full text-center">
+        <i class="fas fa-share-alt"></i> <?php echo e(__('messages.share')); ?>
+
+    </button>
+</div>
+
+<script>
+function shareAd(url) {
+    if (navigator.share) {
+        navigator.share({
+            title: document.title,
+            text: 'شاهد هذا الإعلان على Delni.co',
+            url: url,
+        }).catch(err => console.log(err));
+    } else {
+        navigator.clipboard.writeText(url);
+        alert("تم نسخ رابط الإعلان ✅");
+    }
+}
+</script>
 
     
     <div class="mt-12">
@@ -174,7 +229,23 @@
         }).addTo(map);
         L.marker([lat, lng]).addTo(map).bindPopup("<?php echo e($ad->title); ?>");
     });
+    // 📤 مشاركة الإعلان
+function shareAd(url) {
+    if (navigator.share) {
+        navigator.share({
+            title: "<?php echo e($ad->title); ?>", // 🔹 عنوان الإعلان
+            text: "شاهد هذا الإعلان على Delni.co 👇", // 🔹 نص المشاركة
+            url: url, // 🔹 رابط الإعلان نفسه
+        }).catch(err => console.log("❌ خطأ بالمشاركة:", err));
+    } else {
+        navigator.clipboard.writeText(url);
+        alert("✅ تم نسخ رابط الإعلان لمشاركته");
+    }
+}
 </script>
+<!-- ✅ Lightbox2 -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>

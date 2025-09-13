@@ -135,75 +135,54 @@
         <div id="adsMap" class="w-full h-[400px] rounded-lg shadow"></div>
     </div>
 
-    {{-- 🖼️ عرض الإعلانات --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        @forelse($ads as $ad)
-            @php
-                $images = is_array($ad->images) ? $ad->images : json_decode($ad->images, true);
-                $firstImage = !empty($images[0]) ? asset('storage/'.$images[0]) : asset('storage/placeholder.png');
-            @endphp
-<div class="ad-card relative {{ $ad->is_featured ? 'border-yellow-400':'border-gray-200 dark:border-gray-700' }}">
-    {{-- ⭐ إعلان مميز --}}
-    @if($ad->is_featured)
-        <span class="badge-featured"><i class="fas fa-star"></i></span>
+{{-- 🖼️ عرض الإعلانات --}}
+<div id="adsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    @include('ads.partials.list', ['ads' => $ads])
+</div>
+
+
+{{-- 🔄 زر تحميل المزيد --}}
+<div class="mt-10 text-center">
+    @if ($ads->hasMorePages())
+        <button id="loadMore" 
+                data-next-page="{{ $ads->currentPage() + 1 }}" 
+                class="btn-yellow px-6 py-3">
+            <i class="fas fa-sync-alt"></i> {{ __('messages.load_more') }}
+        </button>
     @endif
-
-    {{-- ❤️ زر المفضلة --}}
-    <div class="absolute top-2 left-2 z-10">
-        @auth
-            @if(auth()->user()->favorites->contains($ad->id))
-                {{-- إذا الإعلان موجود بالمفضلة --}}
-                <form action="{{ route('ads.unfavorite', $ad->id) }}" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="text-red-600 hover:text-gray-400 transition">
-                        <i class="fas fa-heart fa-lg"></i>
-                    </button>
-                </form>
-            @else
-                {{-- إذا الإعلان غير موجود بالمفضلة --}}
-                <form action="{{ route('ads.favorite', $ad->id) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="text-gray-400 hover:text-red-600 transition">
-                        <i class="far fa-heart fa-lg"></i>
-                    </button>
-                </form>
-            @endif
-        @endauth
-    </div>
-
-    {{-- صورة الإعلان --}}
-    <a href="{{ route('ads.show', $ad->id) }}">
-        <img src="{{ $firstImage }}" class="w-full h-48 object-cover rounded-t-xl" alt="ad">
-    </a>
-
-    {{-- تفاصيل الإعلان --}}
-    <div class="p-4 flex flex-col justify-between flex-1">
-        <h2 class="font-bold text-base truncate text-gray-900 dark:text-white">{{ $ad->title }}</h2>
-        <p class="text-gray-500 dark:text-gray-400 text-sm">
-            <i class="fas fa-map-marker-alt text-red-500"></i> {{ $ad->city }}
-        </p>
-        <p class="text-red-600 font-bold text-sm mt-1">
-            <i class="fas fa-dollar-sign"></i> {{ number_format($ad->price) }} {{ __('messages.currency') }}
-        </p>
-        <a href="{{ route('ads.show', $ad->id) }}" class="block mt-3 text-center btn-yellow">
-            <i class="fas fa-eye"></i> {{ __('messages.view_ad') }}
-        </a>
-    </div>
 </div>
 
-        @empty
-            <p class="text-center col-span-4 text-gray-500 mt-8">
-                <i class="fas fa-exclamation-circle"></i> {{ __('messages.no_ads_found') }}
-            </p>
-        @endforelse
-    </div>
+{{-- ✅ منطقة لإضافة المزيد من الإعلانات --}}
+<div id="adsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8"></div>
 
-    {{-- 📄 روابط التصفح --}}
-    <div class="mt-10">
-        {{ $ads->links() }}
-    </div>
-</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const loadMoreBtn = document.getElementById("loadMore");
+    const adsContainer = document.getElementById("adsContainer");
+
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener("click", function () {
+            let nextPage = this.getAttribute("data-next-page");
+            let url = "{{ route('ads.index') }}" + "?page=" + nextPage + "&{!! http_build_query(request()->except('page')) !!}";
+
+            fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+                .then(res => res.text())
+                .then(data => {
+                    adsContainer.insertAdjacentHTML("beforeend", data);
+
+                    // تحديث رقم الصفحة
+                    this.setAttribute("data-next-page", parseInt(nextPage) + 1);
+
+                    // إذا خلصت الصفحات -> أخفي الزر
+                    if (data.trim() === "") {
+                        this.remove();
+                    }
+                })
+                .catch(err => console.error("⚠️ خطأ في تحميل المزيد:", err));
+        });
+    }
+});
+</script>
 
 {{-- ✅ Leaflet --}}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -232,7 +211,7 @@
                             <strong>${ad.title}</strong><br>
                             <i class='fas fa-map-marker-alt text-red-500'></i> ${ad.city}<br>
                             <i class='fas fa-dollar-sign text-green-600'></i> ${ad.price} {{ __('messages.currency') }}<br>
-                            <a href="/ads/${ad.id}" class="text-blue-600 underline">
+                            <a href="/ads/${ad.slug}" class="text-blue-600 underline">
                                 <i class='fas fa-eye'></i> {{ __('messages.view_ad') }}
                             </a>
                         `;

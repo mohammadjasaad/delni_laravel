@@ -29,7 +29,7 @@ return [
 'confirm_password' => 'Confirm Password',
 'upload_multiple_images' => 'Upload Multiple Images ',
 'select_location_on_map' => ' Select Location on Map',
-
+    'share' => 'Share',
 'favorite_ads' => 'Favorite Ads',
     'total_ads'         => 'Total Ads',
     'my_featured_ads'   => 'My Featured Ads',
@@ -42,7 +42,7 @@ return [
     'admin'            => 'Admin 👨‍💻',
     'registered_since' => 'Registered Since 📅',
     'latest_visitors'  => 'Latest Visitors ',
-
+'view_all_ads' => 'View all ads',
     'drivers_count'    => 'Drivers Count ',
     'tickets_total'    => 'Total Tickets ',
 'price_high' => 'Highest Price',
@@ -51,6 +51,7 @@ return [
 
 'taxi_orders'        => 'Taxi Orders',
 'no_taxi_orders'     => 'No taxi orders yet',
+'load_more' => 'Load More',
 
 'emergency_reports'  => 'Emergency Reports',
 'no_emergency_reports' => 'No emergency reports yet',

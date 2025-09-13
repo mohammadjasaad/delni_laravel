@@ -154,80 +154,55 @@
         <div id="adsMap" class="w-full h-[400px] rounded-lg shadow"></div>
     </div>
 
-    
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <?php $__empty_1 = true; $__currentLoopData = $ads; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ad): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            <?php
-                $images = is_array($ad->images) ? $ad->images : json_decode($ad->images, true);
-                $firstImage = !empty($images[0]) ? asset('storage/'.$images[0]) : asset('storage/placeholder.png');
-            ?>
-<div class="ad-card relative <?php echo e($ad->is_featured ? 'border-yellow-400':'border-gray-200 dark:border-gray-700'); ?>">
-    
-    <?php if($ad->is_featured): ?>
-        <span class="badge-featured"><i class="fas fa-star"></i></span>
+
+<div id="adsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <?php echo $__env->make('ads.partials.list', ['ads' => $ads], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+</div>
+
+
+
+<div class="mt-10 text-center">
+    <?php if($ads->hasMorePages()): ?>
+        <button id="loadMore" 
+                data-next-page="<?php echo e($ads->currentPage() + 1); ?>" 
+                class="btn-yellow px-6 py-3">
+            <i class="fas fa-sync-alt"></i> <?php echo e(__('messages.load_more')); ?>
+
+        </button>
     <?php endif; ?>
-
-    
-    <div class="absolute top-2 left-2 z-10">
-        <?php if(auth()->guard()->check()): ?>
-            <?php if(auth()->user()->favorites->contains($ad->id)): ?>
-                
-                <form action="<?php echo e(route('ads.unfavorite', $ad->id)); ?>" method="POST">
-                    <?php echo csrf_field(); ?>
-                    <?php echo method_field('DELETE'); ?>
-                    <button type="submit" class="text-red-600 hover:text-gray-400 transition">
-                        <i class="fas fa-heart fa-lg"></i>
-                    </button>
-                </form>
-            <?php else: ?>
-                
-                <form action="<?php echo e(route('ads.favorite', $ad->id)); ?>" method="POST">
-                    <?php echo csrf_field(); ?>
-                    <button type="submit" class="text-gray-400 hover:text-red-600 transition">
-                        <i class="far fa-heart fa-lg"></i>
-                    </button>
-                </form>
-            <?php endif; ?>
-        <?php endif; ?>
-    </div>
-
-    
-    <a href="<?php echo e(route('ads.show', $ad->id)); ?>">
-        <img src="<?php echo e($firstImage); ?>" class="w-full h-48 object-cover rounded-t-xl" alt="ad">
-    </a>
-
-    
-    <div class="p-4 flex flex-col justify-between flex-1">
-        <h2 class="font-bold text-base truncate text-gray-900 dark:text-white"><?php echo e($ad->title); ?></h2>
-        <p class="text-gray-500 dark:text-gray-400 text-sm">
-            <i class="fas fa-map-marker-alt text-red-500"></i> <?php echo e($ad->city); ?>
-
-        </p>
-        <p class="text-red-600 font-bold text-sm mt-1">
-            <i class="fas fa-dollar-sign"></i> <?php echo e(number_format($ad->price)); ?> <?php echo e(__('messages.currency')); ?>
-
-        </p>
-        <a href="<?php echo e(route('ads.show', $ad->id)); ?>" class="block mt-3 text-center btn-yellow">
-            <i class="fas fa-eye"></i> <?php echo e(__('messages.view_ad')); ?>
-
-        </a>
-    </div>
 </div>
 
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-            <p class="text-center col-span-4 text-gray-500 mt-8">
-                <i class="fas fa-exclamation-circle"></i> <?php echo e(__('messages.no_ads_found')); ?>
 
-            </p>
-        <?php endif; ?>
-    </div>
+<div id="adsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8"></div>
 
-    
-    <div class="mt-10">
-        <?php echo e($ads->links()); ?>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const loadMoreBtn = document.getElementById("loadMore");
+    const adsContainer = document.getElementById("adsContainer");
 
-    </div>
-</div>
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener("click", function () {
+            let nextPage = this.getAttribute("data-next-page");
+            let url = "<?php echo e(route('ads.index')); ?>" + "?page=" + nextPage + "&<?php echo http_build_query(request()->except('page')); ?>";
+
+            fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+                .then(res => res.text())
+                .then(data => {
+                    adsContainer.insertAdjacentHTML("beforeend", data);
+
+                    // تحديث رقم الصفحة
+                    this.setAttribute("data-next-page", parseInt(nextPage) + 1);
+
+                    // إذا خلصت الصفحات -> أخفي الزر
+                    if (data.trim() === "") {
+                        this.remove();
+                    }
+                })
+                .catch(err => console.error("⚠️ خطأ في تحميل المزيد:", err));
+        });
+    }
+});
+</script>
 
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -256,7 +231,7 @@
                             <strong>${ad.title}</strong><br>
                             <i class='fas fa-map-marker-alt text-red-500'></i> ${ad.city}<br>
                             <i class='fas fa-dollar-sign text-green-600'></i> ${ad.price} <?php echo e(__('messages.currency')); ?><br>
-                            <a href="/ads/${ad.id}" class="text-blue-600 underline">
+                            <a href="/ads/${ad.slug}" class="text-blue-600 underline">
                                 <i class='fas fa-eye'></i> <?php echo e(__('messages.view_ad')); ?>
 
                             </a>

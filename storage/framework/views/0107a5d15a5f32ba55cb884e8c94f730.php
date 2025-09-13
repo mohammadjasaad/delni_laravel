@@ -141,7 +141,7 @@
                 <?php endif; ?>
 
                 
-                <a href="<?php echo e(route('ads.show', $ad->id)); ?>">
+                    <a href="<?php echo e(route('ads.show', $ad->slug)); ?>">
                     <img src="<?php echo e(asset('storage/'.$firstImage)); ?>" 
                          onerror="this.onerror=null;this.src='<?php echo e(asset('storage/placeholder.png')); ?>';"
                          class="w-full h-40 object-cover rounded-t-xl" alt="ad">

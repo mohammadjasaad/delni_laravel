@@ -40,4 +40,13 @@ public function index(Request $request)
 
         return redirect()->route('dashboard.users.index')->with('success', '✔️ تم ترقية المستخدم إلى مشرف بنجاح.');
     }
+// ✅ عرض جميع إعلانات مستخدم
+public function ads($id)
+{
+    $user = User::findOrFail($id);
+    $ads = $user->ads()->orderBy('created_at', 'desc')->paginate(12);
+
+    return view('users.ads', compact('user', 'ads'));
+}
+
 }

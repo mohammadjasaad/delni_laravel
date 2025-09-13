@@ -40,9 +40,12 @@ return [
 'favorite_ads' => 'الإعلانات المفضلة',
 'user' => 'المستخدم',
 'phone' => 'رقم الموبايل',
-
+    'share' => 'مشاركة',
 'taxi_orders'        => 'طلبات التاكسي',
 'no_taxi_orders'     => 'لا توجد طلبات تاكسي حتى الآن',
+'load_more' => 'تحميل المزيد',
+
+'view_all_ads' => 'الإعلانات',
 
 'emergency_reports'  => 'بلاغات الطوارئ',
 'no_emergency_reports' => 'لا توجد بلاغات طوارئ حتى الآن',

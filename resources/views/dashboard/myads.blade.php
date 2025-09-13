@@ -121,7 +121,7 @@
                 @endif
 
                 {{-- صورة --}}
-                <a href="{{ route('ads.show', $ad->id) }}">
+                    <a href="{{ route('ads.show', $ad->slug) }}">
                     <img src="{{ asset('storage/'.$firstImage) }}" 
                          onerror="this.onerror=null;this.src='{{ asset('storage/placeholder.png') }}';"
                          class="w-full h-40 object-cover rounded-t-xl" alt="ad">

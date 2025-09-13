@@ -10,17 +10,47 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {{-- 🖼️ الصورة الرئيسية + الصور الإضافية --}}
-        <div>
-            <img src="{{ $mainImage }}" class="w-full h-96 object-cover rounded-xl shadow" alt="ad">
-            @if($images && count($images) > 1)
-                <div class="flex gap-2 mt-3 overflow-x-auto">
-                    @foreach(array_slice($images,1) as $img)
-                        <img src="{{ asset('storage/'.$img) }}" 
-                             class="w-28 h-20 object-cover rounded border hover:scale-105 transition" alt="thumb">
-                    @endforeach
-                </div>
-            @endif
+{{-- 🖼️ الصورة الرئيسية --}}
+<div x-data="{ mainImage: '{{ $mainImage }}' }">
+    <a :href="mainImage" data-lightbox="ad-main" data-title="{{ $ad->title }}">
+        <img :src="mainImage" class="w-full h-96 object-cover rounded-xl shadow cursor-pointer" alt="ad">
+    </a>
+
+    {{-- 📸 الصور الإضافية --}}
+    @if($images && count($images) > 1)
+        <div class="flex gap-2 mt-3 overflow-x-auto">
+            @foreach($images as $img)
+                <img src="{{ asset('storage/'.$img) }}"
+                     class="w-28 h-20 object-cover rounded border hover:scale-105 transition cursor-pointer"
+                     alt="thumb"
+                     @click="mainImage='{{ asset('storage/'.$img) }}'">
+            @endforeach
         </div>
+    @endif
+</div>
+{{-- 🧑 بطاقة المعلن --}}
+<div class="bg-white shadow rounded-xl p-6 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+    {{-- صورة المعلن --}}
+    <div class="flex items-center gap-4">
+        <img src="{{ $ad->user->avatar ? asset('storage/'.$ad->user->avatar) : asset('images/default-user.png') }}" 
+             alt="avatar" class="w-16 h-16 rounded-full object-cover border">
+        <div>
+            <h2 class="font-bold text-lg">{{ $ad->user->name }}</h2>
+            <p class="text-gray-600 flex items-center gap-1">
+                <i class="fas fa-phone text-green-500"></i> {{ $ad->user->phone ?? 'غير متوفر' }}
+            </p>
+            <p class="text-sm text-gray-500 flex items-center gap-1">
+                <i class="fas fa-bullhorn text-yellow-500"></i> {{ $ad->user->ads()->count() }} إعلان
+            </p>
+        </div>
+    </div>
+
+    {{-- زر الإعلانات --}}
+    <a href="{{ route('user.ads', $ad->user->id) }}" 
+       class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg shadow w-full sm:w-auto text-center">
+        <i class="fas fa-list"></i> {{ __('messages.view_all_ads') }}
+    </a>
+</div>
 
         {{-- ✅ تفاصيل الإعلان --}}
         <div>
@@ -106,20 +136,42 @@
                 </div>
             </div>
 
-            {{-- ✅ أزرار الاتصال والمفضلة --}}
-            <div class="flex gap-3 mt-6">
-                <a href="tel:+963988779548" class="btn-yellow bg-green-500 hover:bg-green-600">
-                    <i class="fas fa-phone"></i> {{ __('messages.call') }}
-                </a>
-                <form method="POST" action="{{ route('ads.favorite', $ad->id) }}">
-                    @csrf
-                    <button type="submit" class="btn-yellow bg-yellow-500 hover:bg-yellow-600">
-                        <i class="fas fa-heart"></i> {{ __('messages.add_to_favorite') }}
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+{{-- ✅ أزرار الاتصال والمفضلة والمشاركة --}}
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
+    {{-- زر الاتصال --}}
+    <a href="tel:{{ $ad->user->phone ?? '' }}" 
+       class="btn-yellow bg-green-500 hover:bg-green-600 w-full text-center">
+        <i class="fas fa-phone"></i> {{ __('messages.call') }}
+    </a>
+    {{-- زر المفضلة --}}
+    <form method="POST" action="{{ route('ads.favorite', $ad->id) }}" class="w-full">
+        @csrf
+        <button type="submit" class="btn-yellow bg-yellow-500 hover:bg-yellow-600 w-full text-center">
+            <i class="fas fa-heart"></i> {{ __('messages.add_to_favorite') }}
+        </button>
+    </form>
+
+{{-- زر المشاركة --}}
+    <button onclick="shareAd('{{ route('ads.show', $ad->slug) }}')" 
+            class="btn-yellow bg-yellow-500 hover:bg-yellow-600 w-full text-center">
+        <i class="fas fa-share-alt"></i> {{ __('messages.share') }}
+    </button>
+</div>
+{{-- ✅ سكربت المشاركة --}}
+<script>
+function shareAd(url) {
+    if (navigator.share) {
+        navigator.share({
+            title: document.title,
+            text: 'شاهد هذا الإعلان على Delni.co',
+            url: url,
+        }).catch(err => console.log(err));
+    } else {
+        navigator.clipboard.writeText(url);
+        alert("تم نسخ رابط الإعلان ✅");
+    }
+}
+</script>
 
     {{-- 🖼️ إعلانات مشابهة --}}
     <div class="mt-12">
@@ -158,5 +210,21 @@
         }).addTo(map);
         L.marker([lat, lng]).addTo(map).bindPopup("{{ $ad->title }}");
     });
+    // 📤 مشاركة الإعلان
+function shareAd(url) {
+    if (navigator.share) {
+        navigator.share({
+            title: "{{ $ad->title }}", // 🔹 عنوان الإعلان
+            text: "شاهد هذا الإعلان على Delni.co 👇", // 🔹 نص المشاركة
+            url: url, // 🔹 رابط الإعلان نفسه
+        }).catch(err => console.log("❌ خطأ بالمشاركة:", err));
+    } else {
+        navigator.clipboard.writeText(url);
+        alert("✅ تم نسخ رابط الإعلان لمشاركته");
+    }
+}
 </script>
+<!-- ✅ Lightbox2 -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 </x-app-layout>

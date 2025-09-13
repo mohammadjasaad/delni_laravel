@@ -19,6 +19,8 @@ class User extends Authenticatable
         'phone',
         'password',
         'role', // 🆕 (user / admin)
+        'phone',
+        'avatar',
     ];
 
     // 🟡 الحقول المخفية
