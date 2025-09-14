@@ -53,6 +53,9 @@ return [
 'no_taxi_orders'     => 'No taxi orders yet',
 'load_more' => 'Load More',
 
+    'all_rights_reserved' => 'All rights reserved',
+    'ssl_secure' => 'This website is secured with SSL to protect your data',
+
 'emergency_reports'  => 'Emergency Reports',
 'no_emergency_reports' => 'No emergency reports yet',
 

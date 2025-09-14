@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'Delni.co') }}</title>
+    <title>@yield('title', 'Delni.co')</title>
 
     <!-- ✅ خط Cairo -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
@@ -41,5 +41,27 @@
     @vite(['resources/js/app.js'])
 <!-- ✅ Lightbox2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleBtn = document.getElementById("toggleDarkMode");
+    const htmlTag = document.documentElement;
+
+    // ✅ استرجاع الوضع من LocalStorage
+    if (localStorage.getItem("theme") === "dark") {
+        htmlTag.classList.add("dark");
+    }
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener("click", () => {
+            htmlTag.classList.toggle("dark");
+            if (htmlTag.classList.contains("dark")) {
+                localStorage.setItem("theme", "dark");
+            } else {
+                localStorage.setItem("theme", "light");
+            }
+        });
+    }
+});
+</script>
 </body>
 </html>

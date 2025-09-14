@@ -72,6 +72,12 @@
 </a>
         </div>
 
+<button id="toggleDarkMode"
+        class="px-3 py-1.5 rounded bg-gray-200 dark:bg-gray-700 
+               text-gray-800 dark:text-gray-200 hover:scale-105 transition text-sm">
+    🌙 / ☀️
+</button>
+
         
         <div class="md:hidden">
             <button id="mobileMenuBtn" class="p-2 rounded bg-gray-100 dark:bg-gray-800">☰</button>

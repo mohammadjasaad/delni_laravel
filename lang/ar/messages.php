@@ -47,6 +47,9 @@ return [
 
 'view_all_ads' => 'الإعلانات',
 
+    'all_rights_reserved' => 'جميع الحقوق محفوظة',
+    'ssl_secure' => 'هذا الموقع محمي بشهادة SSL لضمان أمان بياناتك',
+
 'emergency_reports'  => 'بلاغات الطوارئ',
 'no_emergency_reports' => 'لا توجد بلاغات طوارئ حتى الآن',
 

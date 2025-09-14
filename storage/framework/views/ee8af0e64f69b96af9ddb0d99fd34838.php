@@ -38,10 +38,12 @@
         </div>
     </div>
 
-    
-    <div class="bg-gray-100 dark:bg-gray-800 text-center py-3 text-sm text-gray-600 dark:text-gray-400">
-        © <?php echo e(date('Y')); ?> Delni.co — <?php echo e(__('messages.all_rights_reserved')); ?>
+<div class="bg-gray-100 dark:bg-gray-800 text-center py-3 text-sm text-gray-600 dark:text-gray-400">
+    © <?php echo e(date('Y')); ?> Delni.co — <?php echo e(__('messages.all_rights_reserved')); ?>
 
-    </div>
+    <br>
+    🔒 <?php echo e(__('messages.ssl_secure')); ?>
+
+</div>
 </footer>
 <?php /**PATH /home/delni_user/delni/resources/views/partials/footer.blade.php ENDPATH**/ ?>

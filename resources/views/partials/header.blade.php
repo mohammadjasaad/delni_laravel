@@ -65,6 +65,12 @@
     🌐 {{ app()->getLocale() === 'ar' ? __('messages.lang_en') : __('messages.lang_ar') }}
 </a>
         </div>
+{{-- 🌙 زر Dark/Light Mode --}}
+<button id="toggleDarkMode"
+        class="px-3 py-1.5 rounded bg-gray-200 dark:bg-gray-700 
+               text-gray-800 dark:text-gray-200 hover:scale-105 transition text-sm">
+    🌙 / ☀️
+</button>
 
         {{-- ✅ منيو الموبايل (زر ☰) --}}
         <div class="md:hidden">

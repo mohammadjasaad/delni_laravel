@@ -36,9 +36,10 @@
             </ul>
         </div>
     </div>
-
-    {{-- ✅ حقوق النشر --}}
-    <div class="bg-gray-100 dark:bg-gray-800 text-center py-3 text-sm text-gray-600 dark:text-gray-400">
-        © {{ date('Y') }} Delni.co — {{ __('messages.all_rights_reserved') }}
-    </div>
+{{-- ✅ حقوق النشر --}}
+<div class="bg-gray-100 dark:bg-gray-800 text-center py-3 text-sm text-gray-600 dark:text-gray-400">
+    © {{ date('Y') }} Delni.co — {{ __('messages.all_rights_reserved') }}
+    <br>
+    🔒 {{ __('messages.ssl_secure') }}
+</div>
 </footer>
