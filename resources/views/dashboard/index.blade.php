@@ -7,10 +7,6 @@
         <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">
             <i class="fas fa-tachometer-alt text-yellow-500"></i> {{ __('messages.dashboard') }}
         </h1>
-        <button id="toggleDarkMode"
-            class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow hover:scale-105 transition">
-            🌙 / ☀️
-        </button>
     </div>
 
     {{-- 📊 الإحصائيات السريعة --}}
@@ -134,15 +130,4 @@
 {{-- ✅ FontAwesome --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-{{-- 🌙 Script Dark Mode --}}
-<script>
-    const toggleDark = document.getElementById('toggleDarkMode');
-    toggleDark.addEventListener('click', () => {
-        document.documentElement.classList.toggle('dark');
-        localStorage.setItem('darkMode', document.documentElement.classList.contains('dark') ? 'enabled' : 'disabled');
-    });
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        document.documentElement.classList.add('dark');
-    }
-</script>
 </x-app-layout>

@@ -42,26 +42,33 @@
     <?php echo app('Illuminate\Foundation\Vite')(['resources/js/app.js']); ?>
 <!-- ✅ Lightbox2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const toggleBtn = document.getElementById("toggleDarkMode");
-    const htmlTag = document.documentElement;
-
-    // ✅ استرجاع الوضع من LocalStorage
-    if (localStorage.getItem("theme") === "dark") {
-        htmlTag.classList.add("dark");
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('darkMode', document.documentElement.classList.contains('dark') ? 'enabled' : 'disabled');
+        updateIcons();
     }
 
-    if (toggleBtn) {
-        toggleBtn.addEventListener("click", () => {
-            htmlTag.classList.toggle("dark");
-            if (htmlTag.classList.contains("dark")) {
-                localStorage.setItem("theme", "dark");
-            } else {
-                localStorage.setItem("theme", "light");
-            }
-        });
+    function updateIcons() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const desktopBtn = document.getElementById("toggleDarkModeDesktop");
+        const mobileBtn = document.getElementById("toggleDarkModeMobile");
+        if (desktopBtn) desktopBtn.textContent = isDark ? "☀️" : "🌙";
+        if (mobileBtn) mobileBtn.textContent = isDark ? "☀️" : "🌙";
     }
+
+    const desktopBtn = document.getElementById("toggleDarkModeDesktop");
+    const mobileBtn = document.getElementById("toggleDarkModeMobile");
+
+    if (desktopBtn) desktopBtn.addEventListener("click", toggleDarkMode);
+    if (mobileBtn) mobileBtn.addEventListener("click", toggleDarkMode);
+
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.documentElement.classList.add('dark');
+    }
+    updateIcons();
 });
 </script>
 </body>

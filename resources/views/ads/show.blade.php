@@ -9,11 +9,15 @@
     @endphp
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {{-- 🖼️ الصورة الرئيسية + الصور الإضافية --}}
-{{-- 🖼️ الصورة الرئيسية --}}
+
+{{-- 🖼️ الصورة الرئيسية + الصور الإضافية --}}
 <div x-data="{ mainImage: '{{ $mainImage }}' }">
-    <a :href="mainImage" data-lightbox="ad-main" data-title="{{ $ad->title }}">
-        <img :src="mainImage" class="w-full h-96 object-cover rounded-xl shadow cursor-pointer" alt="ad">
+    
+    {{-- ✅ الصورة الرئيسية (تفتح سلايد شو) --}}
+    <a :href="mainImage" data-lightbox="ad-gallery" data-title="{{ $ad->title }}">
+        <img :src="mainImage" id="mainImage"
+             class="w-full h-96 object-cover rounded-xl shadow cursor-pointer" 
+             alt="{{ $ad->title }}">
     </a>
 
     {{-- 📸 الصور الإضافية --}}
@@ -22,40 +26,41 @@
             @foreach($images as $img)
                 <img src="{{ asset('storage/'.$img) }}"
                      class="w-28 h-20 object-cover rounded border hover:scale-105 transition cursor-pointer"
-                     alt="thumb"
-                     @click="mainImage='{{ asset('storage/'.$img) }}'">
+                     alt="{{ $ad->title }}"
+                     onclick="document.getElementById('mainImage').src=this.src;
+                              document.querySelector('a[data-lightbox=\'ad-gallery\']').href=this.src;">
             @endforeach
         </div>
     @endif
-</div>
-{{-- 🧑 بطاقة المعلن --}}
-<div class="bg-white shadow rounded-xl p-6 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-    {{-- صورة المعلن --}}
-    <div class="flex items-center gap-4">
-        <img src="{{ $ad->user->avatar ? asset('storage/'.$ad->user->avatar) : asset('images/default-user.png') }}" 
-             alt="avatar" class="w-16 h-16 rounded-full object-cover border">
-        <div>
-            <h2 class="font-bold text-lg">{{ $ad->user->name }}</h2>
-            <p class="text-gray-600 flex items-center gap-1">
-                <i class="fas fa-phone text-green-500"></i> {{ $ad->user->phone ?? 'غير متوفر' }}
-            </p>
-            <p class="text-sm text-gray-500 flex items-center gap-1">
-                <i class="fas fa-bullhorn text-yellow-500"></i> {{ $ad->user->ads()->count() }} إعلان
-            </p>
-        </div>
-    </div>
 
-    {{-- زر الإعلانات --}}
-    <a href="{{ route('user.ads', $ad->user->id) }}" 
-       class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg shadow w-full sm:w-auto text-center">
-        <i class="fas fa-list"></i> {{ __('messages.view_all_ads') }}
-    </a>
+{{-- 👤 بطاقة المعلن (أسفل الصور مباشرة) --}}
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6 flex items-center justify-between">
+    <div>
+        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
+            {{ $ad->user->name ?? 'مستخدم' }}
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+            📞 {{ $ad->user->phone ?? 'لا يوجد رقم' }}
+        </p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+            {{ $ad->user->ads()->count() }} إعلان
+        </p>
+    </div>
+<a href="{{ route('user.ads', $ad->user->id) }}" 
+   class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1.5 rounded-md shadow text-sm font-medium">
+    <i class="fas fa-list"></i> {{ __('messages.view_all_ads') }}
+</a>
+</div>
 </div>
 
         {{-- ✅ تفاصيل الإعلان --}}
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 mb-3"><i class="fas fa-bullhorn"></i> {{ $ad->title }}</h1>
-            <p class="text-gray-500 mb-2"><i class="fas fa-map-marker-alt text-red-500"></i> {{ $ad->city }}</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+    <i class="fas fa-bullhorn"></i> {{ $ad->title }}
+</h1>
+<p class="text-gray-500 dark:text-gray-300 mb-2">
+    <i class="fas fa-map-marker-alt text-red-500"></i> {{ $ad->city }}
+</p>
             <p class="text-red-600 text-xl font-bold mb-4"><i class="fas fa-dollar-sign"></i> {{ number_format($ad->price) }} {{ __('messages.currency') }}</p>
 
             {{-- ⭐ إعلان مميز --}}
@@ -82,9 +87,11 @@
                 {{-- 📑 تبويب التفاصيل --}}
                 <div x-show="tab==='details'" class="space-y-4">
                     @if($ad->category === 'عقارات' || $ad->category === 'realestate')
-                        <div class="bg-white rounded-xl shadow p-6">
-                            <h2 class="text-lg font-bold mb-4"><i class="fas fa-home"></i> {{ __('messages.real_estate_details') }}</h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+<h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
+    <i class="fas fa-home"></i> {{ __('messages.real_estate_details') }}
+</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                                 <p><i class="fas fa-tag text-gray-500"></i> {{ __('messages.subcategory') }}: {{ $ad->subcategory ?? '-' }}</p>
                                 <p><i class="fas fa-bed text-gray-500"></i> {{ __('messages.rooms') }}: {{ $ad->rooms ?? '-' }}</p>
                                 <p><i class="fas fa-bath text-gray-500"></i> {{ __('messages.bathrooms') }}: {{ $ad->bathrooms ?? '-' }}</p>
@@ -98,9 +105,11 @@
                         </div>
 
                     @elseif($ad->category === 'سيارات' || $ad->category === 'cars')
-                        <div class="bg-white rounded-xl shadow p-6">
-                            <h2 class="text-lg font-bold mb-4"><i class="fas fa-car"></i> {{ __('messages.car_details') }}</h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+<h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
+    <i class="fas fa-home"></i> {{ __('messages.car_model') }}
+</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                                 <p><i class="fas fa-car-side text-gray-500"></i> {{ __('messages.car_model') }}: {{ $ad->car_model ?? '-' }}</p>
                                 <p><i class="fas fa-calendar-alt text-gray-500"></i> {{ __('messages.car_year') }}: {{ $ad->car_year ?? '-' }}</p>
                                 <p><i class="fas fa-tachometer-alt text-gray-500"></i> {{ __('messages.car_km') }}: {{ $ad->car_km ?? '-' }} كم</p>
@@ -112,9 +121,11 @@
                         </div>
 
                     @elseif($ad->category === 'خدمات' || $ad->category === 'services')
-                        <div class="bg-white rounded-xl shadow p-6">
-                            <h2 class="text-lg font-bold mb-4"><i class="fas fa-tools"></i> {{ __('messages.service_details') }}</h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+<h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
+    <i class="fas fa-home"></i> {{ __('messages.service_details') }}
+</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                                 <p><i class="fas fa-wrench text-gray-500"></i> {{ __('messages.service_type') }}: {{ $ad->service_type ?? '-' }}</p>
                                 <p><i class="fas fa-user-tie text-gray-500"></i> {{ __('messages.provider_name') }}: {{ $ad->provider_name ?? '-' }}</p>
                             </div>
@@ -126,7 +137,7 @@
                 </div>
 
                 {{-- 📝 تبويب الوصف --}}
-                <div x-show="tab==='description'" class="text-gray-700 leading-relaxed">
+<div x-show="tab==='description'" class="text-gray-700 dark:text-gray-200 leading-relaxed">
                     {{ $ad->description ?: __('messages.no_description') }}
                 </div>
 
@@ -175,18 +186,22 @@ function shareAd(url) {
 
     {{-- 🖼️ إعلانات مشابهة --}}
     <div class="mt-12">
-        <h2 class="text-xl font-bold mb-4"><i class="fas fa-search"></i> {{ __('messages.related_ads') }}</h2>
+<h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+    <i class="fas fa-search"></i> {{ __('messages.related_ads') }}
+</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             @foreach($relatedAds as $item)
                 @php
                     $imgs = is_array($item->images) ? $item->images : json_decode($item->images, true);
                     $img  = !empty($imgs[0]) ? asset('storage/'.$imgs[0]) : asset('storage/placeholder.png');
                 @endphp
-                <a href="{{ route('ads.show', $item->id) }}" class="block bg-white rounded-xl shadow hover:shadow-lg overflow-hidden">
+                    <a href="{{ route('ads.show', $item->slug) }}" class="block bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg overflow-hidden">
                     <img src="{{ $img }}" class="w-full h-40 object-cover" alt="related">
                     <div class="p-3">
-                        <h3 class="font-bold truncate">{{ $item->title }}</h3>
-                        <p class="text-sm text-gray-500"><i class="fas fa-map-marker-alt"></i> {{ $item->city }}</p>
+<h3 class="font-bold truncate text-gray-800 dark:text-gray-100">{{ $item->title }}</h3>
+<p class="text-sm text-gray-500 dark:text-gray-300">
+    <i class="fas fa-map-marker-alt"></i> {{ $item->city }}
+</p>
                         <p class="text-red-600 font-bold text-sm"><i class="fas fa-dollar-sign"></i> {{ number_format($item->price) }} {{ __('messages.currency') }}</p>
                     </div>
                 </a>

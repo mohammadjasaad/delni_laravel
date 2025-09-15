@@ -18,11 +18,15 @@
     ?>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
+
 
 <div x-data="{ mainImage: '<?php echo e($mainImage); ?>' }">
-    <a :href="mainImage" data-lightbox="ad-main" data-title="<?php echo e($ad->title); ?>">
-        <img :src="mainImage" class="w-full h-96 object-cover rounded-xl shadow cursor-pointer" alt="ad">
+    
+    
+    <a :href="mainImage" data-lightbox="ad-gallery" data-title="<?php echo e($ad->title); ?>">
+        <img :src="mainImage" id="mainImage"
+             class="w-full h-96 object-cover rounded-xl shadow cursor-pointer" 
+             alt="<?php echo e($ad->title); ?>">
     </a>
 
     
@@ -31,42 +35,46 @@
             <?php $__currentLoopData = $images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $img): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <img src="<?php echo e(asset('storage/'.$img)); ?>"
                      class="w-28 h-20 object-cover rounded border hover:scale-105 transition cursor-pointer"
-                     alt="thumb"
-                     @click="mainImage='<?php echo e(asset('storage/'.$img)); ?>'">
+                     alt="<?php echo e($ad->title); ?>"
+                     onclick="document.getElementById('mainImage').src=this.src;
+                              document.querySelector('a[data-lightbox=\'ad-gallery\']').href=this.src;">
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     <?php endif; ?>
-</div>
 
-<div class="bg-white shadow rounded-xl p-6 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-    
-    <div class="flex items-center gap-4">
-        <img src="<?php echo e($ad->user->avatar ? asset('storage/'.$ad->user->avatar) : asset('images/default-user.png')); ?>" 
-             alt="avatar" class="w-16 h-16 rounded-full object-cover border">
-        <div>
-            <h2 class="font-bold text-lg"><?php echo e($ad->user->name); ?></h2>
-            <p class="text-gray-600 flex items-center gap-1">
-                <i class="fas fa-phone text-green-500"></i> <?php echo e($ad->user->phone ?? 'غير متوفر'); ?>
 
-            </p>
-            <p class="text-sm text-gray-500 flex items-center gap-1">
-                <i class="fas fa-bullhorn text-yellow-500"></i> <?php echo e($ad->user->ads()->count()); ?> إعلان
-            </p>
-        </div>
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6 flex items-center justify-between">
+    <div>
+        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
+            <?php echo e($ad->user->name ?? 'مستخدم'); ?>
+
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+            📞 <?php echo e($ad->user->phone ?? 'لا يوجد رقم'); ?>
+
+        </p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+            <?php echo e($ad->user->ads()->count()); ?> إعلان
+        </p>
     </div>
+<a href="<?php echo e(route('user.ads', $ad->user->id)); ?>" 
+   class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1.5 rounded-md shadow text-sm font-medium">
+    <i class="fas fa-list"></i> <?php echo e(__('messages.view_all_ads')); ?>
 
-    
-    <a href="<?php echo e(route('user.ads', $ad->user->id)); ?>" 
-       class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg shadow w-full sm:w-auto text-center">
-        <i class="fas fa-list"></i> <?php echo e(__('messages.view_all_ads')); ?>
-
-    </a>
+</a>
+</div>
 </div>
 
         
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 mb-3"><i class="fas fa-bullhorn"></i> <?php echo e($ad->title); ?></h1>
-            <p class="text-gray-500 mb-2"><i class="fas fa-map-marker-alt text-red-500"></i> <?php echo e($ad->city); ?></p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+    <i class="fas fa-bullhorn"></i> <?php echo e($ad->title); ?>
+
+</h1>
+<p class="text-gray-500 dark:text-gray-300 mb-2">
+    <i class="fas fa-map-marker-alt text-red-500"></i> <?php echo e($ad->city); ?>
+
+</p>
             <p class="text-red-600 text-xl font-bold mb-4"><i class="fas fa-dollar-sign"></i> <?php echo e(number_format($ad->price)); ?> <?php echo e(__('messages.currency')); ?></p>
 
             
@@ -97,9 +105,12 @@
                 
                 <div x-show="tab==='details'" class="space-y-4">
                     <?php if($ad->category === 'عقارات' || $ad->category === 'realestate'): ?>
-                        <div class="bg-white rounded-xl shadow p-6">
-                            <h2 class="text-lg font-bold mb-4"><i class="fas fa-home"></i> <?php echo e(__('messages.real_estate_details')); ?></h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+<h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
+    <i class="fas fa-home"></i> <?php echo e(__('messages.real_estate_details')); ?>
+
+</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                                 <p><i class="fas fa-tag text-gray-500"></i> <?php echo e(__('messages.subcategory')); ?>: <?php echo e($ad->subcategory ?? '-'); ?></p>
                                 <p><i class="fas fa-bed text-gray-500"></i> <?php echo e(__('messages.rooms')); ?>: <?php echo e($ad->rooms ?? '-'); ?></p>
                                 <p><i class="fas fa-bath text-gray-500"></i> <?php echo e(__('messages.bathrooms')); ?>: <?php echo e($ad->bathrooms ?? '-'); ?></p>
@@ -113,9 +124,12 @@
                         </div>
 
                     <?php elseif($ad->category === 'سيارات' || $ad->category === 'cars'): ?>
-                        <div class="bg-white rounded-xl shadow p-6">
-                            <h2 class="text-lg font-bold mb-4"><i class="fas fa-car"></i> <?php echo e(__('messages.car_details')); ?></h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+<h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
+    <i class="fas fa-home"></i> <?php echo e(__('messages.car_model')); ?>
+
+</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                                 <p><i class="fas fa-car-side text-gray-500"></i> <?php echo e(__('messages.car_model')); ?>: <?php echo e($ad->car_model ?? '-'); ?></p>
                                 <p><i class="fas fa-calendar-alt text-gray-500"></i> <?php echo e(__('messages.car_year')); ?>: <?php echo e($ad->car_year ?? '-'); ?></p>
                                 <p><i class="fas fa-tachometer-alt text-gray-500"></i> <?php echo e(__('messages.car_km')); ?>: <?php echo e($ad->car_km ?? '-'); ?> كم</p>
@@ -127,9 +141,12 @@
                         </div>
 
                     <?php elseif($ad->category === 'خدمات' || $ad->category === 'services'): ?>
-                        <div class="bg-white rounded-xl shadow p-6">
-                            <h2 class="text-lg font-bold mb-4"><i class="fas fa-tools"></i> <?php echo e(__('messages.service_details')); ?></h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+<h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
+    <i class="fas fa-home"></i> <?php echo e(__('messages.service_details')); ?>
+
+</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                                 <p><i class="fas fa-wrench text-gray-500"></i> <?php echo e(__('messages.service_type')); ?>: <?php echo e($ad->service_type ?? '-'); ?></p>
                                 <p><i class="fas fa-user-tie text-gray-500"></i> <?php echo e(__('messages.provider_name')); ?>: <?php echo e($ad->provider_name ?? '-'); ?></p>
                             </div>
@@ -141,7 +158,7 @@
                 </div>
 
                 
-                <div x-show="tab==='description'" class="text-gray-700 leading-relaxed">
+<div x-show="tab==='description'" class="text-gray-700 dark:text-gray-200 leading-relaxed">
                     <?php echo e($ad->description ?: __('messages.no_description')); ?>
 
                 </div>
@@ -194,18 +211,24 @@ function shareAd(url) {
 
     
     <div class="mt-12">
-        <h2 class="text-xl font-bold mb-4"><i class="fas fa-search"></i> <?php echo e(__('messages.related_ads')); ?></h2>
+<h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+    <i class="fas fa-search"></i> <?php echo e(__('messages.related_ads')); ?>
+
+</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             <?php $__currentLoopData = $relatedAds; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <?php
                     $imgs = is_array($item->images) ? $item->images : json_decode($item->images, true);
                     $img  = !empty($imgs[0]) ? asset('storage/'.$imgs[0]) : asset('storage/placeholder.png');
                 ?>
-                <a href="<?php echo e(route('ads.show', $item->id)); ?>" class="block bg-white rounded-xl shadow hover:shadow-lg overflow-hidden">
+                    <a href="<?php echo e(route('ads.show', $item->slug)); ?>" class="block bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg overflow-hidden">
                     <img src="<?php echo e($img); ?>" class="w-full h-40 object-cover" alt="related">
                     <div class="p-3">
-                        <h3 class="font-bold truncate"><?php echo e($item->title); ?></h3>
-                        <p class="text-sm text-gray-500"><i class="fas fa-map-marker-alt"></i> <?php echo e($item->city); ?></p>
+<h3 class="font-bold truncate text-gray-800 dark:text-gray-100"><?php echo e($item->title); ?></h3>
+<p class="text-sm text-gray-500 dark:text-gray-300">
+    <i class="fas fa-map-marker-alt"></i> <?php echo e($item->city); ?>
+
+</p>
                         <p class="text-red-600 font-bold text-sm"><i class="fas fa-dollar-sign"></i> <?php echo e(number_format($item->price)); ?> <?php echo e(__('messages.currency')); ?></p>
                     </div>
                 </a>

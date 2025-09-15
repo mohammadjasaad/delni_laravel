@@ -17,9 +17,9 @@
             <a href="{{ route('contact') }}" class="hover:text-yellow-500">{{ __('messages.contact') }}</a>
         </nav>
 
-        {{-- ✅ أقصى اليسار: أزرار التحكم --}}
+        {{-- ✅ أقصى اليسار: أزرار التحكم (للكمبيوتر) --}}
         <div class="hidden md:flex items-center gap-3">
-            {{-- زر إضافة إعلان (للمستخدم فقط، وليس المشرف) --}}
+            {{-- زر إضافة إعلان --}}
             @if(auth()->check() && auth()->user()->role !== 'admin')
                 <a href="{{ route('ads.create') }}"
                    class="px-3 py-1.5 rounded bg-gray-100 dark:bg-gray-800 
@@ -28,12 +28,12 @@
                 </a>
             @endif
 
-            {{-- دخول/لوحة التحكم/لوحة المشرف --}}
+            {{-- دخول/لوحة التحكم --}}
             @auth
                 @if(auth()->user()->role === 'admin')
                     <a href="{{ route('admin.dashboard') }}"
                        class="px-3 py-1.5 rounded bg-yellow-500 text-white hover:bg-yellow-600 text-sm">
-                    🛠️ {{ __('messages.admin_panel') }}
+                        🛠️ {{ __('messages.admin_panel') }}
                     </a>
                 @else
                     <a href="{{ route('dashboard.index') }}"
@@ -58,42 +58,50 @@
                 </a>
             @endauth
 
-{{-- زر اللغة --}}
-<a href="{{ route('change.lang', app()->getLocale() === 'ar' ? 'en' : 'ar') }}"
-   class="px-3 py-1.5 rounded bg-gray-100 dark:bg-gray-800 
-          text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm">
-    🌐 {{ app()->getLocale() === 'ar' ? __('messages.lang_en') : __('messages.lang_ar') }}
-</a>
-        </div>
-{{-- 🌙 زر Dark/Light Mode --}}
-<button id="toggleDarkMode"
-        class="px-3 py-1.5 rounded bg-gray-200 dark:bg-gray-700 
-               text-gray-800 dark:text-gray-200 hover:scale-105 transition text-sm">
-    🌙 / ☀️
-</button>
+            {{-- زر اللغة --}}
+            <a href="{{ route('change.lang', app()->getLocale() === 'ar' ? 'en' : 'ar') }}"
+               class="px-3 py-1.5 rounded bg-gray-100 dark:bg-gray-800 
+                      text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm">
+                🌐 {{ app()->getLocale() === 'ar' ? __('messages.lang_en') : __('messages.lang_ar') }}
+            </a>
 
-        {{-- ✅ منيو الموبايل (زر ☰) --}}
-        <div class="md:hidden">
-            <button id="mobileMenuBtn" class="p-2 rounded bg-gray-100 dark:bg-gray-800">☰</button>
+            {{-- 🌙 زر Dark/Light Mode للكمبيوتر --}}
+            <button id="toggleDarkModeDesktop"
+                    class="px-3 py-1.5 rounded bg-gray-200 dark:bg-gray-700 
+                           text-gray-800 dark:text-gray-200 hover:scale-105 transition text-sm">
+                🌙
+            </button>
+        </div>
+
+        {{-- ✅ أزرار الموبايل: دارك مود + منيو --}}
+        <div class="md:hidden flex items-center gap-2">
+            {{-- 🌙 زر Dark/Light Mode للموبايل --}}
+            <button id="toggleDarkModeMobile"
+                    class="p-2 rounded bg-gray-200 dark:bg-gray-700 
+                           text-gray-800 dark:text-gray-200 hover:scale-105 transition">
+                🌙
+            </button>
+
+            {{-- زر القائمة ☰ --}}
+            <button id="mobileMenuBtn"
+                    class="p-2 rounded bg-gray-100 dark:bg-gray-800">
+                ☰
+            </button>
         </div>
     </div>
 
-    {{-- ✅ القائمة الجانبية للموبايل --}}
-    <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-gray-900 border-t p-4 space-y-3">
-        {{-- روابط رئيسية --}}
+    {{-- ✅ القائمة الجانبية للموبايل (تنزل لتحت) --}}
+    <div id="mobileMenu"
+         class="hidden md:hidden absolute top-full left-0 w-full bg-white dark:bg-gray-900 border-t p-4 space-y-3 shadow-lg z-50">
         <a href="{{ route('home') }}" class="block hover:text-yellow-500">{{ __('messages.home') }}</a>
-        <a href="{{ route('about') }}" class="block hover:text-yellow-500">{{ __('messages.about') }}</a>
-        <a href="{{ route('contact') }}" class="block hover:text-yellow-500">{{ __('messages.contact') }}</a>
 
-        {{-- زر إضافة إعلان (للمستخدم فقط) --}}
         @if(auth()->check() && auth()->user()->role !== 'admin')
             <a href="{{ route('ads.create') }}" class="block hover:text-yellow-500">➕ {{ __('messages.add_ad') }}</a>
         @endif
 
-        {{-- دخول/لوحة التحكم/لوحة المشرف --}}
         @auth
             @if(auth()->user()->role === 'admin')
-<a href="{{ route('admin.dashboard') }}" class="block hover:text-yellow-500">🛠️ {{ __('messages.admin_panel') }}</a>
+                <a href="{{ route('admin.dashboard') }}" class="block hover:text-yellow-500">🛠️ {{ __('messages.admin_panel') }}</a>
             @else
                 <a href="{{ route('dashboard.index') }}" class="block hover:text-yellow-500">👤 {{ __('messages.dashboard') }}</a>
             @endif
@@ -108,7 +116,6 @@
             <a href="{{ route('login') }}" class="block hover:text-yellow-500">👤 {{ __('messages.login') }}</a>
         @endauth
 
-        {{-- زر اللغة --}}
         <a href="{{ route('change.lang', app()->getLocale() === 'ar' ? 'en' : 'ar') }}"
            class="block hover:text-yellow-500">
             🌐 {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}

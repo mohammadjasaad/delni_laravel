@@ -34,7 +34,7 @@
                 <?php if(auth()->user()->role === 'admin'): ?>
                     <a href="<?php echo e(route('admin.dashboard')); ?>"
                        class="px-3 py-1.5 rounded bg-yellow-500 text-white hover:bg-yellow-600 text-sm">
-                    🛠️ <?php echo e(__('messages.admin_panel')); ?>
+                        🛠️ <?php echo e(__('messages.admin_panel')); ?>
 
                     </a>
                 <?php else: ?>
@@ -63,43 +63,51 @@
                 </a>
             <?php endif; ?>
 
+            
+            <a href="<?php echo e(route('change.lang', app()->getLocale() === 'ar' ? 'en' : 'ar')); ?>"
+               class="px-3 py-1.5 rounded bg-gray-100 dark:bg-gray-800 
+                      text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm">
+                🌐 <?php echo e(app()->getLocale() === 'ar' ? __('messages.lang_en') : __('messages.lang_ar')); ?>
 
-<a href="<?php echo e(route('change.lang', app()->getLocale() === 'ar' ? 'en' : 'ar')); ?>"
-   class="px-3 py-1.5 rounded bg-gray-100 dark:bg-gray-800 
-          text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm">
-    🌐 <?php echo e(app()->getLocale() === 'ar' ? __('messages.lang_en') : __('messages.lang_ar')); ?>
+            </a>
 
-</a>
+            
+            <button id="toggleDarkModeDesktop"
+                    class="px-3 py-1.5 rounded bg-gray-200 dark:bg-gray-700 
+                           text-gray-800 dark:text-gray-200 hover:scale-105 transition text-sm">
+                🌙
+            </button>
         </div>
 
-<button id="toggleDarkMode"
-        class="px-3 py-1.5 rounded bg-gray-200 dark:bg-gray-700 
-               text-gray-800 dark:text-gray-200 hover:scale-105 transition text-sm">
-    🌙 / ☀️
-</button>
-
         
-        <div class="md:hidden">
-            <button id="mobileMenuBtn" class="p-2 rounded bg-gray-100 dark:bg-gray-800">☰</button>
+        <div class="md:hidden flex items-center gap-2">
+            
+            <button id="toggleDarkModeMobile"
+                    class="p-2 rounded bg-gray-200 dark:bg-gray-700 
+                           text-gray-800 dark:text-gray-200 hover:scale-105 transition">
+                🌙
+            </button>
+
+            
+            <button id="mobileMenuBtn"
+                    class="p-2 rounded bg-gray-100 dark:bg-gray-800">
+                ☰
+            </button>
         </div>
     </div>
 
     
-    <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-gray-900 border-t p-4 space-y-3">
-        
+    <div id="mobileMenu"
+         class="hidden md:hidden absolute top-full left-0 w-full bg-white dark:bg-gray-900 border-t p-4 space-y-3 shadow-lg z-50">
         <a href="<?php echo e(route('home')); ?>" class="block hover:text-yellow-500"><?php echo e(__('messages.home')); ?></a>
-        <a href="<?php echo e(route('about')); ?>" class="block hover:text-yellow-500"><?php echo e(__('messages.about')); ?></a>
-        <a href="<?php echo e(route('contact')); ?>" class="block hover:text-yellow-500"><?php echo e(__('messages.contact')); ?></a>
 
-        
         <?php if(auth()->check() && auth()->user()->role !== 'admin'): ?>
             <a href="<?php echo e(route('ads.create')); ?>" class="block hover:text-yellow-500">➕ <?php echo e(__('messages.add_ad')); ?></a>
         <?php endif; ?>
 
-        
         <?php if(auth()->guard()->check()): ?>
             <?php if(auth()->user()->role === 'admin'): ?>
-<a href="<?php echo e(route('admin.dashboard')); ?>" class="block hover:text-yellow-500">🛠️ <?php echo e(__('messages.admin_panel')); ?></a>
+                <a href="<?php echo e(route('admin.dashboard')); ?>" class="block hover:text-yellow-500">🛠️ <?php echo e(__('messages.admin_panel')); ?></a>
             <?php else: ?>
                 <a href="<?php echo e(route('dashboard.index')); ?>" class="block hover:text-yellow-500">👤 <?php echo e(__('messages.dashboard')); ?></a>
             <?php endif; ?>
@@ -115,7 +123,6 @@
             <a href="<?php echo e(route('login')); ?>" class="block hover:text-yellow-500">👤 <?php echo e(__('messages.login')); ?></a>
         <?php endif; ?>
 
-        
         <a href="<?php echo e(route('change.lang', app()->getLocale() === 'ar' ? 'en' : 'ar')); ?>"
            class="block hover:text-yellow-500">
             🌐 <?php echo e(app()->getLocale() === 'ar' ? 'English' : 'العربية'); ?>
