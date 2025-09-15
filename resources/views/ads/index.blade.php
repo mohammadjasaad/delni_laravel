@@ -192,12 +192,18 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('filterBox').classList.toggle('hidden');
     });
 
-    document.getElementById('toggleMap').addEventListener('click', () => {
-        document.getElementById('mapBox').classList.toggle('hidden');
-    });
+document.getElementById('toggleMap').addEventListener('click', () => {
+    const mapBox = document.getElementById('mapBox');
+    mapBox.classList.toggle('hidden');
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const map = L.map('adsMap').setView([34.8021, 38.9968], 7);
+    // ✅ تحديث الخريطة إذا ظهرت
+    if (!mapBox.classList.contains('hidden')) {
+        setTimeout(() => { map.invalidateSize(); }, 300);
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    window.map = L.map('adsMap').setView([34.8021, 38.9968], 7);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; Delni.co' }).addTo(map);
 
         fetch("{{ route('ads.mapData') }}")

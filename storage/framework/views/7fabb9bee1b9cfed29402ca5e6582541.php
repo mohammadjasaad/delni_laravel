@@ -96,10 +96,12 @@
                         <i class="fas fa-align-left"></i> <?php echo e(__('messages.description')); ?>
 
                     </button>
-                    <button @click="tab='map'" :class="tab==='map' ? 'border-b-2 border-yellow-500 font-bold text-yellow-600' : ''" class="pb-2 flex items-center gap-1">
-                        <i class="fas fa-map"></i> <?php echo e(__('messages.location')); ?>
+<button @click="tab='map'; setTimeout(()=>map.invalidateSize(),300)" 
+        :class="tab==='map' ? 'border-b-2 border-yellow-500 font-bold text-yellow-600' : ''" 
+        class="pb-2 flex items-center gap-1">
+    <i class="fas fa-map"></i> <?php echo e(__('messages.location')); ?>
 
-                    </button>
+</button>
                 </div>
 
                 
@@ -240,35 +242,40 @@ function shareAd(url) {
 
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const lat = <?php echo e($ad->lat ?? 33.5138); ?>;
-        const lng = <?php echo e($ad->lng ?? 36.2765); ?>;
-        const map = L.map('map').setView([lat, lng], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; Delni.co'
-        }).addTo(map);
-        L.marker([lat, lng]).addTo(map).bindPopup("<?php echo e($ad->title); ?>");
-    });
-    // 📤 مشاركة الإعلان
-function shareAd(url) {
-    if (navigator.share) {
-        navigator.share({
-            title: "<?php echo e($ad->title); ?>", // 🔹 عنوان الإعلان
-            text: "شاهد هذا الإعلان على Delni.co 👇", // 🔹 نص المشاركة
-            url: url, // 🔹 رابط الإعلان نفسه
-        }).catch(err => console.log("❌ خطأ بالمشاركة:", err));
-    } else {
-        navigator.clipboard.writeText(url);
-        alert("✅ تم نسخ رابط الإعلان لمشاركته");
-    }
-}
-</script>
-<!-- ✅ Lightbox2 -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+let map;
+document.addEventListener("DOMContentLoaded", function () {
+    var lat = <?php echo e($ad->lat ?? 41.0672); ?>;
+    var lng = <?php echo e($ad->lng ?? 28.7994); ?>;
+
+    map = L.map('map').setView([lat, lng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup("📍 موقع الإعلان")
+                .openPopup();
+        });
+
+        function shareAd(url) {
+            if (navigator.share) {
+                navigator.share({ title: document.title, text: 'شاهد هذا الإعلان على Delni.co', url: url });
+            } else {
+                navigator.clipboard.writeText(url);
+                alert("تم نسخ رابط الإعلان ✅");
+            }
+        }
+    </script>
+
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+</div>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
