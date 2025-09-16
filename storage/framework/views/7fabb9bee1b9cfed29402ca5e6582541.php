@@ -106,17 +106,24 @@
 
                 
                 <div x-show="tab==='details'" class="space-y-4">
-                    <?php if($ad->category === 'عقارات' || $ad->category === 'realestate'): ?>
-                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-<h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
-    <i class="fas fa-home"></i> <?php echo e(__('messages.real_estate_details')); ?>
 
-</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
+                    
+                    <?php if($ad->category === 'عقارات' || $ad->category === 'realestate'): ?>
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                            <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
+                                <i class="fas fa-home"></i> <?php echo e(__('messages.real_estate_details')); ?>
+
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                                 <p><i class="fas fa-tag text-gray-500"></i> <?php echo e(__('messages.subcategory')); ?>: <?php echo e($ad->subcategory ?? '-'); ?></p>
                                 <p><i class="fas fa-bed text-gray-500"></i> <?php echo e(__('messages.rooms')); ?>: <?php echo e($ad->rooms ?? '-'); ?></p>
                                 <p><i class="fas fa-bath text-gray-500"></i> <?php echo e(__('messages.bathrooms')); ?>: <?php echo e($ad->bathrooms ?? '-'); ?></p>
-                                <p><i class="fas fa-ruler-combined text-gray-500"></i> <?php echo e(__('messages.area')); ?>: <?php echo e($ad->area ?? '-'); ?> م²</p>
+<p><i class="fas fa-ruler-combined text-gray-500"></i> 
+   <?php echo e(__('messages.area_total')); ?>: <?php echo e($ad->area_total ?? '-'); ?> م²
+</p>
+<p><i class="fas fa-ruler-combined text-gray-500"></i> 
+   <?php echo e(__('messages.area_net')); ?>: <?php echo e($ad->area_net ?? '-'); ?> م²
+</p>
                                 <p><i class="fas fa-building text-gray-500"></i> <?php echo e(__('messages.floor')); ?>: <?php echo e($ad->floor ?? '-'); ?></p>
                                 <p><i class="fas fa-industry text-gray-500"></i> <?php echo e(__('messages.building_age')); ?>: <?php echo e($ad->building_age ?? '-'); ?></p>
                                 <p><i class="fas fa-elevator text-gray-500"></i> <?php echo e(__('messages.elevator')); ?>: <?php echo e($ad->has_elevator ? __('messages.yes') : __('messages.no')); ?></p>
@@ -125,16 +132,17 @@
                             </div>
                         </div>
 
+                    
                     <?php elseif($ad->category === 'سيارات' || $ad->category === 'cars'): ?>
-                                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-<h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
-    <i class="fas fa-home"></i> <?php echo e(__('messages.car_model')); ?>
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                            <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
+                                <i class="fas fa-car"></i> <?php echo e(__('messages.car_details')); ?>
 
-</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                                 <p><i class="fas fa-car-side text-gray-500"></i> <?php echo e(__('messages.car_model')); ?>: <?php echo e($ad->car_model ?? '-'); ?></p>
                                 <p><i class="fas fa-calendar-alt text-gray-500"></i> <?php echo e(__('messages.car_year')); ?>: <?php echo e($ad->car_year ?? '-'); ?></p>
-                                <p><i class="fas fa-tachometer-alt text-gray-500"></i> <?php echo e(__('messages.car_km')); ?>: <?php echo e($ad->car_km ?? '-'); ?> كم</p>
+                                <p><i class="fas fa-tachometer-alt text-gray-500"></i> <?php echo e(__('messages.car_km')); ?>: <?php echo e($ad->car_km ? $ad->car_km.' كم' : '-'); ?></p>
                                 <p><i class="fas fa-gas-pump text-gray-500"></i> <?php echo e(__('messages.fuel')); ?>: <?php echo e($ad->fuel ?? '-'); ?></p>
                                 <p><i class="fas fa-cogs text-gray-500"></i> <?php echo e(__('messages.gearbox')); ?>: <?php echo e($ad->gearbox ?? '-'); ?></p>
                                 <p><i class="fas fa-palette text-gray-500"></i> <?php echo e(__('messages.color')); ?>: <?php echo e($ad->car_color ?? '-'); ?></p>
@@ -142,15 +150,22 @@
                             </div>
                         </div>
 
+                    
                     <?php elseif($ad->category === 'خدمات' || $ad->category === 'services'): ?>
-                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-<h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
-    <i class="fas fa-home"></i> <?php echo e(__('messages.service_details')); ?>
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                            <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
+                                <i class="fas fa-tools"></i> <?php echo e(__('messages.service_details')); ?>
 
-</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                                 <p><i class="fas fa-wrench text-gray-500"></i> <?php echo e(__('messages.service_type')); ?>: <?php echo e($ad->service_type ?? '-'); ?></p>
                                 <p><i class="fas fa-user-tie text-gray-500"></i> <?php echo e(__('messages.provider_name')); ?>: <?php echo e($ad->provider_name ?? '-'); ?></p>
+                                <p><i class="fas fa-car text-gray-500"></i> <?php echo e(__('messages.vehicle_type')); ?>: <?php echo e($ad->vehicle_type ?? '-'); ?></p>
+                                <p><i class="fas fa-shield-alt text-gray-500"></i> <?php echo e(__('messages.insurance_type')); ?>: <?php echo e($ad->insurance_type ?? '-'); ?></p>
+                                <p><i class="fas fa-tools text-gray-500"></i> <?php echo e(__('messages.maintenance_type')); ?>: <?php echo e($ad->maintenance_type ?? '-'); ?></p>
+                                <p><i class="fas fa-home text-gray-500"></i> <?php echo e(__('messages.property_type')); ?>: <?php echo e($ad->property_type ?? '-'); ?></p>
+                                <p><i class="fas fa-gavel text-gray-500"></i> <?php echo e(__('messages.bidding_type')); ?>: <?php echo e($ad->bidding_type ?? '-'); ?></p>
+                                <p><i class="fas fa-headset text-gray-500"></i> <?php echo e(__('messages.support_type')); ?>: <?php echo e($ad->support_type ?? '-'); ?></p>
                             </div>
                         </div>
 
@@ -179,14 +194,28 @@
         <i class="fas fa-phone"></i> <?php echo e(__('messages.call')); ?>
 
     </a>
-    
-    <form method="POST" action="<?php echo e(route('ads.favorite', $ad->id)); ?>" class="w-full">
-        <?php echo csrf_field(); ?>
-        <button type="submit" class="btn-yellow bg-yellow-500 hover:bg-yellow-600 w-full text-center">
-            <i class="fas fa-heart"></i> <?php echo e(__('messages.add_to_favorite')); ?>
+<?php if(auth()->guard()->check()): ?>
+    <?php if(auth()->user()->favorites()->where('ad_id', $ad->id)->exists()): ?>
+        
+        <form method="POST" action="<?php echo e(route('ads.unfavorite', $ad->slug)); ?>" class="w-full">
+            <?php echo csrf_field(); ?>
+            <?php echo method_field('DELETE'); ?>
+            <button type="submit" class="btn-yellow bg-red-500 hover:bg-red-600 w-full text-center">
+                <i class="fas fa-heart-broken"></i> <?php echo e(__('messages.remove_favorite')); ?>
 
-        </button>
-    </form>
+            </button>
+        </form>
+    <?php else: ?>
+        
+        <form method="POST" action="<?php echo e(route('ads.favorite', $ad->slug)); ?>" class="w-full">
+            <?php echo csrf_field(); ?>
+            <button type="submit" class="btn-yellow bg-yellow-500 hover:bg-yellow-600 w-full text-center">
+                <i class="fas fa-heart"></i> <?php echo e(__('messages.add_to_favorite')); ?>
+
+            </button>
+        </form>
+    <?php endif; ?>
+<?php endif; ?>
 
 
     <button onclick="shareAd('<?php echo e(route('ads.show', $ad->slug)); ?>')" 

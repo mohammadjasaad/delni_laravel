@@ -88,16 +88,23 @@
 
                 {{-- 📑 تبويب التفاصيل --}}
                 <div x-show="tab==='details'" class="space-y-4">
+
+                    {{-- 🏠 عقارات --}}
                     @if($ad->category === 'عقارات' || $ad->category === 'realestate')
-                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-<h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
-    <i class="fas fa-home"></i> {{ __('messages.real_estate_details') }}
-</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                            <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
+                                <i class="fas fa-home"></i> {{ __('messages.real_estate_details') }}
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                                 <p><i class="fas fa-tag text-gray-500"></i> {{ __('messages.subcategory') }}: {{ $ad->subcategory ?? '-' }}</p>
                                 <p><i class="fas fa-bed text-gray-500"></i> {{ __('messages.rooms') }}: {{ $ad->rooms ?? '-' }}</p>
                                 <p><i class="fas fa-bath text-gray-500"></i> {{ __('messages.bathrooms') }}: {{ $ad->bathrooms ?? '-' }}</p>
-                                <p><i class="fas fa-ruler-combined text-gray-500"></i> {{ __('messages.area') }}: {{ $ad->area ?? '-' }} م²</p>
+<p><i class="fas fa-ruler-combined text-gray-500"></i> 
+   {{ __('messages.area_total') }}: {{ $ad->area_total ?? '-' }} م²
+</p>
+<p><i class="fas fa-ruler-combined text-gray-500"></i> 
+   {{ __('messages.area_net') }}: {{ $ad->area_net ?? '-' }} م²
+</p>
                                 <p><i class="fas fa-building text-gray-500"></i> {{ __('messages.floor') }}: {{ $ad->floor ?? '-' }}</p>
                                 <p><i class="fas fa-industry text-gray-500"></i> {{ __('messages.building_age') }}: {{ $ad->building_age ?? '-' }}</p>
                                 <p><i class="fas fa-elevator text-gray-500"></i> {{ __('messages.elevator') }}: {{ $ad->has_elevator ? __('messages.yes') : __('messages.no') }}</p>
@@ -106,15 +113,16 @@
                             </div>
                         </div>
 
+                    {{-- 🚗 سيارات --}}
                     @elseif($ad->category === 'سيارات' || $ad->category === 'cars')
-                                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-<h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
-    <i class="fas fa-home"></i> {{ __('messages.car_model') }}
-</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                            <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
+                                <i class="fas fa-car"></i> {{ __('messages.car_details') }}
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                                 <p><i class="fas fa-car-side text-gray-500"></i> {{ __('messages.car_model') }}: {{ $ad->car_model ?? '-' }}</p>
                                 <p><i class="fas fa-calendar-alt text-gray-500"></i> {{ __('messages.car_year') }}: {{ $ad->car_year ?? '-' }}</p>
-                                <p><i class="fas fa-tachometer-alt text-gray-500"></i> {{ __('messages.car_km') }}: {{ $ad->car_km ?? '-' }} كم</p>
+                                <p><i class="fas fa-tachometer-alt text-gray-500"></i> {{ __('messages.car_km') }}: {{ $ad->car_km ? $ad->car_km.' كم' : '-' }}</p>
                                 <p><i class="fas fa-gas-pump text-gray-500"></i> {{ __('messages.fuel') }}: {{ $ad->fuel ?? '-' }}</p>
                                 <p><i class="fas fa-cogs text-gray-500"></i> {{ __('messages.gearbox') }}: {{ $ad->gearbox ?? '-' }}</p>
                                 <p><i class="fas fa-palette text-gray-500"></i> {{ __('messages.color') }}: {{ $ad->car_color ?? '-' }}</p>
@@ -122,14 +130,21 @@
                             </div>
                         </div>
 
+                    {{-- 🛠️ خدمات --}}
                     @elseif($ad->category === 'خدمات' || $ad->category === 'services')
-                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-<h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
-    <i class="fas fa-home"></i> {{ __('messages.service_details') }}
-</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                            <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
+                                <i class="fas fa-tools"></i> {{ __('messages.service_details') }}
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                                 <p><i class="fas fa-wrench text-gray-500"></i> {{ __('messages.service_type') }}: {{ $ad->service_type ?? '-' }}</p>
                                 <p><i class="fas fa-user-tie text-gray-500"></i> {{ __('messages.provider_name') }}: {{ $ad->provider_name ?? '-' }}</p>
+                                <p><i class="fas fa-car text-gray-500"></i> {{ __('messages.vehicle_type') }}: {{ $ad->vehicle_type ?? '-' }}</p>
+                                <p><i class="fas fa-shield-alt text-gray-500"></i> {{ __('messages.insurance_type') }}: {{ $ad->insurance_type ?? '-' }}</p>
+                                <p><i class="fas fa-tools text-gray-500"></i> {{ __('messages.maintenance_type') }}: {{ $ad->maintenance_type ?? '-' }}</p>
+                                <p><i class="fas fa-home text-gray-500"></i> {{ __('messages.property_type') }}: {{ $ad->property_type ?? '-' }}</p>
+                                <p><i class="fas fa-gavel text-gray-500"></i> {{ __('messages.bidding_type') }}: {{ $ad->bidding_type ?? '-' }}</p>
+                                <p><i class="fas fa-headset text-gray-500"></i> {{ __('messages.support_type') }}: {{ $ad->support_type ?? '-' }}</p>
                             </div>
                         </div>
 
@@ -156,13 +171,26 @@
        class="btn-yellow bg-green-500 hover:bg-green-600 w-full text-center">
         <i class="fas fa-phone"></i> {{ __('messages.call') }}
     </a>
-    {{-- زر المفضلة --}}
-    <form method="POST" action="{{ route('ads.favorite', $ad->id) }}" class="w-full">
-        @csrf
-        <button type="submit" class="btn-yellow bg-yellow-500 hover:bg-yellow-600 w-full text-center">
-            <i class="fas fa-heart"></i> {{ __('messages.add_to_favorite') }}
-        </button>
-    </form>
+@auth
+    @if(auth()->user()->favorites()->where('ad_id', $ad->id)->exists())
+        {{-- زر إزالة من المفضلة --}}
+        <form method="POST" action="{{ route('ads.unfavorite', $ad->slug) }}" class="w-full">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn-yellow bg-red-500 hover:bg-red-600 w-full text-center">
+                <i class="fas fa-heart-broken"></i> {{ __('messages.remove_favorite') }}
+            </button>
+        </form>
+    @else
+        {{-- زر إضافة للمفضلة --}}
+        <form method="POST" action="{{ route('ads.favorite', $ad->slug) }}" class="w-full">
+            @csrf
+            <button type="submit" class="btn-yellow bg-yellow-500 hover:bg-yellow-600 w-full text-center">
+                <i class="fas fa-heart"></i> {{ __('messages.add_to_favorite') }}
+            </button>
+        </form>
+    @endif
+@endauth
 
 {{-- زر المشاركة --}}
     <button onclick="shareAd('{{ route('ads.show', $ad->slug) }}')" 

@@ -11,17 +11,27 @@ class Ad extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
-        'description',
-        'price',
-        'city',
-        'category',
-        'images',
+        'title', 'description', 'price', 'city', 'category', 'images',
+        
+        // 🏠 عقارات
+        'rooms','bathrooms','area_total','area_net','floor','building_age','has_elevator','has_parking','heating_type','subcategory',
+        
+        // 🚗 سيارات
+        'car_model','car_year','car_km','fuel','gearbox','car_color','is_new',
+        
+        // 🛠️ خدمات
+        'service_type','provider_name',
+        
+        // 🌍 الموقع
+        'lat','lng',
         'user_id',
-        'lat',
-        'lng',
-        'is_featured',
-        'slug',
+        
+        // 🛠️ خدمات إضافية
+        'vehicle_type','insurance_type','maintenance_type',
+        'property_type','bidding_type','support_type',
+        
+        // ⭐ مميزات إضافية
+        'is_featured','slug'
     ];
 
     protected $casts = [

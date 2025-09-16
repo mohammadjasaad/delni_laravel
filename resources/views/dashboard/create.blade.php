@@ -70,20 +70,21 @@
                 </p>
             </div>
 
-            {{-- 🏠 خصائص العقارات --}}
-            <div x-show="category === 'عقارات'" class="space-y-3">
-                <h2 class="font-bold text-lg">🏠 تفاصيل العقار</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <x-input type="number" name="rooms" placeholder="عدد الغرف" />
-                    <x-input type="number" name="bathrooms" placeholder="عدد الحمامات" />
-                    <x-input type="number" name="area" placeholder="المساحة م²" />
-                    <x-input type="number" name="floor" placeholder="الطابق" />
-                    <x-input type="number" name="building_age" placeholder="عمر البناء" />
-                    <label class="flex items-center"><input type="checkbox" name="has_elevator" class="mr-2"> مصعد</label>
-                    <label class="flex items-center"><input type="checkbox" name="has_parking" class="mr-2"> موقف سيارات</label>
-                    <x-input type="text" name="heating_type" placeholder="نوع التدفئة" />
-                </div>
-            </div>
+{{-- 🏠 خصائص العقارات --}}
+<div x-show="category === 'عقارات'" class="space-y-3">
+    <h2 class="font-bold text-lg">🏠 تفاصيل العقار</h2>
+    <div class="grid grid-cols-2 gap-4">
+        <x-input type="number" name="rooms" placeholder="عدد الغرف" />
+        <x-input type="number" name="bathrooms" placeholder="عدد الحمامات" />
+        <x-input type="number" name="area_total" placeholder="المساحة الإجمالية م²" />
+        <x-input type="number" name="area_net" placeholder="المساحة الصافية م²" />
+        <x-input type="number" name="floor" placeholder="الطابق" />
+        <x-input type="number" name="building_age" placeholder="عمر البناء" />
+        <label class="flex items-center"><input type="checkbox" name="has_elevator" class="mr-2"> مصعد</label>
+        <label class="flex items-center"><input type="checkbox" name="has_parking" class="mr-2"> موقف سيارات</label>
+        <x-input type="text" name="heating_type" placeholder="نوع التدفئة" />
+    </div>
+</div>
 
 {{-- 🚗 خصائص السيارات --}}
 <div x-show="category === 'سيارات'" class="space-y-3">

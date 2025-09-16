@@ -23,6 +23,38 @@
               class="space-y-6" x-data="{ category: '{{ old('category') }}' }">
             @csrf
 
+            {{-- 📂 التصنيف --}}
+            <div>
+                <x-label for="category" :value="__('messages.category')" />
+                <select id="category" name="category" x-model="category" required
+                        class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
+                    <option value="">{{ __('messages.select_category') }}</option>
+                    <option value="realestate" {{ old('category') == 'realestate' ? 'selected' : '' }}>
+                        🏠 {{ __('messages.real_estate') }}
+                    </option>
+                    <option value="cars" {{ old('category') == 'cars' ? 'selected' : '' }}>
+                        🚗 {{ __('messages.cars') }}
+                    </option>
+                    <option value="services" {{ old('category') == 'services' ? 'selected' : '' }}>
+                        🛠️ {{ __('messages.services') }}
+                    </option>
+                </select>
+            </div>
+
+            {{-- 🏙️ المدينة --}}
+            <div>
+                <x-label for="city" :value="__('messages.city')" />
+                <select id="city" name="city" required
+                        class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
+                    <option value="">{{ __('messages.select_city') }}</option>
+                    @foreach($cities as $city)
+                        <option value="{{ $city }}" {{ old('city') == $city ? 'selected' : '' }}>
+                            {{ $city }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
             {{-- 📝 العنوان --}}
             <div>
                 <x-label for="title" :value="__('messages.title')" />
@@ -45,37 +77,6 @@
                          value="{{ old('price') }}" required />
             </div>
 
-            {{-- 🏙️ المدينة --}}
-            <div>
-                <x-label for="city" :value="__('messages.city')" />
-                <select id="city" name="city" required
-                        class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
-                    <option value="">{{ __('messages.select_city') }}</option>
-                    @foreach($cities as $city)
-                        <option value="{{ $city }}" {{ old('city') == $city ? 'selected' : '' }}>
-                            {{ $city }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            {{-- 📂 التصنيف --}}
-            <div>
-                <x-label for="category" :value="__('messages.category')" />
-                <select id="category" name="category" x-model="category" required
-                        class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500">
-                    <option value="">{{ __('messages.select_category') }}</option>
-                    <option value="realestate" {{ old('category') == 'realestate' ? 'selected' : '' }}>
-                        🏠 {{ __('messages.real_estate') }}
-                    </option>
-                    <option value="cars" {{ old('category') == 'cars' ? 'selected' : '' }}>
-                        🚗 {{ __('messages.cars') }}
-                    </option>
-                    <option value="services" {{ old('category') == 'services' ? 'selected' : '' }}>
-                        🛠️ {{ __('messages.services') }}
-                    </option>
-                </select>
-            </div>
 
             {{-- 🖼️ الصور --}}
             <div>
@@ -92,9 +93,11 @@
             <div x-show="category === 'realestate'" class="space-y-3">
                 <h2 class="font-bold text-lg">🏠 {{ __('messages.real_estate_details') }}</h2>
                 <div class="grid grid-cols-2 gap-4">
+<x-input type="text" name="subcategory" placeholder="{{ __('messages.subcategory') }}" />
                     <x-input type="number" name="rooms" placeholder="{{ __('messages.rooms') }}" />
                     <x-input type="number" name="bathrooms" placeholder="{{ __('messages.bathrooms') }}" />
-                    <x-input type="number" name="area" placeholder="{{ __('messages.area') }} م²" />
+<x-input type="number" name="area_total" placeholder="المساحة الإجمالية م²" />
+<x-input type="number" name="area_net" placeholder="المساحة الصافية م²" />
                     <x-input type="number" name="floor" placeholder="{{ __('messages.floor') }}" />
                     <x-input type="number" name="building_age" placeholder="{{ __('messages.building_age') }}" />
                     <label class="flex items-center"><input type="checkbox" name="has_elevator" class="mr-2"> {{ __('messages.elevator') }}</label>

@@ -56,6 +56,16 @@ return [
     'all_rights_reserved' => 'All rights reserved',
     'ssl_secure' => 'This website is secured with SSL to protect your data',
 
+    'insurance_type'  => 'Insurance Type',
+    'property_type'   => 'Property Type',
+    'support_type'    => 'Support Type',
+    'vehicle_type'    => 'Vehicle Type',
+    'maintenance_type'=> 'Maintenance Type',
+    'bidding_type'    => 'Bidding Type',
+
+    'area_total' => 'Total Area',
+    'area_net'   => 'Net Area',
+
 'emergency_reports'  => 'Emergency Reports',
 'no_emergency_reports' => 'No emergency reports yet',
 

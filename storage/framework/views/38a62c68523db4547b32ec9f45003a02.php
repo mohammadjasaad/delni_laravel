@@ -4,6 +4,8 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
 <head>
     <meta charset="utf-8">
+    <!-- ✅ CSRF Token -->
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo $__env->yieldContent('title', 'Delni.co'); ?></title>
 
@@ -40,37 +42,37 @@
 
     
     <?php echo app('Illuminate\Foundation\Vite')(['resources/js/app.js']); ?>
-<!-- ✅ Lightbox2 JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+    <!-- ✅ Lightbox2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    function toggleDarkMode() {
-        document.documentElement.classList.toggle('dark');
-        localStorage.setItem('darkMode', document.documentElement.classList.contains('dark') ? 'enabled' : 'disabled');
-        updateIcons();
-    }
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark') ? 'enabled' : 'disabled');
+            updateIcons();
+        }
 
-    function updateIcons() {
-        const isDark = document.documentElement.classList.contains('dark');
+        function updateIcons() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const desktopBtn = document.getElementById("toggleDarkModeDesktop");
+            const mobileBtn = document.getElementById("toggleDarkModeMobile");
+            if (desktopBtn) desktopBtn.textContent = isDark ? "☀️" : "🌙";
+            if (mobileBtn) mobileBtn.textContent = isDark ? "☀️" : "🌙";
+        }
+
         const desktopBtn = document.getElementById("toggleDarkModeDesktop");
         const mobileBtn = document.getElementById("toggleDarkModeMobile");
-        if (desktopBtn) desktopBtn.textContent = isDark ? "☀️" : "🌙";
-        if (mobileBtn) mobileBtn.textContent = isDark ? "☀️" : "🌙";
-    }
 
-    const desktopBtn = document.getElementById("toggleDarkModeDesktop");
-    const mobileBtn = document.getElementById("toggleDarkModeMobile");
+        if (desktopBtn) desktopBtn.addEventListener("click", toggleDarkMode);
+        if (mobileBtn) mobileBtn.addEventListener("click", toggleDarkMode);
 
-    if (desktopBtn) desktopBtn.addEventListener("click", toggleDarkMode);
-    if (mobileBtn) mobileBtn.addEventListener("click", toggleDarkMode);
-
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        document.documentElement.classList.add('dark');
-    }
-    updateIcons();
-});
-</script>
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.documentElement.classList.add('dark');
+        }
+        updateIcons();
+    });
+    </script>
 </body>
 </html>
 <?php /**PATH /home/delni_user/delni/resources/views/layouts/app.blade.php ENDPATH**/ ?>

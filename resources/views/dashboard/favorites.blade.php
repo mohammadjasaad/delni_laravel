@@ -94,7 +94,7 @@
             @foreach($favorites as $ad)
                 @php
                     $images = is_array($ad->images) ? $ad->images : json_decode($ad->images, true);
-                    $firstImage = $images[0] ?? 'placeholder.png';
+                    $firstImage = !empty($images[0]) ? asset('storage/'.$images[0]) : asset('storage/placeholder.png');
                 @endphp
 
                 {{-- 🟨 بطاقة إعلان --}}
@@ -108,9 +108,8 @@
                     @endif
 
                     {{-- 🖼️ صورة الإعلان --}}
-                    <a href="{{ route('ads.show', $ad->id) }}">
-                        <img src="{{ asset('storage/' . $firstImage) }}" alt="Ad Image"
-                             class="w-full h-48 object-cover">
+                    <a href="{{ route('ads.show', $ad->slug) }}">
+                        <img src="{{ $firstImage }}" alt="{{ $ad->title }}" class="w-full h-48 object-cover">
                         <div class="p-4 space-y-2">
                             <h2 class="text-lg font-semibold text-gray-800 dark:text-white truncate">
                                 {{ $ad->title }}
@@ -129,7 +128,7 @@
 
                     {{-- ❌ زر إزالة من المفضلة --}}
                     <div class="px-4 pb-4">
-                        <form method="POST" action="{{ route('ads.unfavorite', $ad->id) }}">
+                        <form method="POST" action="{{ route('ads.unfavorite', $ad->slug) }}">
                             @csrf
                             @method('DELETE')
                             <button type="submit"

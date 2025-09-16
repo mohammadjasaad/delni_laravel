@@ -14,22 +14,11 @@
         
         <div class="absolute top-2 left-2 z-10">
             <?php if(auth()->guard()->check()): ?>
-                <?php if(auth()->user()->favorites->contains($ad->id)): ?>
-                    <form action="<?php echo e(route('ads.unfavorite', $ad->id)); ?>" method="POST">
-                        <?php echo csrf_field(); ?>
-                        <?php echo method_field('DELETE'); ?>
-                        <button type="submit" class="text-red-600 hover:text-gray-400 transition">
-                            <i class="fas fa-heart fa-lg"></i>
-                        </button>
-                    </form>
-                <?php else: ?>
-                    <form action="<?php echo e(route('ads.favorite', $ad->id)); ?>" method="POST">
-                        <?php echo csrf_field(); ?>
-                        <button type="submit" class="text-gray-400 hover:text-red-600 transition">
-                            <i class="far fa-heart fa-lg"></i>
-                        </button>
-                    </form>
-                <?php endif; ?>
+                <button 
+                    class="favorite-btn <?php echo e(auth()->user()->favorites->contains($ad->id) ? 'text-red-600' : 'text-gray-400'); ?> hover:text-red-600 transition"
+                    data-slug="<?php echo e($ad->slug); ?>">
+                    <i class="<?php echo e(auth()->user()->favorites->contains($ad->id) ? 'fas' : 'far'); ?> fa-heart fa-lg"></i>
+                </button>
             <?php endif; ?>
         </div>
 
@@ -61,4 +50,42 @@
 
     </p>
 <?php endif; ?>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".favorite-btn").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            const slug = btn.dataset.slug;
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+
+            try {
+                let response = await fetch(`/ads/${slug}/toggle-favorite`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": token,
+                        "Accept": "application/json",
+                    }
+                });
+
+                if (response.ok) {
+                    btn.classList.toggle("text-red-600");
+                    btn.classList.toggle("text-gray-400");
+
+                    let icon = btn.querySelector("i");
+                    icon.classList.toggle("fas");
+                    icon.classList.toggle("far");
+                } else {
+                    console.error("❌ خطأ بالطلب:", response.status);
+                }
+            } catch (err) {
+                console.error("⚠️ خطأ:", err);
+            }
+        });
+    });
+});
+</script>
 <?php /**PATH /home/delni_user/delni/resources/views/ads/partials/list.blade.php ENDPATH**/ ?>

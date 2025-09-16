@@ -150,43 +150,37 @@ public function favorites(Request $request)
 {
     $user = Auth::user();
 
-    // 📦 استعلام المفضلة مع الإعلان
-    $query = $user->favorites()->with('ad');
+    // 📦 استعلام المفضلة مع الإعلانات
+    $query = Ad::whereHas('favorites', function($q) use ($user) {
+        $q->where('user_id', $user->id);
+    });
 
     // 🌍 فلترة المدينة
     if ($request->filled('city')) {
-        $query->whereHas('ad', function($q) use ($request) {
-            $q->where('city', $request->city);
-        });
+        $query->where('city', $request->city);
     }
 
     // 📂 فلترة التصنيف
     if ($request->filled('category')) {
-        $query->whereHas('ad', function($q) use ($request) {
-            $q->where('category', $request->category);
-        });
+        $query->where('category', $request->category);
     }
 
     // ⭐ فلترة حالة الإعلان
     if ($request->filled('featured')) {
-        $query->whereHas('ad', function($q) use ($request) {
-            $q->where('is_featured', $request->featured);
-        });
+        $query->where('is_featured', $request->featured);
     }
 
     // 🔄 الترتيب
     switch ($request->get('sort')) {
         case 'price_asc':
-            $query->whereHas('ad', function($q) { $q->orderBy('price', 'asc'); });
+            $query->orderBy('price', 'asc');
             break;
         case 'price_desc':
-            $query->whereHas('ad', function($q) { $q->orderBy('price', 'desc'); });
+            $query->orderBy('price', 'desc');
             break;
         default:
-            $query->whereHas('ad', function($q) {
-                $q->orderBy('is_featured', 'desc')
+            $query->orderBy('is_featured', 'desc')
                   ->orderBy('created_at', 'desc');
-            });
             break;
     }
 

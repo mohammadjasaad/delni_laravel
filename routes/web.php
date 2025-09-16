@@ -65,6 +65,9 @@ Route::get('/{slug}', [AdController::class, 'show'])->name('ads.show');
 # ❤️ المفضلة
 Route::post('/{slug}/favorite', [AdController::class, 'addFavorite'])->middleware('auth')->name('ads.favorite');
 Route::delete('/{slug}/unfavorite', [AdController::class, 'removeFavorite'])->middleware('auth')->name('ads.unfavorite');
+Route::post('/{slug}/toggle-favorite', [AdController::class, 'toggleFavorite'])
+    ->middleware('auth')
+    ->name('ads.toggleFavorite');
 
 # 🚨 بلاغ عن إعلان
 Route::post('/{slug}/report', [ReportController::class, 'store'])->middleware('auth')->name('ads.report');

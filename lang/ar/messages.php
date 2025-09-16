@@ -45,8 +45,17 @@ return [
 'no_taxi_orders'     => 'لا توجد طلبات تاكسي حتى الآن',
 'load_more' => 'تحميل المزيد',
 
+    'insurance_type'  => 'نوع التأمين',
+    'property_type'   => 'نوع العقار',
+    'support_type'    => 'نوع الدعم',
+    'vehicle_type'    => 'نوع المركبة',
+    'maintenance_type'=> 'نوع الصيانة',
+    'bidding_type'    => 'نوع المزايدة',
+
 'view_all_ads' => 'الإعلانات',
 
+    'area_total' => 'المساحة الإجمالية',
+    'area_net'   => 'المساحة الصافية',
     'all_rights_reserved' => 'جميع الحقوق محفوظة',
     'ssl_secure' => 'هذا الموقع محمي بشهادة SSL لضمان أمان بياناتك',
 
