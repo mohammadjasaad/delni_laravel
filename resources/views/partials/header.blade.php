@@ -1,5 +1,4 @@
-{{-- resources/views/partials/header.blade.php --}}
-<header class="bg-white dark:bg-gray-900 shadow-sm">
+<header class="bg-white dark:bg-gray-900 shadow-sm relative z-[2000]">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
         {{-- ✅ أقصى اليمين: الشعار --}}
@@ -12,9 +11,6 @@
 
         {{-- ✅ الوسط: روابط رئيسية (ثابتة للجميع) --}}
         <nav class="hidden md:flex gap-6 text-sm font-medium text-gray-700 dark:text-gray-300">
-            <a href="{{ route('home') }}" class="hover:text-yellow-500">{{ __('messages.home') }}</a>
-            <a href="{{ route('about') }}" class="hover:text-yellow-500">{{ __('messages.about') }}</a>
-            <a href="{{ route('contact') }}" class="hover:text-yellow-500">{{ __('messages.contact') }}</a>
         </nav>
 
         {{-- ✅ أقصى اليسار: أزرار التحكم (للكمبيوتر) --}}
@@ -27,6 +23,19 @@
                     ➕ {{ __('messages.add_ad') }}
                 </a>
             @endif
+
+            {{-- 🏬 زر متجري --}}
+            @auth
+                @php
+                    $userStore = \App\Models\Store::where('user_id', auth()->id())->first();
+                @endphp
+                @if($userStore)
+                    <a href="{{ route('mall.dashboard', $userStore->id) }}"
+                       class="px-3 py-1.5 rounded bg-yellow-400 text-black font-semibold shadow hover:bg-yellow-500 transition text-sm flex items-center gap-1">
+                        <i class="fas fa-store"></i> {{ __('mall.my_store') }}
+                    </a>
+                @endif
+            @endauth
 
             {{-- دخول/لوحة التحكم --}}
             @auth
@@ -98,6 +107,18 @@
         @if(auth()->check() && auth()->user()->role !== 'admin')
             <a href="{{ route('ads.create') }}" class="block hover:text-yellow-500">➕ {{ __('messages.add_ad') }}</a>
         @endif
+
+        {{-- 🏬 زر متجري (موبايل) --}}
+        @auth
+            @php
+                $userStore = \App\Models\Store::where('user_id', auth()->id())->first();
+            @endphp
+            @if($userStore)
+                <a href="{{ route('mall.dashboard', $userStore->id) }}" class="block hover:text-yellow-500">
+                    <i class="fas fa-store"></i> {{ __('mall.my_store') }}
+                </a>
+            @endif
+        @endauth
 
         @auth
             @if(auth()->user()->role === 'admin')

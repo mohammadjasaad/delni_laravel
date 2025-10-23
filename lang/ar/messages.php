@@ -44,6 +44,9 @@ return [
 'taxi_orders'        => 'طلبات التاكسي',
 'no_taxi_orders'     => 'لا توجد طلبات تاكسي حتى الآن',
 'load_more' => 'تحميل المزيد',
+'delni_mall' => 'دلني مول',
+
+'mall_categories' => 'أقسام دلني مول',
 
     'insurance_type'  => 'نوع التأمين',
     'property_type'   => 'نوع العقار',
@@ -51,6 +54,8 @@ return [
     'vehicle_type'    => 'نوع المركبة',
     'maintenance_type'=> 'نوع الصيانة',
     'bidding_type'    => 'نوع المزايدة',
+
+'manage_banners' => 'إدارة البانرات',
 
 'view_all_ads' => 'الإعلانات',
 
@@ -92,6 +97,13 @@ return [
 'account_info'=> 'معلومات الحساب',
 'change_password' => 'تغيير كلمة المرور',
 'update_password' => 'تحديث كلمة المرور',
+
+
+    // ✅ حالات الطلب
+    'pending'   => 'قيد الانتظار',
+    'accepted'  => 'تم القبول',
+    'completed' => 'مكتمل',
+    'cancelled' => 'ملغى',
 
 // 📌 إضافات للفلاتر
 'deal_type' => 'نوع العرض',
@@ -413,4 +425,21 @@ return [
     'admin_dashboard' => 'لوحة المشرف الرئيسية',
     'manage_users' => 'إدارة المستخدمين',
     'manage_emergency_reports' => 'إدارة جميع البلاغات المرسلة',
+
+
+
+    // 🌐 عام
+    'dashboard'        => 'لوحة التحكم',
+    'home'             => 'الرئيسية',
+    'save'             => 'حفظ',
+    'update'           => 'تحديث',
+    'delete'           => 'حذف',
+    'edit'             => 'تعديل',
+    'back'             => 'رجوع',
+    'view'             => 'عرض',
+    'no_data'          => 'لا توجد بيانات',
+    'created_at'       => 'تاريخ الإنشاء',
+    'currency'         => '₺',
+    'confirm_delete'   => 'هل أنت متأكد من الحذف؟',
+
 ];

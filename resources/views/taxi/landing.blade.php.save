@@ -1,0 +1,151 @@
+نعم{{-- resources/views/taxi/landing.blade.php --}}
+<x-app-layout>
+    <section class="min-h-screen flex flex-col bg-gray-900 text-white">
+
+        {{-- 🟡 Hero Section --}}
+        <header class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white py-16 shadow-lg">
+            <div class="max-w-7xl mx-auto px-6 text-center">
+                <h1 class="text-5xl md:text-6xl font-extrabold mb-4 tracking-tight drop-shadow-lg">🚖 Delni Taxi</h1>
+                <p class="text-lg md:text-2xl font-light">
+                    شريكك الموثوق في التنقل اليومي |
+                    <span class="font-semibold">Your Reliable Ride Partner</span>
+                </p>
+
+                <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="{{ route('taxi.passenger') }}"
+                       class="bg-white text-yellow-700 font-semibold py-3 px-8 rounded-xl shadow hover:bg-yellow-50 transition">
+                        🚕 اطلب سيارة الآن
+                    </a>
+                    <a href="{{ route('driver.login') }}"
+                       class="border border-white text-white font-semibold py-3 px-8 rounded-xl hover:bg-yellow-600 transition">
+                        👨‍✈️ تسجيل دخول السائقين
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        {{-- 🚦 Choose Role Section --}}
+        <main class="flex-1 bg-gray-50 text-gray-900">
+            <div class="max-w-7xl mx-auto py-20 px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">
+                    اختر دورك | <span class="text-yellow-600">Choose Your Role</span>
+                </h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
+                    {{-- Passenger --}}
+                    <a href="{{ route('taxi.passenger') }}"
+                       class="flex flex-col items-center justify-center bg-white p-10 rounded-2xl shadow-md hover:shadow-xl transition transform hover:scale-105 duration-300">
+                        <div class="text-7xl mb-4">🚕</div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">راكب | Passenger</h3>
+                        <p class="text-gray-600 text-base">احجز رحلتك بسهولة خلال ثوانٍ.</p>
+                    </a>
+
+                    {{-- Driver --}}
+                    <a href="{{ route('driver.login') }}"
+                       class="flex flex-col items-center justify-center bg-white p-10 rounded-2xl shadow-md hover:shadow-xl transition transform hover:scale-105 duration-300">
+                        <div class="text-7xl mb-4">👨‍✈️</div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">سائق | Driver</h3>
+                        <p class="text-gray-600 text-base">ابدأ القيادة وزد دخلك اليوم.</p>
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        {{-- 🌙 Dark Mode Map Section --}}
+        <section class="relative w-full h-[500px] md:h-[600px]">
+            <div id="taxiMap" class="absolute inset-0 w-full h-full z-0 rounded-none"></div>
+
+            {{-- Overlay Title --}}
+            <div class="absolute inset-0 flex flex-col justify-center items-center bg-black/40 text-white text-center z-10">
+                <h3 class="text-3xl md:text-4xl font-bold mb-4 drop-shadow-lg">📍 السائقون القريبون منك</h3>
+                <p class="text-lg mb-2">شاهد موقعك الحالي والسائقين حولك بشكل مباشر</p>
+                <p class="text-sm text-gray-300">(الخريطة تتحدث تلقائيًا لإظهار حركة السيارات)</p>
+            </div>
+        </section>
+
+        {{-- 🦶 Footer --}}
+        <footer class="bg-gray-950 text-gray-400 py-10 mt-0 border-t border-gray-800">
+            <div class="max-w-7xl mx-auto px-6 text-center space-y-3">
+                <p>© {{ date('Y') }} <span class="text-yellow-400 font-semibold">Delni.co</span> — جميع الحقوق محفوظة</p>
+                <div class="flex flex-wrap justify-center gap-4 text-sm">
+                    <a href="{{ route('home') }}" class="hover:text-yellow-400">🏠 الرئيسية</a>
+                    <a href="{{ route('contact') }}" class="hover:text-yellow-400">📞 اتصل بنا</a>
+                    <a href="{{ route('terms') }}" class="hover:text-yellow-400">📜 الشروط والأحكام</a>
+                    <a href="{{ route('privacy') }}" class="hover:text-yellow-400">🔒 سياسة الخصوصية</a>
+                </div>
+            </div>
+        </footer>
+    </section>
+
+    {{-- 🗺️ Leaflet Dark Map --}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const map = L.map('taxiMap', { zoomControl: false }).setView([33.5138, 36.2765], 13);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap & CARTO',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+
+            let driverMarkers = [];
+
+            // 📍 موقع المستخدم
+            function addUserMarker(lat, lng) {
+                L.marker([lat, lng])
+                    .addTo(map)
+                    .bindPopup("<b>📍 موقعك الحالي</b>")
+                    .openPopup();
+            }
+
+            // 🚗 إنشاء سائقين وهميين
+            function generateDrivers(lat, lng) {
+                for (let i = 0; i < 8; i++) {
+                    const driverLat = lat + (Math.random() - 0.5) * 0.02;
+                    const driverLng = lng + (Math.random() - 0.5) * 0.02;
+
+                    const marker = L.marker([driverLat, driverLng]).addTo(map)
+                        .bindPopup("🚖 سائق قريب منك");
+                    driverMarkers.push(marker);
+                }
+            }
+
+            // 🔁 تحريك السيارات بشكل عشوائي
+            function moveDrivers() {
+                driverMarkers.forEach(marker => {
+                    const oldLatLng = marker.getLatLng();
+                    const newLat = oldLatLng.lat + (Math.random() - 0.5) * 0.0015;
+                    const newLng = oldLatLng.lng + (Math.random() - 0.5) * 0.0015;
+                    marker.setLatLng([newLat, newLng]);
+                });
+            }
+
+            // 📡 تفعيل الموقع
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    const userLat = pos.coords.latitude;
+                    const userLng = pos.coords.longitude;
+
+                    map.setView([userLat, userLng], 14);
+                    addUserMarker(userLat, userLng);
+                    generateDrivers(userLat, userLng);
+
+                    // تحديث حركة السائقين كل 5 ثوانٍ
+                    setInterval(moveDrivers, 5000);
+                }, () => {
+                    // موقع افتراضي دمشق
+                    addUserMarker(33.5138, 36.2765);
+                    generateDrivers(33.5138, 36.2765);
+                    setInterval(moveDrivers, 5000);
+                });
+            } else {
+                addUserMarker(33.5138, 36.2765);
+                generateDrivers(33.5138, 36.2765);
+                setInterval(moveDrivers, 5000);
+            }
+        });
+    </script>
+</x-app-layout>

@@ -1,5 +1,4 @@
-
-<header class="bg-white dark:bg-gray-900 shadow-sm">
+<header class="bg-white dark:bg-gray-900 shadow-sm relative z-[2000]">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
         
@@ -12,9 +11,6 @@
 
         
         <nav class="hidden md:flex gap-6 text-sm font-medium text-gray-700 dark:text-gray-300">
-            <a href="<?php echo e(route('home')); ?>" class="hover:text-yellow-500"><?php echo e(__('messages.home')); ?></a>
-            <a href="<?php echo e(route('about')); ?>" class="hover:text-yellow-500"><?php echo e(__('messages.about')); ?></a>
-            <a href="<?php echo e(route('contact')); ?>" class="hover:text-yellow-500"><?php echo e(__('messages.contact')); ?></a>
         </nav>
 
         
@@ -27,6 +23,20 @@
                     ➕ <?php echo e(__('messages.add_ad')); ?>
 
                 </a>
+            <?php endif; ?>
+
+            
+            <?php if(auth()->guard()->check()): ?>
+                <?php
+                    $userStore = \App\Models\Store::where('user_id', auth()->id())->first();
+                ?>
+                <?php if($userStore): ?>
+                    <a href="<?php echo e(route('mall.dashboard', $userStore->id)); ?>"
+                       class="px-3 py-1.5 rounded bg-yellow-400 text-black font-semibold shadow hover:bg-yellow-500 transition text-sm flex items-center gap-1">
+                        <i class="fas fa-store"></i> <?php echo e(__('mall.my_store')); ?>
+
+                    </a>
+                <?php endif; ?>
             <?php endif; ?>
 
             
@@ -103,6 +113,19 @@
 
         <?php if(auth()->check() && auth()->user()->role !== 'admin'): ?>
             <a href="<?php echo e(route('ads.create')); ?>" class="block hover:text-yellow-500">➕ <?php echo e(__('messages.add_ad')); ?></a>
+        <?php endif; ?>
+
+        
+        <?php if(auth()->guard()->check()): ?>
+            <?php
+                $userStore = \App\Models\Store::where('user_id', auth()->id())->first();
+            ?>
+            <?php if($userStore): ?>
+                <a href="<?php echo e(route('mall.dashboard', $userStore->id)); ?>" class="block hover:text-yellow-500">
+                    <i class="fas fa-store"></i> <?php echo e(__('mall.my_store')); ?>
+
+                </a>
+            <?php endif; ?>
         <?php endif; ?>
 
         <?php if(auth()->guard()->check()): ?>

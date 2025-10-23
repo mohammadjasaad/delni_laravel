@@ -69,16 +69,22 @@
             route="admin.visitors.index"
         />
 
-        {{-- 🚀 الروابط السريعة --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-12">
-            <x-admin.quick-link route="admin.users.index" icon="👤" label="{{ __('messages.manage_users') }}" color="blue"/>
-            <x-admin.quick-link route="admin.support_tickets.index" icon="🎫" label="{{ __('messages.support_tickets') }}" color="green"/>
-            <x-admin.quick-link route="admin.emergency_reports.index" icon="🚨" label="{{ __('messages.manage_emergency_reports') }}" color="red"/>
-            <x-admin.quick-link route="admin.visitors.index" icon="👁️" label="{{ __('messages.visitors') }}" color="purple"/>
-            <x-admin.quick-link route="admin.statistics" icon="📊" label="{{ __('messages.statistics') }}" color="yellow"/>
-        </div>
-    </div>
+{{-- 🚀 الروابط السريعة --}}
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-12">
+    <x-admin.quick-link route="admin.users.index" icon="👤" label="{{ __('messages.manage_users') }}" color="blue"/>
+    <x-admin.quick-link route="admin.support_tickets.index" icon="🎫" label="{{ __('messages.support_tickets') }}" color="green"/>
+    <x-admin.quick-link route="admin.emergency_reports.index" icon="🚨" label="{{ __('messages.manage_emergency_reports') }}" color="red"/>
+    <x-admin.quick-link route="admin.visitors.index" icon="👁️" label="{{ __('messages.visitors') }}" color="purple"/>
+    <x-admin.quick-link route="admin.statistics" icon="📊" label="{{ __('messages.statistics') }}" color="yellow"/>
+
+    {{-- 📢 إدارة البانرات --}}
+    <x-admin.quick-link route="banners.index" icon="📢" label="{{ __('messages.manage_banners') }}" color="indigo"/>
+
+    {{-- 🖼️ إدارة بانرات المول --}}
+    <x-admin.quick-link route="mall-banners.index" icon="🖼️" label="إدارة بانرات المول" color="pink"/>
+</div>
 
     {{-- 📊 Chart.js --}}
     @vite('resources/js/admin-dashboard.js')
+
 </x-app-layout>

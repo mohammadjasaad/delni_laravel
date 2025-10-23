@@ -9,39 +9,39 @@ use Illuminate\Http\Request;
 
 class TaxiController extends Controller
 {
-    // عرض صفحة التاكسي الرئيسية
-public function index()
-{
-    // ✅ استرجاع السائقين المتاحين فقط
-    $drivers = \App\Models\Driver::where('status', 'متاح')->get();
+    // ✅ عرض صفحة التاكسي الرئيسية
+    public function index()
+    {
+        // استرجاع السائقين المتاحين فقط
+        $drivers = Driver::where('status', 'متاح')->get();
 
-    // ✅ تحديد موقع المستخدم مبدئياً (دمشق مثالاً)
-    $userLat = 33.5138;
-    $userLng = 36.2765;
+        // تحديد موقع المستخدم مبدئياً (دمشق مثالاً)
+        $userLat = 33.5138;
+        $userLng = 36.2765;
 
-    // ✅ أقرب سائق (مبدئيًا نأخذ أول واحد)
-    $nearestDriver = $drivers->first();
+        // أقرب سائق (مبدئيًا نأخذ أول واحد)
+        $nearestDriver = $drivers->first();
 
-    // ✅ الطلب الجاري للمستخدم الحالي (إن وجد)
-    $activeOrder = null;
-    if (auth()->check()) {
-        $activeOrder = \App\Models\TaxiOrder::where('user_id', auth()->id())
-                        ->whereIn('status', ['قيد التنفيذ', 'بانتظار السائق'])
-                        ->orderBy("created_at","desc")
-                        ->first();
+        // الطلب الجاري للمستخدم الحالي (إن وجد)
+        $activeOrder = null;
+        if (auth()->check()) {
+            $activeOrder = \App\Models\TaxiOrder::where('user_id', auth()->id())
+                            ->whereIn('status', ['قيد التنفيذ', 'بانتظار السائق'])
+                            ->orderBy("created_at", "desc")
+                            ->first();
+        }
+
+        // تمرير البيانات إلى الواجهة
+        return view('taxi.delni-taxi', compact(
+            'drivers',
+            'userLat',
+            'userLng',
+            'nearestDriver',
+            'activeOrder'
+        ));
     }
 
-    // ✅ إرسال كل شيء للواجهة
-    return view('taxi.delni-taxi', compact(
-        'drivers',
-        'userLat',
-        'userLng',
-        'nearestDriver',
-        'activeOrder'
-    ));
-}
-
-    // جلب موقع السائق حسب ID
+    // ✅ جلب موقع السائق حسب ID (API)
     public function driverLocation($id)
     {
         $driver = TaxiDriver::findOrFail($id);
@@ -51,7 +51,7 @@ public function index()
         ]);
     }
 
-    // عرض خريطة كل السائقين
+    // ✅ عرض خريطة كل السائقين
     public function showDriversMap()
     {
         $drivers = Driver::whereNotNull('latitude')
@@ -61,7 +61,7 @@ public function index()
         return view('taxi.drivers-map', compact('drivers'));
     }
 
-    // عرض صفحة إنهاء الرحلة مع التقييم
+    // ✅ عرض صفحة إنهاء الرحلة مع التقييم
     public function tripCompleted(Request $request)
     {
         $driver = Driver::first(); // مؤقتًا نستخدم أول سائق
@@ -72,7 +72,7 @@ public function index()
         return view('taxi.order-completed', compact('driver', 'rating'));
     }
 
-    // API: جلب كل السائقين مع إحداثياتهم
+    // ✅ API: جلب كل السائقين مع إحداثياتهم
     public function getDriversJson()
     {
         $drivers = Driver::whereNotNull('latitude')
@@ -81,35 +81,4 @@ public function index()
 
         return response()->json($drivers);
     }
-public function showDelniTaxi()
-{
-    // ✅ استرجاع السائقين المتاحين فقط
-    $drivers = \App\Models\Driver::where('status', 'متاح')->get();
-
-    // ✅ تحديد إحداثيات المستخدم الافتراضية (يمكن ربطها بالموقع الحقيقي لاحقاً)
-    $userLat = 33.5138; // دمشق كمثال
-    $userLng = 36.2765;
-
-    // ✅ إيجاد أقرب سائق (اختياري حالياً – سنحسبه لاحقاً)
-    $nearestDriver = $drivers->first(); // مؤقتاً نأخذ أول سائق
-
-    // ✅ الطلب الحالي للمستخدم إن وجد
-    $activeOrder = null;
-    if (auth()->check()) {
-        $activeOrder = \App\Models\TaxiOrder::where('user_id', auth()->id())
-                        ->whereIn('status', ['قيد التنفيذ', 'بانتظار السائق'])
-                        ->orderBy("created_at","desc")
-                        ->first();
-    }
-
-    // ✅ تمرير البيانات إلى واجهة العرض
-    return view('taxi.delni-taxi', compact(
-        'drivers',
-        'userLat',
-        'userLng',
-        'nearestDriver',
-        'activeOrder'
-    ));
-}
-
 }

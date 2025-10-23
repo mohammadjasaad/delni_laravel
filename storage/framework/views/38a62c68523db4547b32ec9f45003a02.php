@@ -1,26 +1,21 @@
 <!DOCTYPE html>
 <html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>" dir="rtl">
-<!-- ✅ Lightbox2 CSS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
 <head>
     <meta charset="utf-8">
-    <!-- ✅ CSRF Token -->
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo $__env->yieldContent('title', 'Delni.co'); ?></title>
 
     <!-- ✅ خط Cairo -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
-
     <!-- ✅ ستايلات -->
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css']); ?>
-
-    <!-- ✅ إضافة AlpineJS -->
+    <!-- ✅ FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ✅ AlpineJS -->
     <script src="//unpkg.com/alpinejs" defer></script>
 
-    <style>
-        body { font-family: 'Cairo', sans-serif; }
-    </style>
+    <style> body { font-family: 'Cairo', sans-serif; } </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex flex-col min-h-screen">
 
@@ -28,12 +23,58 @@
     <?php echo $__env->make('partials.header', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
     
+    <div class="fixed top-6 right-6 z-50 space-y-3 w-full max-w-sm" x-data x-cloak>
+        <?php $__currentLoopData = ['success', 'error', 'warning', 'info']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $msg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php if(session($msg)): ?>
+                <?php
+                    $messages = is_array(session($msg)) ? session($msg) : [session($msg)];
+                ?>
+                <?php $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <div x-data="{ show: true }"
+                         x-show="show"
+                         x-transition:enter="transform ease-out duration-300 transition"
+                         x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+                         x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         x-init="setTimeout(() => show = false, 6000)"
+                         class="flex justify-between items-center px-4 py-3 rounded-lg shadow-lg
+                                <?php if($msg === 'success'): ?> bg-green-100 border border-green-300 text-green-800
+                                <?php elseif($msg === 'error'): ?> bg-red-100 border border-red-300 text-red-800
+                                <?php elseif($msg === 'warning'): ?> bg-yellow-100 border border-yellow-300 text-yellow-800
+                                <?php elseif($msg === 'info'): ?> bg-blue-100 border border-blue-300 text-blue-800
+                                <?php endif; ?>">
+                        
+                        
+                        <span class="flex items-center gap-2">
+                            <?php if($msg === 'success'): ?> <i class="fas fa-check-circle"></i>
+                            <?php elseif($msg === 'error'): ?> <i class="fas fa-exclamation-triangle"></i>
+                            <?php elseif($msg === 'warning'): ?> <i class="fas fa-bolt"></i>
+                            <?php elseif($msg === 'info'): ?> <i class="fas fa-info-circle"></i>
+                            <?php endif; ?>
+                            <?php echo e($message); ?>
+
+                        </span>
+
+                        
+                        <button @click="show = false" class="ml-4 font-bold
+                                <?php if($msg === 'success'): ?> text-green-700 hover:text-green-900
+                                <?php elseif($msg === 'error'): ?> text-red-700 hover:text-red-900
+                                <?php elseif($msg === 'warning'): ?> text-yellow-700 hover:text-yellow-900
+                                <?php elseif($msg === 'info'): ?> text-blue-700 hover:text-blue-900
+                                <?php endif; ?>">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <?php endif; ?>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    </div>
+
+    
     <main class="flex-1 py-8">
-        <?php if(isset($slot)): ?>
-            <?php echo e($slot); ?>
-
-        <?php endif; ?>
-
+        <?php if(isset($slot)): ?> <?php echo e($slot); ?> <?php endif; ?>
         <?php echo $__env->yieldContent('content'); ?>
     </main>
 
@@ -42,36 +83,38 @@
 
     
     <?php echo app('Illuminate\Foundation\Vite')(['resources/js/app.js']); ?>
-    <!-- ✅ Lightbox2 JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 
+    
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark') ? 'enabled' : 'disabled');
-            updateIcons();
-        }
+        document.addEventListener("DOMContentLoaded", function () {
+            function toggleDarkMode() {
+                document.documentElement.classList.toggle('dark');
+                localStorage.setItem('darkMode',
+                    document.documentElement.classList.contains('dark') ? 'enabled' : 'disabled'
+                );
+                updateIcons();
+            }
 
-        function updateIcons() {
-            const isDark = document.documentElement.classList.contains('dark');
+            function updateIcons() {
+                const isDark = document.documentElement.classList.contains('dark');
+                const desktopBtn = document.getElementById("toggleDarkModeDesktop");
+                const mobileBtn = document.getElementById("toggleDarkModeMobile");
+                if (desktopBtn) desktopBtn.textContent = isDark ? "☀️" : "🌙";
+                if (mobileBtn) mobileBtn.textContent = isDark ? "☀️" : "🌙";
+            }
+
             const desktopBtn = document.getElementById("toggleDarkModeDesktop");
             const mobileBtn = document.getElementById("toggleDarkModeMobile");
-            if (desktopBtn) desktopBtn.textContent = isDark ? "☀️" : "🌙";
-            if (mobileBtn) mobileBtn.textContent = isDark ? "☀️" : "🌙";
-        }
 
-        const desktopBtn = document.getElementById("toggleDarkModeDesktop");
-        const mobileBtn = document.getElementById("toggleDarkModeMobile");
+            if (desktopBtn) desktopBtn.addEventListener("click", toggleDarkMode);
+            if (mobileBtn) mobileBtn.addEventListener("click", toggleDarkMode);
 
-        if (desktopBtn) desktopBtn.addEventListener("click", toggleDarkMode);
-        if (mobileBtn) mobileBtn.addEventListener("click", toggleDarkMode);
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.documentElement.classList.add('dark');
+            }
 
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            document.documentElement.classList.add('dark');
-        }
-        updateIcons();
-    });
+            updateIcons();
+        });
     </script>
 </body>
 </html>

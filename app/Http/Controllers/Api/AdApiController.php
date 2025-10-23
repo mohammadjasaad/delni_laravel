@@ -180,83 +180,6 @@ class AdApiController extends Controller
         }
     }
 
-// ✅ تعديل إعلان (دمج الصور)
-public function updateMerge(Request $request, $id)
-{
-    try {
-        $user = Auth::user();
-        $ad   = Ad::find($id);
-
-        if (!$ad) {
-            return response()->json(['error' => 'Ad not found'], 404);
-        }
-        if ($ad->user_id !== $user->id) {
-            return response()->json(['error' => 'Forbidden'], 403);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'title'       => 'sometimes|string|max:255',
-            'description' => 'sometimes|string',
-            'price'       => 'sometimes|numeric',
-            'city'        => 'sometimes|string|max:255',
-            'category'    => 'sometimes|string|max:255',
-            'lat'         => 'nullable|numeric',
-            'lng'         => 'nullable|numeric',
-            'images.*'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Validation failed',
-                'errors'  => $validator->errors()
-            ], 422);
-        }
-
-        $data = $request->only(['title','description','price','city','category','lat','lng','is_featured']);
-
-        // 🟡 تسجيل البيانات القادمة من الطلب للتدقيق
-        \Log::info("UpdateMerge Request Data", [
-    'all'       => $request->all(),
-    'title'     => $request->input('title'),
-    'price'     => $request->input('price'),
-    'city'      => $request->input('city'),
-    'category'  => $request->input('category'),
-    'files'     => $request->files->all(),
-]);
-
-        $imagesArray = $ad->images ?? [];
-
-        if ($request->hasFile('images')) {
-            $files = is_array($request->file('images')) ? $request->file('images') : [$request->file('images')];
-            foreach ($files as $img) {
-                $imagesArray[] = $img->store('uploads', 'public');
-            }
-        } elseif ($request->filled('images')) {
-            $decoded = json_decode($request->images, true);
-            if (is_array($decoded)) $imagesArray = array_merge($imagesArray, $decoded);
-        }
-
-        $data['images'] = $imagesArray;
-        $ad->update($data);
-
-        $ad->images = collect($ad->images)->map(fn($img) => Storage::url($img));
-
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Ad updated successfully (merge)',
-            'ad'      => $ad,
-        ]);
-    } catch (\Throwable $e) {
-        \Log::error('Ad Merge Error: '.$e->getMessage(), [
-            'trace' => $e->getTraceAsString()
-        ]);
-        return response()->json([
-            'status'  => 'error',
-            'message' => $e->getMessage()
-        ], 500);
-    }
-}
-
     // ✅ حذف إعلان
     public function destroy($id)
     {
@@ -281,5 +204,65 @@ public function updateMerge(Request $request, $id)
             'message' => 'Ad deleted successfully',
         ]);
     }
-}
 
+    // ✅ البحث المتقدم مع الترتيب
+    public function search(Request $request)
+    {
+        $query = Ad::query();
+
+        // 🔍 فلاتر البحث
+        if ($request->filled('query')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->query . '%')
+                  ->orWhere('description', 'like', '%' . $request->query . '%');
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('city')) {
+            $query->where('city', $request->city);
+        }
+
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        // 🔽 الترتيب (latest, price_asc, price_desc)
+        $sort = $request->get('sort', 'latest');
+
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('is_featured', 'desc')
+                      ->orderBy('created_at', 'desc');
+                break;
+        }
+
+        $ads = $query->get();
+
+        // ✅ تعديل روابط الصور
+        $ads->transform(function ($ad) {
+            $ad->images = collect($ad->images)->map(fn($img) => Storage::url($img));
+            return $ad;
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'count'  => $ads->count(),
+            'ads'    => $ads,
+        ]);
+    }
+}

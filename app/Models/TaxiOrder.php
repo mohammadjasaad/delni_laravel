@@ -10,18 +10,29 @@ class TaxiOrder extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_name',
+        'user_id',
+        'driver_id',
         'pickup_latitude',
         'pickup_longitude',
-        'driver_id',
+        'dropoff_latitude',
+        'dropoff_longitude',
         'status',
+        'rating',
     ];
 
     /**
-     * العلاقة مع جدول السائقين
+     * العلاقة مع السائق
      */
     public function driver()
     {
         return $this->belongsTo(Driver::class);
+    }
+
+    /**
+     * العلاقة مع الرسائل
+     */
+    public function messages()
+    {
+        return $this->hasMany(TaxiMessage::class, 'order_id');
     }
 }

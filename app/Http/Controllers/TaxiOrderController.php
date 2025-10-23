@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\TaxiDriver;
+use App\Models\Driver;
 use App\Models\TaxiOrder;
-use App\Models\Rating;
+use App\Models\TaxiMessage;
 
 class TaxiOrderController extends Controller
 {
@@ -15,7 +15,7 @@ class TaxiOrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'user_name' => 'required|string',
+            'user_id' => 'nullable|numeric',
             'pickup_latitude' => 'required|numeric',
             'pickup_longitude' => 'required|numeric',
         ]);
@@ -23,7 +23,8 @@ class TaxiOrderController extends Controller
         $pickupLat = $request->pickup_latitude;
         $pickupLng = $request->pickup_longitude;
 
-        $driver = TaxiDriver::where('status', 'متاح')
+        // 🟡 جلب أقرب سائق متاح
+        $driver = Driver::where('status', 'available')
             ->selectRaw(
                 "*, (6371 * acos( cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)) )) AS distance",
                 [$pickupLat, $pickupLng, $pickupLat]
@@ -32,119 +33,155 @@ class TaxiOrderController extends Controller
             ->first();
 
         if (!$driver) {
-            return response()->json(['message' => 'لا يوجد سائق متاح حاليًا'], 404);
+            return response()->json(['message' => '🚫 لا يوجد سائق متاح حالياً'], 404);
         }
 
+        // 🟢 إنشاء الطلب
         $order = TaxiOrder::create([
-            'user_name' => $request->user_name,
+            'user_id' => $request->user_id,
             'pickup_latitude' => $pickupLat,
             'pickup_longitude' => $pickupLng,
             'driver_id' => $driver->id,
-            'status' => 'قيد التنفيذ',
+            'status' => 'pending',
         ]);
 
-        $driver->update(['status' => 'مشغول']);
+        $driver->update(['status' => 'busy']);
 
-        return response()->json([
-            'message' => 'تم إرسال الطلب بنجاح',
-            'order_id' => $order->id,
-            'order' => $order,
-            'driver' => $driver,
-        ]);
+        return redirect()->route('taxi.order.status', ['id' => $order->id])
+            ->with('success', '✅ تم إرسال الطلب بنجاح، نعمل على توصيل السائق إليك.');
     }
 
     /**
-     * 🚦 بدء الرحلة من قبل السائق
-     */
-    public function startRide($id)
-    {
-        $order = TaxiOrder::findOrFail($id);
-
-        if ($order->status !== 'قيد التنفيذ') {
-            return redirect()->back()->with('error', '🚫 لا يمكن بدء الرحلة في هذه المرحلة.');
-        }
-
-        $order->status = 'بدأت الرحلة';
-        $order->save();
-
-        return redirect()->back()->with('success', '🚦 تم بدء الرحلة بنجاح.');
-    }
-
-    /**
-     * 📍 عرض حالة الطلب والخريطة والمحادثة
+     * 📍 عرض حالة الطلب (الصفحة التفاعلية)
      */
     public function showStatus($id)
     {
-        $order = TaxiOrder::findOrFail($id);
-        $driver = TaxiDriver::find($order->driver_id);
+        $order = TaxiOrder::with('driver')->findOrFail($id);
+        $driver = $order->driver;
 
         return view('taxi.order-status', compact('order', 'driver'));
     }
 
     /**
-     * ✅ إنهاء الرحلة وإعادة تعيين السائق
+     * 🔄 تحديث حالة الطلب (للـ Realtime عبر AJAX)
+     */
+    public function updateRealtime($id)
+    {
+        $order = TaxiOrder::with('driver')->find($id);
+
+        if (!$order) {
+            return response()->json(['error' => '🚫 الطلب غير موجود'], 404);
+        }
+
+        return response()->json([
+            'status' => $order->status,
+            'driver' => $order->driver ? [
+                'id' => $order->driver->id,
+                'name' => $order->driver->name,
+                'car_model' => $order->driver->car_model,
+                'car_number' => $order->driver->car_number,
+                'phone' => $order->driver->phone,
+                'latitude' => $order->driver->latitude,
+                'longitude' => $order->driver->longitude,
+            ] : null,
+        ]);
+    }
+
+    /**
+     * 🚦 بدء الرحلة
+     */
+    public function startRide($id)
+    {
+        $order = TaxiOrder::findOrFail($id);
+
+        if ($order->status !== 'accepted') {
+            return back()->with('error', '🚫 لا يمكن بدء الرحلة الآن.');
+        }
+
+        $order->update(['status' => 'ongoing']);
+        return back()->with('success', '🚦 تم بدء الرحلة بنجاح.');
+    }
+
+    /**
+     * ✅ إنهاء الرحلة
      */
     public function complete($id)
     {
         $order = TaxiOrder::findOrFail($id);
-        $order->update(['status' => 'منتهي']);
+        $order->update(['status' => 'completed']);
 
         if ($order->driver_id) {
-            $driver = TaxiDriver::find($order->driver_id);
+            $driver = Driver::find($order->driver_id);
             if ($driver) {
-                $driver->update(['status' => 'متاح']);
+                $driver->update(['status' => 'available']);
             }
         }
 
-        return response()->json(['message' => 'تم إنهاء الرحلة بنجاح']);
+        return response()->json(['message' => '✅ تم إنهاء الرحلة بنجاح']);
     }
 
     /**
-     * ⭐ إنهاء الرحلة مع تقييم السائق
-     */
-    public function completeWithRating(Request $request)
-    {
-        $request->validate([
-            'order_id' => 'required|exists:taxi_orders,id',
-            'driver_id' => 'required|exists:taxi_drivers,id',
-            'driver_name' => 'required|string',
-            'rating' => 'required|numeric|min:1|max:5',
-            'comment' => 'nullable|string|max:1000',
-        ]);
-
-        $order = TaxiOrder::findOrFail($request->order_id);
-        $order->update(['status' => 'منتهي']);
-
-        $driver = TaxiDriver::find($request->driver_id);
-        if ($driver) {
-            $driver->update(['status' => 'متاح']);
-        }
-
-        Rating::create([
-            'driver_name' => $request->driver_name,
-            'rating' => $request->rating,
-            'comment' => $request->comment,
-        ]);
-
-        return redirect()->route('trip.completed')->with('success', '✅ تم إنهاء الرحلة وتسجيل التقييم.');
-    }
-
-    /**
-     * ❌ إلغاء الطلب واسترجاع السائق
+     * ❌ إلغاء الطلب
      */
     public function cancel($id)
     {
         $order = TaxiOrder::findOrFail($id);
-        $order->update(['status' => 'ملغي']);
+        $order->update(['status' => 'cancelled']);
 
         if ($order->driver_id) {
-            $driver = TaxiDriver::find($order->driver_id);
+            $driver = Driver::find($order->driver_id);
             if ($driver) {
-                $driver->update(['status' => 'متاح']);
+                $driver->update(['status' => 'available']);
             }
         }
 
-        return response()->json(['message' => 'تم إلغاء الطلب']);
+        return response()->json(['message' => '🚫 تم إلغاء الطلب']);
+    }
+
+    /**
+     * 🔄 تحديث حالة الطلب (من لوحة التحكم)
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,accepted,completed,cancelled,ongoing'
+        ]);
+
+        $order = TaxiOrder::findOrFail($id);
+        $order->status = $request->status;
+        $order->save();
+
+        return back()->with('success', '✅ تم تحديث حالة الطلب بنجاح');
+    }
+
+    /**
+     * 📋 عرض جميع الطلبات + الرسائل (للوحة الإدارة)
+     */
+    public function index(Request $request)
+    {
+        $query = TaxiOrder::with(['driver', 'messages']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('driver')) {
+            $query->whereHas('driver', function ($q) use ($request) {
+                $q->where('name', 'LIKE', '%' . $request->driver . '%');
+            });
+        }
+
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        if ($request->filled('rating')) {
+            $query->where('rating', $request->rating);
+        }
+
+        $orders = $query->latest()->paginate(20)->appends($request->query());
+        $messages = TaxiMessage::with('order')->latest()->get();
+
+        return view('admin.taxi.orders', compact('orders', 'messages'));
     }
 }
-

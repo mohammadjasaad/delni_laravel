@@ -20,7 +20,7 @@
 
         {{-- 🔘 أزرار الخدمات --}}
         <div class="flex flex-wrap justify-center gap-4 mb-8">
-            <a href="{{ route('order.taxi') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded shadow">
+            <a href="{{ route('taxi.request') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded shadow">
                 🚕 اطلب سيارة الآن
             </a>
             <a href="{{ route('drivers.map') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded shadow">
@@ -41,7 +41,7 @@
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">🕒 حالة الطلب الحالية</h3>
                     <p class="text-gray-700">السائق: <strong>{{ $activeOrder->driver_name }}</strong></p>
                     <p class="text-gray-700">الحالة: <strong>{{ $activeOrder->status }}</strong></p>
-                    <a href="{{ route('order.status', ['id' => $activeOrder->id]) }}"
+                    <a href="{{ route('taxi.order.status', ['id' => $activeOrder->id]) }}"
                        class="mt-4 inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded shadow">
                         🔍 تفاصيل الطلب
                     </a>

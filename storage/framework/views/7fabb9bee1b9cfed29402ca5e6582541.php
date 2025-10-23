@@ -10,15 +10,12 @@
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
 <div class="max-w-6xl mx-auto px-4 py-8">
-
     
     <?php
         $images = is_array($ad->images) ? $ad->images : json_decode($ad->images, true);
         $mainImage = !empty($images[0]) ? asset('storage/'.$images[0]) : asset('storage/placeholder.png');
     ?>
-
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
 
 <div x-data="{ mainImage: '<?php echo e($mainImage); ?>' }">
     
@@ -28,7 +25,6 @@
              class="w-full h-96 object-cover rounded-xl shadow cursor-pointer" 
              alt="<?php echo e($ad->title); ?>">
     </a>
-
     
     <?php if($images && count($images) > 1): ?>
         <div class="flex gap-2 mt-3 overflow-x-auto">
@@ -41,7 +37,6 @@
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     <?php endif; ?>
-
 
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-6 flex items-center justify-between">
     <div>
@@ -64,7 +59,6 @@
 </a>
 </div>
 </div>
-
         
         <div>
             <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
@@ -76,7 +70,6 @@
 
 </p>
             <p class="text-red-600 text-xl font-bold mb-4"><i class="fas fa-dollar-sign"></i> <?php echo e(number_format($ad->price)); ?> <?php echo e(__('messages.currency')); ?></p>
-
             
             <?php if($ad->is_featured): ?>
                 <span class="inline-block bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full mb-4">
@@ -84,7 +77,6 @@
 
                 </span>
             <?php endif; ?>
-
             
             <div x-data="{ tab: 'details' }" class="mt-4">
                 <div class="flex gap-6 border-b mb-4">
@@ -103,10 +95,8 @@
 
 </button>
                 </div>
-
                 
                 <div x-show="tab==='details'" class="space-y-4">
-
                     
                     <?php if($ad->category === 'عقارات' || $ad->category === 'realestate'): ?>
                         <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
@@ -131,7 +121,6 @@
                                 <p><i class="fas fa-fire text-gray-500"></i> <?php echo e(__('messages.heating')); ?>: <?php echo e($ad->heating_type ?? '-'); ?></p>
                             </div>
                         </div>
-
                     
                     <?php elseif($ad->category === 'سيارات' || $ad->category === 'cars'): ?>
                         <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
@@ -149,7 +138,6 @@
                                 <p><i class="fas fa-check-circle text-gray-500"></i> <?php echo e(__('messages.condition')); ?>: <?php echo e($ad->is_new ? __('messages.new') : __('messages.used')); ?></p>
                             </div>
                         </div>
-
                     
                     <?php elseif($ad->category === 'خدمات' || $ad->category === 'services'): ?>
                         <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
@@ -168,24 +156,20 @@
                                 <p><i class="fas fa-headset text-gray-500"></i> <?php echo e(__('messages.support_type')); ?>: <?php echo e($ad->support_type ?? '-'); ?></p>
                             </div>
                         </div>
-
                     <?php else: ?>
                         <p><i class="fas fa-folder-open text-gray-500"></i> <?php echo e($ad->category); ?></p>
                     <?php endif; ?>
                 </div>
-
                 
 <div x-show="tab==='description'" class="text-gray-700 dark:text-gray-200 leading-relaxed">
                     <?php echo e($ad->description ?: __('messages.no_description')); ?>
 
                 </div>
-
                 
                 <div x-show="tab==='map'" class="mt-4">
                   <div id="map" class="w-full h-[400px] md:h-[500px] rounded-lg shadow"></div>
                 </div>
             </div>
-
 
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
     
@@ -217,7 +201,6 @@
     <?php endif; ?>
 <?php endif; ?>
 
-
     <button onclick="shareAd('<?php echo e(route('ads.show', $ad->slug)); ?>')" 
             class="btn-yellow bg-yellow-500 hover:bg-yellow-600 w-full text-center">
         <i class="fas fa-share-alt"></i> <?php echo e(__('messages.share')); ?>
@@ -239,7 +222,6 @@ function shareAd(url) {
     }
 }
 </script>
-
     
     <div class="mt-12">
 <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">
@@ -266,9 +248,7 @@ function shareAd(url) {
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
-
 </div>
-
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     
@@ -279,18 +259,15 @@ let map;
 document.addEventListener("DOMContentLoaded", function () {
     var lat = <?php echo e($ad->lat ?? 41.0672); ?>;
     var lng = <?php echo e($ad->lng ?? 28.7994); ?>;
-
     map = L.map('map').setView([lat, lng], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
-
             L.marker([lat, lng]).addTo(map)
                 .bindPopup("📍 موقع الإعلان")
                 .openPopup();
         });
-
         function shareAd(url) {
             if (navigator.share) {
                 navigator.share({ title: document.title, text: 'شاهد هذا الإعلان على Delni.co', url: url });
@@ -300,7 +277,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     </script>
-
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>

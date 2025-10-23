@@ -3,19 +3,26 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Driver extends Model
+class Driver extends Authenticatable
 {
     use HasFactory;
 
     protected $fillable = [
         'name',
+        'phone',
+        'email',
+        'password',
         'car_number',
-        'status',
+        'car_model',
         'latitude',
         'longitude',
-        'phone' // تأكد من أن الحقل موجود إذا أضفته للموديل
+        'status', // available | busy | offline
+    ];
+
+    protected $hidden = [
+        'password',
     ];
 
     /**

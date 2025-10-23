@@ -9,35 +9,69 @@ body {
 }
 
 /* ✅ التبويبات */
-.tab-link { @apply flex items-center gap-2 px-6 py-2.5 rounded-full font-medium bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 hover:text-gray-900 hover:shadow transition-all duration-200 ease-in-out dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700; }
-.tab-link.active { @apply bg-gradient-to-r from-yellow-400 to-yellow-500 text-black border-yellow-400 shadow-lg; }
+.tab-link { 
+    @apply flex items-center gap-2 px-6 py-2.5 rounded-full font-medium 
+           bg-gray-100 text-gray-700 border border-gray-200 
+           hover:bg-gray-200 hover:text-gray-900 hover:shadow 
+           transition-all duration-200 ease-in-out 
+           dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700; 
+}
+.tab-link.active { 
+    @apply bg-gradient-to-r from-yellow-400 to-yellow-500 text-black border-yellow-400 shadow-lg; 
+}
 
 /* ✅ الفلترة */
-.sub-tab { @apply px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 hover:text-gray-900 hover:shadow transition-all duration-200 ease-in-out dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700; }
-.sub-tab.active { @apply bg-gradient-to-r from-yellow-400 to-yellow-500 text-black border-yellow-400 shadow-lg; }
+.sub-tab { 
+    @apply px-4 py-2 rounded-full text-sm font-medium 
+           bg-gray-100 text-gray-700 border border-gray-200 
+           hover:bg-gray-200 hover:text-gray-900 hover:shadow 
+           transition-all duration-200 ease-in-out 
+           dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700; 
+}
+.sub-tab.active { 
+    @apply bg-gradient-to-r from-yellow-400 to-yellow-500 text-black border-yellow-400 shadow-lg; 
+}
 
 /* ✅ الحقول */
-.input { @apply w-full p-3 border rounded-xl text-sm focus:ring-yellow-500 focus:border-yellow-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600; }
+.input { 
+    @apply w-full p-3 border rounded-xl text-sm 
+           focus:ring-yellow-500 focus:border-yellow-500 
+           dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600; 
+}
 
 /* ✅ الأزرار */
-.btn-yellow { @apply bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg font-semibold transition transform duration-200 flex items-center justify-center gap-2 shadow hover:scale-105 active:scale-95; }
+.btn-yellow { 
+    @apply bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg 
+           font-semibold transition transform duration-200 flex items-center justify-center gap-2 
+           shadow hover:scale-105 active:scale-95; 
+}
 .btn-blue   { @apply bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1 shadow hover:scale-105 active:scale-95; }
 .btn-red    { @apply bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1 shadow hover:scale-105 active:scale-95; }
 .btn-gray   { @apply bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm flex items-center gap-1 shadow hover:scale-105 active:scale-95; }
 
 /* ✅ بطاقات إحصائيات */
-.stat-card { padding:1rem; @apply rounded-xl text-center shadow text-gray-800 dark:text-white dark:bg-gray-800 dark:border dark:border-gray-700 bg-gradient-to-br from-gray-50 to-gray-100; }
+.stat-card { 
+    padding:1rem; 
+    @apply rounded-xl text-center shadow text-gray-800 dark:text-white dark:bg-gray-800 dark:border dark:border-gray-700 bg-gradient-to-br from-gray-50 to-gray-100; 
+}
 .stat-card h3 { @apply font-bold text-lg mt-2; }
 .stat-card p  { @apply text-2xl font-extrabold; }
 
 /* ✅ بطاقة الإعلان */
-.ad-card { @apply relative flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-2xl hover:scale-105 hover:translate-y-1 transition transform duration-200 ease-in-out overflow-hidden border h-full; }
+.ad-card { 
+    @apply relative flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-md 
+           hover:shadow-2xl hover:scale-105 hover:translate-y-1 transition transform duration-200 ease-in-out 
+           overflow-hidden border h-full; 
+}
 .ad-card img { @apply w-full h-48 object-cover transition group-hover:opacity-90; }
 .price { @apply text-rose-600 dark:text-rose-400 font-bold text-sm mt-1; }
 .ad-card:hover .price { @apply text-red-700 dark:text-rose-300; }
 
 /* ✅ شارة الإعلان المميز */
-.badge-featured { @apply absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow animate-pulse; }
+.badge-featured { 
+    @apply absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold px-2 py-0.5 
+           rounded-full flex items-center gap-1 shadow animate-pulse; 
+}
 
 /* ✅ Grid View */
 .grid-view { @apply block; }
@@ -57,6 +91,38 @@ body {
 .dark .list-view p { color: rgb(156 163 175); }
 .list-view .actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem; }
 
+/* ✅ بطاقات المتاجر */
+.store-card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg transition p-4 
+           flex flex-col items-center text-center;
+}
+.store-card img {
+    @apply w-24 h-24 rounded-full object-cover mb-3 border border-gray-200 dark:border-gray-700;
+}
+.store-card h3 { @apply font-semibold text-gray-800 dark:text-gray-100 truncate; }
+.store-card p { @apply text-sm text-gray-600 dark:text-gray-400 line-clamp-2; }
+
+/* ✅ بطاقات المنتجات */
+.product-card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-xl transition p-4 flex flex-col;
+}
+.product-card img { @apply w-full h-40 object-cover rounded-lg mb-4; }
+.product-card h3 { @apply font-semibold text-gray-800 dark:text-gray-100 mb-1 truncate; }
+.product-card p { @apply text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2; }
+.product-card .price { @apply font-bold text-yellow-600 mb-2; }
+
+/* ✅ عناوين وأقسام */
+.section-title { @apply text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2; }
+
+.card { @apply bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-xl transition p-4 flex flex-col; }
+.card-title { @apply font-semibold text-gray-800 dark:text-gray-100 mb-1 truncate; }
+.card-desc  { @apply text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2; }
+.card-price { @apply font-bold text-yellow-600 mb-2; }
+
+/* ✅ تنبيهات */
+.alert-success { @apply mb-6 bg-green-100 text-green-800 p-4 rounded shadow; }
+.alert-error   { @apply mb-6 bg-red-100 text-red-800 p-4 rounded shadow; }
+
 /* 🛠️ منع أي فراغ أسفل الموقع */
 html, body {
     margin: 0;
@@ -71,7 +137,148 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
+main { flex: 1; }
 
-main {
-    flex: 1;
+/* ✅ أيقونات التصنيفات (دلني مول) */
+.category-icon {
+    @apply flex flex-col items-center justify-center 
+           w-24 h-24 min-w-[6rem] rounded-xl 
+           bg-gray-100 dark:bg-gray-800 shadow 
+           text-gray-700 dark:text-gray-300 
+           hover:bg-yellow-400 hover:text-white 
+           transition text-lg font-bold;
+}
+
+.category-icon span {
+    @apply text-sm mt-1;
+}
+
+/* ✅ حاوية الشريط بدون Scrollbar */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ✅ أيقونات التصنيفات */
+.category-icon {
+    @apply flex flex-col items-center justify-center gap-2 
+           min-w-[90px] p-3 rounded-xl shadow-sm 
+           bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+           hover:bg-yellow-100 dark:hover:bg-yellow-700 hover:scale-105 
+           transition transform duration-200 ease-in-out text-center;
+}
+.category-icon i {
+    @apply text-2xl text-yellow-500;
+}
+.category-icon span {
+    @apply text-xs font-medium text-gray-700 dark:text-gray-300;
+}
+
+/* ✅ أيقونات التصنيفات (مطورة) */
+.category-scroll {
+    @apply flex gap-4 overflow-x-auto py-4 no-scrollbar;
+}
+
+.category-icon {
+    @apply flex flex-col items-center justify-center gap-2 
+           min-w-[90px] p-3 rounded-xl shadow-sm cursor-pointer
+           bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+           hover:bg-yellow-100 dark:hover:bg-yellow-700 hover:scale-110 
+           transition transform duration-200 ease-in-out text-center;
+}
+
+.category-icon i {
+    @apply text-3xl text-yellow-500;
+}
+
+.category-icon span {
+    @apply text-sm font-semibold text-gray-700 dark:text-gray-200;
+}
+
+/* 🚫 إخفاء Scrollbar */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* 🟡 Bubble Tail - Curved مثل واتساب */
+
+/* للمستخدم (يمين - أزرق) */
+.bubble-user::after {
+    content: "";
+    position: absolute;
+    right: -8px;
+    top: 10px;
+    width: 12px;
+    height: 12px;
+    background-color: #bfdbfe; /* نفس لون bg-blue-100 */
+    border-bottom-left-radius: 12px;
+    transform: rotate(45deg);
+}
+
+/* للسائق (يسار - أخضر) */
+.bubble-driver::after {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 10px;
+    width: 12px;
+    height: 12px;
+    background-color: #bbf7d0; /* نفس لون bg-green-100 */
+    border-bottom-right-radius: 12px;
+    transform: rotate(-45deg);
+}
+
+/* للأدمن (وسط - بنفسجي) */
+.bubble-admin::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    transform: translateX(-50%) rotate(45deg);
+    width: 12px;
+    height: 12px;
+    background-color: #e9d5ff; /* نفس لون bg-purple-100 */
+    border-top-left-radius: 12px;
+}
+
+/* ✅ Dark Mode للأزرار الخاصة بالفقاعات */
+
+/* المستخدم (يمين - أزرق غامق) */
+.dark .bubble-user::after {
+    background-color: #1e40af; /* bg-blue-900 */
+}
+
+/* السائق (يسار - أخضر غامق) */
+.dark .bubble-driver::after {
+    background-color: #14532d; /* bg-green-900 */
+}
+
+/* الأدمن (وسط - بنفسجي غامق) */
+.dark .bubble-admin::after {
+    background-color: #4c1d95; /* bg-purple-900 */
+}
+
+/* 🎨 تلوين بطاقات الطلبات حسب الحالة */
+.order-card.pending   { @apply border-yellow-300 bg-yellow-50; }
+.order-card.accepted  { @apply border-blue-300 bg-blue-50; }
+.order-card.ongoing   { @apply border-purple-300 bg-purple-50; }
+.order-card.completed { @apply border-green-300 bg-green-50; }
+.order-card.cancelled { @apply border-red-300 bg-red-50; }
+
+/* 🎨 أيقونة الحالة داخل البطاقة */
+.order-card .status-icon {
+    @apply absolute top-2 right-2 text-3xl opacity-80;
+}
+.order-card.pending   .status-icon { @apply text-yellow-500; }
+.order-card.accepted  .status-icon { @apply text-blue-500; }
+.order-card.ongoing   .status-icon { @apply text-purple-500; }
+.order-card.completed .status-icon { @apply text-green-500; }
+.order-card.cancelled .status-icon { @apply text-red-500; }
+
+/* ✨ وميض البطاقة للحالات */
+@keyframes pulse-pending {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.6); }
+    50% { box-shadow: 0 0 20px 5px rgba(250, 204, 21, 0.8); }
+}
+
+/* 🎯 تفعيل الوميض فقط عند pending */
+.order-card.pending {
+    animation: pulse-pending 2s infinite;
 }

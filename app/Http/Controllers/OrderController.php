@@ -3,34 +3,41 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Order;
-use Illuminate\Support\Facades\Auth;
+use App\Models\TaxiOrder;
 use App\Models\Driver;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-public function store(Request $request)
-{
-    $lat = $request->input('lat');
-    $lng = $request->input('lng');
+    // 🟡 إنشاء الطلب من صفحة request.blade.php
+    public function store(Request $request)
+    {
+        // ✅ إذا المستخدم غير مسجل دخول
+        if (!Auth::check()) {
+            return redirect()->route('login')
+                ->with('error', '⚠️ يجب تسجيل الدخول أولاً قبل طلب التاكسي.');
+        }
 
-    // ❗ يمكنك هنا لاحقًا حفظ الطلب في قاعدة البيانات أو ربطه بسائق
-    return redirect()->route('order.status')->with('success', '🚖 تم إرسال طلبك من الإحداثيات: ' . $lat . ', ' . $lng);
-}
-public function status()
-{
-    // استدعاء آخر طلب للمستخدم
-    $order = TaxiOrder::latest()->where('user_id', auth()->id())->first();
+        $lat = $request->input('lat');
+        $lng = $request->input('lng');
 
-    // التحقق من وجود الطلب
-    if (!$order) {
-        return redirect()->back()->with('error', 'لا يوجد طلب حالي');
+        // ✅ حفظ الطلب في قاعدة البيانات
+        $order = TaxiOrder::create([
+            'user_id' => Auth::id(),
+            'pickup_lat' => $lat,
+            'pickup_lng' => $lng,
+            'status' => 'pending',
+        ]);
+
+        // ✅ التوجيه إلى صفحة حالة الطلب
+        return redirect()->route('taxi.order.status', ['id' => $order->id])
+            ->with('success', '🚖 تم إرسال طلبك بنجاح!');
     }
 
-    // جلب السائق المرتبط بالطلب
-    $driver = $order->driver;
-
-    return view('taxi.order-status', compact('order', 'driver'));
-}
-
+    // 🟢 صفحة حالة الطلب (تحويل تلقائي للمسار الصحيح)
+    public function status($id)
+    {
+        // ✅ إعادة توجيه نحو TaxiOrderController لعرض الحالة
+        return redirect()->route('taxi.order.status', ['id' => $id]);
+    }
 }

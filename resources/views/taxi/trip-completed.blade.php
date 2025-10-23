@@ -4,7 +4,7 @@
         {{-- ✅ رسالة الشكر --}}
         <h1 class="text-3xl font-extrabold text-green-600">✅ شكراً لاستخدامك Delni Taxi!</h1>
         <p class="text-gray-700 text-lg">تم إنهاء الرحلة بنجاح. نتمنى لك يوماً سعيداً ومليئاً بالراحة.</p>
-<div class="text-5xl text-yellow-500 mb-4">⭐️⭐️⭐️⭐️⭐️</div>
+        <div class="text-5xl text-yellow-500 mb-4">⭐️⭐️⭐️⭐️⭐️</div>
 
         {{-- ✅ معلومات السائق --}}
         <div class="bg-gray-100 p-5 rounded-lg text-right shadow-sm border border-gray-200">
@@ -18,7 +18,8 @@
         {{-- ✅ تنبيه عدم التقييم --}}
         @if(!session('rating_submitted'))
             <div class="bg-yellow-100 text-yellow-800 p-4 rounded-md shadow border border-yellow-300">
-                ⚠️ لم تقم بتقييم السائق بعد. يمكنك تقييمه من صفحة <a href="{{ route('order.status') }}" class="underline font-semibold text-yellow-900 hover:text-yellow-700">حالة الطلب</a>.
+                ⚠️ لم تقم بتقييم السائق بعد. يمكنك تقييمه من صفحة 
+                <a href="{{ route('taxi.order.status', ['id' => $order->id]) }}" class="underline font-semibold text-yellow-900 hover:text-yellow-700">حالة الطلب</a>.
             </div>
         @endif
 
@@ -28,7 +29,7 @@
                 🏠 العودة إلى الرئيسية
             </a>
 
-            <a href="{{ route('delni.taxi') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded-lg transition duration-200">
+            <a href="{{ route('taxi.index') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded-lg transition duration-200">
                 🚕 طلب تاكسي جديد
             </a>
         </div>

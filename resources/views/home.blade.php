@@ -1,31 +1,57 @@
 {{-- resources/views/home.blade.php --}}
 <x-app-layout title="Delni.co">
     <div class="max-w-7xl mx-auto px-4 py-8">
-
-        {{-- ✅ التبويبات العلوية --}}
-        <div class="flex flex-wrap justify-center gap-3 mb-8">
-            <a href="{{ route('ads.index', ['category' => 'realestate']) }}" 
-               class="tab-link {{ request('category')=='realestate'?'active':'' }}">
-                <i class="fas fa-building"></i> {{ __('messages.real_estate') }}
+{{-- ✅ قسم الدعايات (سلايدر بوسترات Full Width) --}}
+<div class="w-full mb-6">
+    <div class="swiper mySwiper w-full">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <img src="{{ asset('images/ad-sample-1.jpg') }}" 
+                     class="w-full h-40 md:h-72 object-cover" alt="إعلان 1">
+            </div>
+            <div class="swiper-slide">
+                <img src="{{ asset('images/ad-sample-2.jpg') }}" 
+                     class="w-full h-40 md:h-72 object-cover" alt="إعلان 2">
+            </div>
+            <div class="swiper-slide">
+                <img src="{{ asset('images/ad-sample-3.jpg') }}" 
+                     class="w-full h-40 md:h-72 object-cover" alt="إعلان 3">
+            </div>
+        </div>
+        {{-- ✅ أزرار التنقل --}}
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        {{-- ✅ النقاط --}}
+        <div class="swiper-pagination"></div>
+    </div>
+</div>
+        {{-- ✅ التبويبات العلوية (تصنيفات) --}}
+        <div class="category-scroll mb-6">
+            <a href="{{ route('ads.index', ['category' => 'realestate']) }}" class="category-icon">
+                <i class="fas fa-building"></i>
+                <span>{{ __('messages.real_estate') }}</span>
             </a>
-            <a href="{{ route('ads.index', ['category' => 'cars']) }}" 
-               class="tab-link {{ request('category')=='cars'?'active':'' }}">
-                <i class="fas fa-car"></i> {{ __('messages.cars') }}
+            <a href="{{ route('ads.index', ['category' => 'cars']) }}" class="category-icon">
+                <i class="fas fa-car"></i>
+                <span>{{ __('messages.car_parts') }}</span>
             </a>
-            <a href="{{ route('ads.index', ['category' => 'services']) }}" 
-               class="tab-link {{ request('category')=='services'?'active':'' }}">
-                <i class="fas fa-tools"></i> {{ __('messages.services') }}
+            <a href="{{ route('ads.index', ['category' => 'services']) }}" class="category-icon">
+                <i class="fas fa-tools"></i>
+                <span>{{ __('messages.services') }}</span>
             </a>
-            <a href="{{ route('delni.taxi') }}" 
-               class="tab-link {{ request()->routeIs('delni.taxi')?'active':'' }}">
-                <i class="fas fa-taxi"></i> {{ __('messages.delni_taxi') }}
+            <a href="{{ route('mall.index') }}" class="category-icon">
+                <i class="fas fa-store"></i>
+                <span>{{ __('messages.delni_mall') }}</span>
             </a>
-            <a href="{{ route('emergency.index') }}" 
-               class="tab-link {{ request()->routeIs('emergency.index')?'active':'' }}">
-                <i class="fas fa-ambulance"></i> {{ __('messages.delni_emergency') }}
+            <a href="{{ route('delni.taxi') }}" class="category-icon">
+                <i class="fas fa-taxi"></i>
+                <span>{{ __('messages.delni_taxi') }}</span>
+            </a>
+            <a href="{{ route('emergency.index') }}" class="category-icon">
+                <i class="fas fa-ambulance"></i>
+                <span>{{ __('messages.delni_emergency') }}</span>
             </a>
         </div>
-
         {{-- 🔍 شريط البحث --}}
         <form method="GET" action="{{ route('ads.index') }}" 
               class="bg-white dark:bg-gray-800 shadow-md rounded-2xl p-6 mb-10 border border-gray-200 dark:border-gray-700">
@@ -39,7 +65,7 @@
                 <select name="category" class="input">
                     <option value="">{{ __('messages.select_category') }}</option>
                     <option value="realestate">{{ __('messages.real_estate') }}</option>
-                    <option value="cars">{{ __('messages.cars') }}</option>
+                    <option value="cars">{{ __('messages.car_parts') }}</option>
                     <option value="services">{{ __('messages.services') }}</option>
                 </select>
                 <button type="submit" class="btn-yellow">
@@ -47,13 +73,11 @@
                 </button>
             </div>
         </form>
-
         {{-- 🗺️ خريطة مصغّرة --}}
         <div class="mb-12">
             <h2 class="section-title"><i class="fas fa-map"></i> {{ __('messages.ads_on_map') }}</h2>
             <div id="homeMap" class="w-full h-[400px] rounded-lg shadow"></div>
         </div>
-
         {{-- ⭐ الإعلانات المميزة --}}
         @if(isset($featuredAds) && $featuredAds->count())
             <h2 class="section-title"><i class="fas fa-star text-yellow-500"></i> {{ __('messages.featured_ads') }}</h2>
@@ -74,7 +98,6 @@
                 @endforeach
             </div>
         @endif
-
         {{-- 📋 أحدث الإعلانات --}}
         <h2 class="section-title"><i class="fas fa-clock text-yellow-500"></i> {{ __('messages.latest_ads') }}</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -94,17 +117,18 @@
             @endforeach
         </div>
     </div>
-
     {{-- ✅ مكتبات الخرائط --}}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    {{-- ✅ سكربت الخريطة --}}
+    {{-- ✅ مكتبة Swiper --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    {{-- ✅ سكربت الخريطة والسلايدر --}}
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // 🗺️ الخريطة
             const map = L.map('homeMap').setView([34.8021, 38.9968], 7);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
             const ads = @json($ads);
             ads.forEach(ad => {
                 if (ad.lat && ad.lng) {
@@ -115,6 +139,22 @@
                             <i class='fas fa-dollar-sign text-green-600'></i> ${ad.price} {{ __('messages.currency') }}
                         `);
                 }
+            });
+            // 🎞️ السلايدر
+            new Swiper(".mySwiper", {
+                loop: true,
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
             });
         });
     </script>

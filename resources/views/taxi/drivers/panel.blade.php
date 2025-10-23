@@ -9,40 +9,47 @@
             </div>
         @endif
 
-        {{-- ✅ معلومات السائق --}}
-        <div class="text-gray-800 space-y-3 sm:space-y-4 text-sm sm:text-base">
-            <div><strong>👤 الاسم:</strong> {{ $driver->name }}</div>
-            <div><strong>🚗 رقم السيارة:</strong> {{ $driver->car_number }}</div>
-            <div>
-                <strong>📍 الحالة:</strong>
-                <span class="font-semibold 
-                    {{ $driver->status === 'متاح' ? 'text-green-600' : 
-                       ($driver->status === 'مشغول' ? 'text-red-600' : 'text-gray-500') }}">
-                    {{ $driver->status ?? 'غير معروف' }}
-                </span>
-            </div>
-            <div>
-                <strong>🌍 الموقع:</strong> {{ $driver->latitude ?? 'غير محدد' }}, {{ $driver->longitude ?? 'غير محدد' }}
-            </div>
-        </div>
+{{-- ✅ معلومات السائق --}}
+<div class="text-gray-800 space-y-3 sm:space-y-4 text-sm sm:text-base">
+    <div><strong>👤 الاسم:</strong> {{ $driver->name }}</div>
+    <div><strong>🚗 رقم السيارة:</strong> {{ $driver->car_number }}</div>
+    <div>
+        <strong>📍 الحالة:</strong>
+        @php
+            $statusLabels = [
+                'available' => '✅ متاح',
+                'busy'      => '🚕 مشغول',
+                'offline'   => '❌ غير متصل',
+            ];
+        @endphp
+        <span class="font-semibold 
+            {{ $driver->status === 'available' ? 'text-green-600' : 
+               ($driver->status === 'busy' ? 'text-red-600' : 'text-gray-500') }}">
+            {{ $statusLabels[$driver->status] ?? 'غير معروف' }}
+        </span>
+    </div>
+    <div>
+        <strong>🌍 الموقع:</strong> {{ $driver->latitude ?? 'غير محدد' }}, {{ $driver->longitude ?? 'غير محدد' }}
+    </div>
+</div>
 
-        {{-- ✅ تغيير الحالة --}}
-        <div class="mt-6">
-            <form method="POST" action="{{ route('driver.status', $driver->id) }}" class="space-y-3">
-                @csrf
-                <label for="status" class="block font-semibold text-gray-700">🛠️ تغيير الحالة:</label>
-                <select name="status" id="status"
-                        class="w-full p-2 border border-gray-300 rounded text-sm sm:text-base">
-                    <option value="متاح" {{ $driver->status === 'متاح' ? 'selected' : '' }}>✅ متاح</option>
-                    <option value="مشغول" {{ $driver->status === 'مشغول' ? 'selected' : '' }}>🚕 مشغول</option>
-                    <option value="غير متصل" {{ $driver->status === 'غير متصل' ? 'selected' : '' }}>❌ غير متصل</option>
-                </select>
-                <button type="submit"
-                        class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded w-full sm:w-auto">
-                    💾 حفظ التغيير
-                </button>
-            </form>
-        </div>
+{{-- ✅ تغيير الحالة --}}
+<div class="mt-6">
+    <form method="POST" action="{{ route('driver.status', $driver->id) }}" class="space-y-3">
+        @csrf
+        <label for="status" class="block font-semibold text-gray-700">🛠️ تغيير الحالة:</label>
+        <select name="status" id="status"
+                class="w-full p-2 border border-gray-300 rounded text-sm sm:text-base">
+            <option value="available" {{ $driver->status === 'available' ? 'selected' : '' }}>✅ متاح</option>
+            <option value="busy" {{ $driver->status === 'busy' ? 'selected' : '' }}>🚕 مشغول</option>
+            <option value="offline" {{ $driver->status === 'offline' ? 'selected' : '' }}>❌ غير متصل</option>
+        </select>
+        <button type="submit"
+                class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded w-full sm:w-auto">
+            💾 حفظ التغيير
+        </button>
+    </form>
+</div>
 
         {{-- ✅ تحديث الموقع --}}
         <div class="mt-6">

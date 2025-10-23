@@ -49,9 +49,20 @@ return [
 'price_low'  => 'Lowest Price',
 'user' => 'User',
 
+
+
+    // ✅ Order statuses
+    'pending'   => 'Pending',
+    'accepted'  => 'Accepted',
+    'completed' => 'Completed',
+    'cancelled' => 'Cancelled',
+
+'mall_categories' => 'Delni Mall Categories',
+
 'taxi_orders'        => 'Taxi Orders',
 'no_taxi_orders'     => 'No taxi orders yet',
 'load_more' => 'Load More',
+'delni_mall' => 'Delni Mall',
 
     'all_rights_reserved' => 'All rights reserved',
     'ssl_secure' => 'This website is secured with SSL to protect your data',
@@ -404,4 +415,22 @@ Delni is an independent project developed with expertise and passion to provide 
     'admin_dashboard' => 'Admin Dashboard',
     'manage_users' => 'Manage Users',
     'manage_emergency_reports' => 'Manage Emergency Reports',
+
+
+
+    // 🌐 General
+    'dashboard'        => 'Dashboard',
+    'home'             => 'Home',
+    'save'             => 'Save',
+    'update'           => 'Update',
+    'delete'           => 'Delete',
+    'edit'             => 'Edit',
+    'back'             => 'Back',
+    'view'             => 'View',
+    'no_data'          => 'No data found',
+    'created_at'       => 'Created At',
+    'currency'         => '₺',
+    'confirm_delete'   => 'Are you sure you want to delete this item?',
+
+
 ];

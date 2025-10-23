@@ -7,6 +7,8 @@ use App\Models\Ad;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\Banner;
+
 
 class AdController extends Controller
 {
@@ -74,16 +76,20 @@ if ($request->filled('area_max')) $query->where('area_total', '<=', $request->ar
             break;
     }
 
-    // ✅ 12 إعلان كل مرة
-    $ads = $query->paginate(12);
+// ✅ 12 إعلان كل مرة
+$ads = $query->paginate(12);
 
-    // إذا الطلب AJAX ➝ رجّع جزء البطاقات فقط
-    if ($request->ajax()) {
-        return view('ads.partials.list', compact('ads'))->render();
-    }
+// ✅ جلب البانرات المفعلة
+$banners = Banner::where('active', 1)->get();
 
-    // إذا الطلب عادي ➝ رجّع الصفحة الكاملة
-    return view('ads.index', compact('ads'));
+// إذا الطلب AJAX ➝ رجّع جزء البطاقات فقط
+if ($request->ajax()) {
+    return view('ads.partials.list', compact('ads'))->render();
+}
+
+// إذا الطلب عادي ➝ رجّع الصفحة الكاملة
+return view('ads.index', compact('ads', 'banners'));
+
 }
 
     // ➕ إنشاء إعلان

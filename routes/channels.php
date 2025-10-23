@@ -16,3 +16,9 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+
+Broadcast::channel('taxi-chat.{orderId}', function ($user = null, $orderId) {
+    // السماح لجميع المستخدمين بالاستماع للدردشة الخاصة بالطلب
+    return true;
+});

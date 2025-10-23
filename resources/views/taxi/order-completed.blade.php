@@ -28,7 +28,7 @@
                class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded transition">
                 🏠 العودة إلى الصفحة الرئيسية
             </a>
-            <a href="{{ route('taxi.map') }}"
+            <a href="{{ route('taxi.index') }}"
                class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-2 rounded transition">
                 🚖 طلب رحلة جديدة
             </a>

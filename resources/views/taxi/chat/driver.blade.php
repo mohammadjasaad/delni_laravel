@@ -12,15 +12,14 @@
         </div>
 
         {{-- ✅ صندوق الرسائل --}}
-        <div id="chatBox" class="h-64 overflow-y-auto border rounded p-4 bg-white mb-6 text-sm sm:text-base space-y-2">
-            {{-- الرسائل ستُحمّل هنا --}}
+        <div id="chatBox" class="h-72 overflow-y-auto border rounded p-4 bg-gray-50 mb-6 text-sm sm:text-base space-y-2">
+            {{-- سيتم تحميل الرسائل هنا --}}
         </div>
 
-        {{-- ✅ نموذج إرسال رد السائق --}}
-        <form id="chatForm" class="flex gap-2 items-center" method="POST" action="{{ route('driver.message.reply', ['order' => $order->id]) }}">
+        {{-- ✅ نموذج الإرسال --}}
+        <form id="chatForm" class="flex gap-2 items-center">
             @csrf
-            <input type="hidden" name="sender" value="driver">
-            <input type="text" name="message" placeholder="✍️ اكتب ردك..." required
+            <input type="text" id="chatInput" name="message" placeholder="✍️ اكتب رسالتك..." required
                    class="flex-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
             <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded">
                 إرسال
@@ -37,36 +36,68 @@
 
     {{-- ✅ JavaScript --}}
     <script>
-        async function loadMessages() {
-            const res = await fetch("{{ route('passenger.message.fetch', ['order_id' => $order->id]) }}");
-            const messages = await res.json();
-            const chatBox = document.getElementById("chatBox");
-            chatBox.innerHTML = "";
-            messages.forEach(msg => {
-                const msgDiv = document.createElement("div");
-                msgDiv.className = msg.sender === 'driver' ? 'text-right' : 'text-left';
-                msgDiv.innerHTML = `
-                    <div class="inline-block px-3 py-2 rounded 
-                        ${msg.sender === 'driver' ? 'bg-yellow-100 text-yellow-900' : 'bg-gray-100 text-gray-800'}">
-                        <strong>${msg.sender === 'driver' ? '👨‍✈️ أنت' : '👤 الراكب'}:</strong> ${msg.message}
-                    </div>`;
-                chatBox.appendChild(msgDiv);
-            });
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const orderId = {{ $order->id }};
+            const chatBox = document.getElementById('chatBox');
+            const input = document.getElementById('chatInput');
+            const form = document.getElementById('chatForm');
 
-        document.getElementById("chatForm").addEventListener("submit", async function (e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            await fetch(this.action, {
-                method: "POST",
-                body: formData
+            // ✅ تحميل الرسائل السابقة
+            async function loadMessages() {
+                const res = await fetch(`/api/taxi/messages/${orderId}`);
+                const messages = await res.json();
+                chatBox.innerHTML = '';
+                messages.forEach(msg => appendMessage(msg.sender_type, msg.message));
+            }
+
+            // ✅ عرض الرسالة
+            function appendMessage(sender, message) {
+                const div = document.createElement('div');
+                div.className = sender === 'driver'
+                    ? 'text-right'
+                    : 'text-left';
+                div.innerHTML = `
+                    <div class="inline-block px-3 py-2 rounded ${
+                        sender === 'driver'
+                            ? 'bg-yellow-100 text-yellow-900'
+                            : 'bg-gray-200 text-gray-800'
+                    }">
+                        <strong>${sender === 'driver' ? '👨‍✈️ أنت' : '👤 الراكب'}:</strong> ${message}
+                    </div>`;
+                chatBox.appendChild(div);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+
+            // ✅ استقبال الرسائل الفورية عبر Laravel Echo (Pusher)
+            window.Echo.channel(`taxi-chat.${orderId}`)
+                .listen('.TaxiMessageSent', (e) => {
+                    appendMessage(e.message.sender_type, e.message.message);
+                });
+
+            // ✅ إرسال رسالة جديدة
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const message = input.value.trim();
+                if (!message) return;
+
+                await fetch(`/api/taxi/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        order_id: orderId,
+                        sender_type: 'driver',
+                        message: message
+                    })
+                });
+
+                appendMessage('driver', message);
+                input.value = '';
             });
-            this.reset();
+
             loadMessages();
         });
-
-        setInterval(loadMessages, 5000);
-        loadMessages();
     </script>
 </x-app-layout>
