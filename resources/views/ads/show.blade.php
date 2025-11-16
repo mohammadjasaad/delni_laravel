@@ -1,8 +1,9 @@
 {{-- resources/views/ads/show.blade.php --}}
 <x-app-layout>
 <div class="max-w-6xl mx-auto px-4 py-8">
+
     {{-- ✅ الصور --}}
-    @php
+@php
         $images = is_array($ad->images) ? $ad->images : json_decode($ad->images, true);
         $mainImage = !empty($images[0]) ? asset('storage/'.$images[0]) : asset('storage/placeholder.png');
     @endphp
@@ -40,6 +41,16 @@
         <p class="text-xs text-gray-500 dark:text-gray-400">
             {{ $ad->user->ads()->count() }} إعلان
         </p>
+        {{-- ⭐ تقييم مزوّد الخدمة --}}
+        @if(isset($providerRatingCount) && $providerRatingCount > 0)
+            <div class="flex items-center gap-2 mt-2 text-yellow-500 text-sm">
+                ⭐ {{ number_format($providerRatingAvg, 1) }}
+                <span class="text-gray-500 text-xs">({{ $providerRatingCount }} تقييم)</span>
+            </div>
+        @else
+            <p class="text-gray-400 text-sm mt-1">لا توجد تقييمات بعد</p>
+        @endif
+
     </div>
 <a href="{{ route('user.ads', $ad->user->id) }}" 
    class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1.5 rounded-md shadow text-sm font-medium">
@@ -50,12 +61,52 @@
         {{-- ✅ تفاصيل الإعلان --}}
         <div>
             <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+{{-- 🏷️ نوع العرض (بيع / إيجار) --}}
+@php
+    $dealType = $ad->deal_type;
+    if (in_array($dealType, ['sale', 'بيع'])) $dealLabel = '🚩 بيع';
+    elseif (in_array($dealType, ['rent', 'إيجار'])) $dealLabel = '🏠 إيجار';
+    else $dealLabel = '-';
+@endphp
+
+<span class="inline-block bg-blue-100 text-blue-700 font-bold px-3 py-1 rounded-lg shadow-sm text-sm mb-3">
+    {{ $dealLabel }}
+</span>
+
     <i class="fas fa-bullhorn"></i> {{ $ad->title }}
 </h1>
 <p class="text-gray-500 dark:text-gray-300 mb-2">
     <i class="fas fa-map-marker-alt text-red-500"></i> {{ $ad->city }}
 </p>
-            <p class="text-red-600 text-xl font-bold mb-4"><i class="fas fa-dollar-sign"></i> {{ number_format($ad->price) }} {{ __('messages.currency') }}</p>
+
+{{-- 📄 رقم الإعلان وتاريخ النشر --}}
+<div class="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-300 mb-4">
+    <div class="flex items-center gap-1">
+        <i class="fas fa-hashtag text-yellow-500"></i>
+        <span>رقم الإعلان:</span>
+        <span class="font-semibold text-gray-800 dark:text-gray-100">{{ $ad->reference ?? '—' }}</span>
+    </div>
+    <div class="flex items-center gap-1">
+        <i class="fas fa-calendar-alt text-yellow-500"></i>
+        <span>تاريخ النشر:</span>
+        <span class="font-semibold text-gray-800 dark:text-gray-100">{{ $ad->created_at->format('Y-m-d') }}</span>
+    </div>
+</div>
+
+{{-- 💰 السعر --}}
+<div class="flex items-center gap-2 mb-4">
+    @if($ad->currency === 'USD')
+        <span class="bg-green-100 text-green-700 font-bold px-3 py-1 rounded-lg shadow-sm text-lg">
+            <i class="fas fa-dollar-sign"></i> {{ number_format($ad->price, 0) }}
+        </span>
+        <span class="text-gray-500 text-sm">دولار أمريكي</span>
+    @else
+        <span class="bg-yellow-100 text-yellow-700 font-bold px-3 py-1 rounded-lg shadow-sm text-lg">
+            {{ number_format($ad->price, 0) }} ل.س
+        </span>
+        <span class="text-gray-500 text-sm">الليرة السورية</span>
+    @endif
+</div>
             {{-- ⭐ إعلان مميز --}}
             @if($ad->is_featured)
                 <span class="inline-block bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full mb-4">
@@ -77,68 +128,172 @@
     <i class="fas fa-map"></i> {{ __('messages.location') }}
 </button>
                 </div>
-                {{-- 📑 تبويب التفاصيل --}}
-                <div x-show="tab==='details'" class="space-y-4">
-                    {{-- 🏠 عقارات --}}
-                    @if($ad->category === 'عقارات' || $ad->category === 'realestate')
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                            <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
-                                <i class="fas fa-home"></i> {{ __('messages.real_estate_details') }}
-                            </h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
-                                <p><i class="fas fa-tag text-gray-500"></i> {{ __('messages.subcategory') }}: {{ $ad->subcategory ?? '-' }}</p>
-                                <p><i class="fas fa-bed text-gray-500"></i> {{ __('messages.rooms') }}: {{ $ad->rooms ?? '-' }}</p>
-                                <p><i class="fas fa-bath text-gray-500"></i> {{ __('messages.bathrooms') }}: {{ $ad->bathrooms ?? '-' }}</p>
-<p><i class="fas fa-ruler-combined text-gray-500"></i> 
-   {{ __('messages.area_total') }}: {{ $ad->area_total ?? '-' }} م²
-</p>
-<p><i class="fas fa-ruler-combined text-gray-500"></i> 
-   {{ __('messages.area_net') }}: {{ $ad->area_net ?? '-' }} م²
-</p>
-                                <p><i class="fas fa-building text-gray-500"></i> {{ __('messages.floor') }}: {{ $ad->floor ?? '-' }}</p>
-                                <p><i class="fas fa-industry text-gray-500"></i> {{ __('messages.building_age') }}: {{ $ad->building_age ?? '-' }}</p>
-                                <p><i class="fas fa-elevator text-gray-500"></i> {{ __('messages.elevator') }}: {{ $ad->has_elevator ? __('messages.yes') : __('messages.no') }}</p>
-                                <p><i class="fas fa-parking text-gray-500"></i> {{ __('messages.parking') }}: {{ $ad->has_parking ? __('messages.yes') : __('messages.no') }}</p>
-                                <p><i class="fas fa-fire text-gray-500"></i> {{ __('messages.heating') }}: {{ $ad->heating_type ?? '-' }}</p>
-                            </div>
-                        </div>
-                    {{-- 🚗 سيارات --}}
-                    @elseif($ad->category === 'سيارات' || $ad->category === 'cars')
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                            <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
-                                <i class="fas fa-car"></i> {{ __('messages.car_details') }}
-                            </h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
-                                <p><i class="fas fa-car-side text-gray-500"></i> {{ __('messages.car_model') }}: {{ $ad->car_model ?? '-' }}</p>
-                                <p><i class="fas fa-calendar-alt text-gray-500"></i> {{ __('messages.car_year') }}: {{ $ad->car_year ?? '-' }}</p>
-                                <p><i class="fas fa-tachometer-alt text-gray-500"></i> {{ __('messages.car_km') }}: {{ $ad->car_km ? $ad->car_km.' كم' : '-' }}</p>
-                                <p><i class="fas fa-gas-pump text-gray-500"></i> {{ __('messages.fuel') }}: {{ $ad->fuel ?? '-' }}</p>
-                                <p><i class="fas fa-cogs text-gray-500"></i> {{ __('messages.gearbox') }}: {{ $ad->gearbox ?? '-' }}</p>
-                                <p><i class="fas fa-palette text-gray-500"></i> {{ __('messages.color') }}: {{ $ad->car_color ?? '-' }}</p>
-                                <p><i class="fas fa-check-circle text-gray-500"></i> {{ __('messages.condition') }}: {{ $ad->is_new ? __('messages.new') : __('messages.used') }}</p>
-                            </div>
-                        </div>
-                    {{-- 🛠️ خدمات --}}
-                    @elseif($ad->category === 'خدمات' || $ad->category === 'services')
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                            <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
-                                <i class="fas fa-tools"></i> {{ __('messages.service_details') }}
-                            </h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
-                                <p><i class="fas fa-wrench text-gray-500"></i> {{ __('messages.service_type') }}: {{ $ad->service_type ?? '-' }}</p>
-                                <p><i class="fas fa-user-tie text-gray-500"></i> {{ __('messages.provider_name') }}: {{ $ad->provider_name ?? '-' }}</p>
-                                <p><i class="fas fa-car text-gray-500"></i> {{ __('messages.vehicle_type') }}: {{ $ad->vehicle_type ?? '-' }}</p>
-                                <p><i class="fas fa-shield-alt text-gray-500"></i> {{ __('messages.insurance_type') }}: {{ $ad->insurance_type ?? '-' }}</p>
-                                <p><i class="fas fa-tools text-gray-500"></i> {{ __('messages.maintenance_type') }}: {{ $ad->maintenance_type ?? '-' }}</p>
-                                <p><i class="fas fa-home text-gray-500"></i> {{ __('messages.property_type') }}: {{ $ad->property_type ?? '-' }}</p>
-                                <p><i class="fas fa-gavel text-gray-500"></i> {{ __('messages.bidding_type') }}: {{ $ad->bidding_type ?? '-' }}</p>
-                                <p><i class="fas fa-headset text-gray-500"></i> {{ __('messages.support_type') }}: {{ $ad->support_type ?? '-' }}</p>
-                            </div>
-                        </div>
-                    @else
-                        <p><i class="fas fa-folder-open text-gray-500"></i> {{ $ad->category }}</p>
-                    @endif
+{{-- 📑 تبويب التفاصيل --}}
+<div x-show="tab==='details'" class="space-y-4">
+@php
+    $cat = strtolower(trim($ad->category ?? ''));
+@endphp
+
+{{-- 🏠 عقارات --}}
+@if(in_array($cat, ['عقارات','realestate','real estate']))
+    @php
+        $dealTypeMap = ['sale'=>'بيع','rent'=>'إيجار','بيع'=>'بيع','إيجار'=>'إيجار',''=> '-', null => '-'];
+        $subcategoryMap = ['residential'=>'سكني','commercial'=>'تجاري','land'=>'أرض','villa'=>'فيلا','office'=>'مكتب','building'=>'بناء كامل'];
+        $floorMap = ['ground'=>'الأرضي','1'=>'الأول','2'=>'الثاني','3'=>'الثالث','4'=>'الرابع','5'=>'الخامس','6+'=>'أعلى من الخامس'];
+        $ageMap   = ['new'=>'جديد','1-5'=>'1 - 5 سنوات','6-10'=>'6 - 10 سنوات','10+'=>'أكثر من 10 سنوات'];
+        $heatingMap = ['مركزي'=>'مركزي','غاز'=>'غاز','كهرباء'=>'كهرباء','مازوت'=>'مازوت','بدون'=>'بدون تدفئة'];
+    @endphp
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-gray-900 dark:text-gray-100 border-b pb-2">
+            <i class="fas fa-home text-yellow-500"></i> تفاصيل العقار
+        </h2>
+
+        @php
+            $fields = [
+                ['icon'=>'fa-tag','label'=>'نوع العرض','value'=>$dealLabel],
+                ['icon'=>'fa-list','label'=>'نوع العقار','value'=>$subcategoryMap[$ad->subcategory] ?? '-'],
+                ['icon'=>'fa-bed','label'=>'عدد الغرف','value'=>$ad->rooms ?? '-'],
+                ['icon'=>'fa-bath','label'=>'عدد الحمامات','value'=>$ad->bathrooms ?? '-'],
+                ['icon'=>'fa-ruler-combined','label'=>'المساحة الإجمالية','value'=>$ad->area_total ? $ad->area_total.' م²' : '-'],
+                ['icon'=>'fa-ruler','label'=>'المساحة الصافية','value'=>$ad->area_net ? $ad->area_net.' م²' : '-'],
+                ['icon'=>'fa-building','label'=>'الطابق','value'=>$floorMap[$ad->floor] ?? ($ad->floor ?? '-')],
+                ['icon'=>'fa-hourglass-half','label'=>'عمر البناء','value'=>$ageMap[$ad->building_age] ?? ($ad->building_age ?? '-')],
+                ['icon'=>'fa-fire','label'=>'نوع التدفئة','value'=>$heatingMap[$ad->heating_type] ?? ($ad->heating_type ?? '-')],
+                ['icon'=>'fa-elevator','label'=>'مصعد','value'=>$ad->has_elevator ? 'نعم' : 'لا'],
+                ['icon'=>'fa-parking','label'=>'موقف سيارات','value'=>$ad->has_parking ? 'نعم' : 'لا'],
+            ];
+        @endphp
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-2 text-sm">
+            @foreach($fields as $f)
+                <div class="flex items-center justify-between border-b border-gray-100 py-1">
+                    <div class="flex items-center gap-2">
+                        <i class="fas {{ $f['icon'] }} text-gray-500 w-5 text-center"></i>
+                        <span class="text-gray-900 font-medium">{{ $f['label'] }}:</span>
+                    </div>
+                    <span class="text-red-600 font-semibold">{{ $f['value'] }}</span>
                 </div>
+            @endforeach
+        </div>
+    </div>
+
+{{-- 🚗 سيارات --}}
+@elseif(in_array($cat, ['سيارات','سيارة','cars','car','vehicle']))
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mt-6">
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-gray-900 dark:text-gray-100 border-b pb-2">
+        <i class="fas fa-car text-yellow-500"></i> تفاصيل السيارة
+    </h2>
+
+    @php
+        $colors = [
+            'White'=>'أبيض','Black'=>'أسود','Gray'=>'رمادي','Silver'=>'فضي','Blue'=>'أزرق','Red'=>'أحمر',
+            'Gold'=>'ذهبي','Green'=>'أخضر','Brown'=>'بني','Beige'=>'بيج','Orange'=>'برتقالي','Yellow'=>'أصفر'
+        ];
+        $dealMap = ['sale'=>'بيع','rent'=>'إيجار','lease'=>'إيجار','بيع'=>'بيع','إيجار'=>'إيجار'];
+    @endphp
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-2 text-sm">
+        @php
+            $fields = [
+                ['icon'=>'fa-industry','label'=>'الشركة المصنعة','value'=>$ad->car_brand ?? '-'],
+                ['icon'=>'fa-car-side','label'=>'الموديل','value'=>$ad->car_model ?? '-'],
+                ['icon'=>'fa-calendar-alt','label'=>'سنة الصنع','value'=>$ad->car_year ?? '-'],
+                ['icon'=>'fa-gas-pump','label'=>'نوع الوقود','value'=>match($ad->fuel ?? '') {
+                    'Petrol'=>'بنزين','Diesel'=>'ديزل','Electric'=>'كهرباء','Hybrid'=>'هجين', default=>$ad->fuel ?? '-'
+                }],
+                ['icon'=>'fa-cogs','label'=>'ناقل الحركة','value'=>match($ad->gearbox ?? '') {
+                    'Automatic'=>'أوتوماتيك','Manual'=>'عادي', default=>$ad->gearbox ?? '-'
+                }],
+                ['icon'=>'fa-palette','label'=>'اللون','value'=>$colors[$ad->car_color] ?? $ad->car_color ?? '-'],
+                ['icon'=>'fa-tachometer-alt','label'=>'عدد الكيلومترات','value'=>$ad->car_km ? number_format($ad->car_km).' كم' : '-'],
+                ['icon'=>'fa-bolt','label'=>'سعة المحرك','value'=>$ad->engine_size ? $ad->engine_size.' سم³' : '-'],
+                ['icon'=>'fa-door-closed','label'=>'عدد الأبواب','value'=>$ad->doors ?? '-'],
+                ['icon'=>'fa-car-crash','label'=>'نوع الهيكل','value'=>$ad->body_type ?? '-'],
+                ['icon'=>'fa-tags','label'=>'نوع العرض','value'=>$dealLabel],
+                ['icon'=>'fa-flag-checkered','label'=>'الحالة','value'=>$ad->is_new ? '🚗 جديدة' : '🔧 مستعملة'],
+            ];
+        @endphp
+
+        @foreach($fields as $f)
+        <div class="flex items-center justify-between border-b border-gray-100 py-1">
+            <div class="flex items-center gap-2">
+                <i class="fas {{ $f['icon'] }} text-gray-500 w-5 text-center"></i>
+                <span class="text-gray-900 font-medium">{{ $f['label'] }}:</span>
+            </div>
+            <span class="text-red-600 font-semibold">{{ $f['value'] }}</span>
+        </div>
+        @endforeach
+    </div>
+
+{{-- 🛠️ خدمات --}}
+@elseif(in_array($cat, ['خدمات','services']))
+
+    @php
+        $serviceTypes = [
+            'maintenance' => 'صيانة عامة',
+            'cleaning' => 'تنظيف منازل ومكاتب',
+            'moving' => 'نقل أثاث',
+            'gardening' => 'تنسيق حدائق',
+            'pets' => 'رعاية الحيوانات',
+
+            'car-mechanic' => 'ميكانيك سيارات',
+            'car-electric' => 'كهرباء سيارات',
+            'car-wash' => 'غسيل سيارات',
+            'cargo' => 'نقل بضائع',
+            'driver' => 'سائق خاص',
+
+            'private-lessons' => 'دروس خصوصية',
+            'programming' => 'كورسات برمجة',
+            'languages' => 'تعليم لغات',
+            'music' => 'تعليم موسيقى',
+            'fitness' => 'تدريب رياضي',
+
+            'dentists' => 'أطباء أسنان',
+            'clinics' => 'عيادات وصيدليات',
+            'barbers' => 'صالونات حلاقة',
+            'beauty' => 'مراكز تجميل',
+            'massage' => 'مساج وعلاج طبيعي',
+
+            'lawyers' => 'محاماة',
+            'accounting' => 'محاسبة',
+            'marketing' => 'تسويق رقمي',
+            'design' => 'تصميم وغرافيك',
+            'photography' => 'تصوير ومونتاج',
+
+            'university' => 'تسجيل جامعي',
+            'translation' => 'ترجمة',
+            'research' => 'كتابة أبحاث',
+            'documents' => 'تخليص معاملات',
+        ];
+
+        $serviceLabel = $serviceTypes[$ad->service_type] ?? 'خدمة';
+    @endphp
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-100 border-b pb-2">
+            <i class="fas fa-tools text-yellow-500"></i> تفاصيل الخدمة
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 text-sm text-gray-700 dark:text-gray-200">
+
+            <div class="flex items-center justify-between border-b border-gray-200 pb-1">
+                <span><i class="fas fa-wrench text-gray-500"></i> نوع الخدمة:</span>
+                <span class="font-bold text-red-600">{{ $serviceLabel }}</span>
+            </div>
+
+            <div class="flex items-center justify-between border-b border-gray-200 pb-1">
+                <span><i class="fas fa-user-tag text-gray-500"></i> اسم المزود:</span>
+                <span class="font-bold text-gray-800 dark:text-gray-100">{{ $ad->provider_name ?? '-' }}</span>
+            </div>
+        </div>
+    </div>
+
+{{-- غير معروف --}}
+@else
+    <p><i class="fas fa-folder-open text-gray-500"></i> {{ $ad->category }}</p>
+@endif
+</div>
                 {{-- 📝 تبويب الوصف --}}
 <div x-show="tab==='description'" class="text-gray-700 dark:text-gray-200 leading-relaxed">
                     {{ $ad->description ?: __('messages.no_description') }}

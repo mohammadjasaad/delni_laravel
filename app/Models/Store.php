@@ -9,12 +9,14 @@ class Store extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'category',
-        'description',
-        'user_id',
-    ];
+protected $fillable = [
+    'name',
+    'category',
+    'description',
+    'logo',       // ✅ أضف هذا السطر
+    'user_id',
+    'status',
+];
 
     # 🔗 علاقة المتجر مع الإعلانات
     public function ads()
@@ -77,5 +79,10 @@ public function products()
 {
     return $this->hasMany(Product::class);
 }
+    // ✅ تعريف المفتاح المستخدم في Route Model Binding
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
 
 }

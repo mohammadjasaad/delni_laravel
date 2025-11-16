@@ -1,13 +1,33 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="rtl">
 <head>
+
+    <!-- ✅ مهم جداً: تعريف تطبيق فيسبوك -->
+    <meta property="fb:app_id" content="1584714839078603" />
+
+<meta name="facebook-domain-verification" content="htc7zaxssdfu9svapezkx5h4mtp9wd" />
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+<!-- Open Graph - Facebook Preview -->
+<meta property="og:title" content="Delni.co">
+<meta property="og:description" content="Delni.co هي منصتك للإعلانات المبوبة في سوريا — بيع واشتري العقارات والسيارات والخدمات بسهولة وسرعة.">
+<meta property="og:image" content="https://delni.co/images/delnilogo.png">
+<meta property="og:image:alt" content="Delni Logo">
+<meta property="og:url" content="https://delni.co/">
+<meta property="og:type" content="website">
+
     <title>@yield('title', 'Delni.co')</title>
 
     <!-- ✅ خط Cairo -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
+
+    <!-- ✅ Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
     <!-- ✅ ستايلات -->
     @vite(['resources/css/app.css'])
     <!-- ✅ FontAwesome -->
@@ -16,6 +36,64 @@
     <script src="//unpkg.com/alpinejs" defer></script>
 
     <style> body { font-family: 'Cairo', sans-serif; } </style>
+<style>
+.user-avatar {
+    width: 2.25rem; /* w-9 */
+    height: 2.25rem; /* h-9 */
+    border-radius: 9999px;
+    background-color: #FACC15; /* bg-yellow-400 */
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform .15s ease-in-out;
+}
+.user-avatar:hover {
+    transform: scale(1.05);
+}
+.dropdown-menu {
+    position: absolute;
+    left: 0;
+    margin-top: .5rem;
+    width: 11rem;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: .5rem;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+    padding: .25rem 0;
+    display: none;
+    z-index: 999;
+}
+.dark .dropdown-menu {
+    background-color: #1f2937;
+    border-color: #374151;
+}
+.dropdown-menu a,
+.dropdown-menu form button {
+    padding: .5rem 1rem;
+    display: block;
+    font-size: .875rem;
+    color: #374151;
+    width: 100%;
+    text-align: right;
+}
+.dark .dropdown-menu a,
+.dark .dropdown-menu form button {
+    color: #e5e7eb;
+}
+.dropdown-menu a:hover,
+.dropdown-menu form button:hover {
+    background-color: #f3f4f6;
+}
+.dark .dropdown-menu a:hover,
+.dark .dropdown-menu form button:hover {
+    background-color: #374151;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex flex-col min-h-screen">
 

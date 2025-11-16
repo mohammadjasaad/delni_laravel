@@ -42,18 +42,20 @@
                     <x-input id="price" type="number" step="0.01" name="price" value="{{ old('price', $product->price) }}" required />
                 </div>
 
-                {{-- 🖼️ صورة --}}
-                <div>
-                    <x-label for="image" :value="__('mall.product_image')" />
-                    <input id="image" type="file" name="image" class="file-input">
+{{-- 🖼️ الصور (متعددة) --}}
+<div>
+    <x-label for="images" :value="__('mall.product_images')" />
+    <input id="images" type="file" name="images[]" class="file-input" multiple>
 
-                    {{-- ✅ الصورة الحالية --}}
-                    @if($product->image)
-                        <div class="mt-3">
-                            <img src="{{ asset('storage/'.$product->image) }}" alt="{{ $product->name }}" class="w-28 h-28 rounded object-cover border">
-                        </div>
-                    @endif
-                </div>
+    {{-- ✅ عرض الصور الحالية --}}
+    @if($product->images && is_array($product->images))
+        <div class="flex flex-wrap gap-3 mt-3">
+            @foreach($product->images as $img)
+                <img src="{{ asset('storage/'.$img) }}" class="w-24 h-24 rounded object-cover border">
+            @endforeach
+        </div>
+    @endif
+</div>
 
                 {{-- 🎯 الأزرار --}}
                 <div class="flex items-center justify-between">

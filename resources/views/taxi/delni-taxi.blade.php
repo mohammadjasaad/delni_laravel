@@ -1,49 +1,40 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="max-w-5xl mx-auto px-4 py-8">
 
-        {{-- 🟡 العنوان الرئيسي --}}
-        <h1 class="text-3xl font-bold text-center text-yellow-600 mb-8">
+        <h1 class="text-3xl font-bold text-center text-yellow-600 mb-6">
             🚖 {{ __('messages.delni_taxi') }}
         </h1>
 
-        {{-- 🗺️ الخريطة التفاعلية --}}
-        <div id="map" class="w-full h-[400px] rounded shadow mb-8"></div>
+        {{-- 🗺️ الخريطة --}}
+        <div id="map" class="w-full h-[450px] rounded-lg shadow-md mb-6"></div>
 
-        {{-- 👨‍✈️ معلومات أقرب سائق --}}
-        @if(isset($nearestDriver))
-            <div class="bg-white p-4 rounded shadow mb-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-2">🚗 أقرب سائق: {{ $nearestDriver->name }}</h2>
-                <p class="text-gray-600">رقم السيارة: {{ $nearestDriver->car_number }}</p>
-                <p class="text-gray-600">المسافة: {{ $nearestDriver->distance }} كم</p>
-            </div>
-        @endif
-
-        {{-- 🔘 أزرار الخدمات --}}
+        {{-- 🔘 أزرار التحكم --}}
         <div class="flex flex-wrap justify-center gap-4 mb-8">
-            <a href="{{ route('taxi.request') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded shadow">
+            <button onclick="locateUser()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
+                📍 حدد موقعي
+            </button>
+
+            <button onclick="findNearestDriver()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">
+                🚗 العثور على أقرب سائق
+            </button>
+
+            <a href="#" id="requestRideBtn" onclick="submitTaxiOrder()"
+               class="hidden bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded">
                 🚕 اطلب سيارة الآن
-            </a>
-            <a href="{{ route('drivers.map') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded shadow">
-                🗺️ خريطة السائقين
-            </a>
-            <a href="{{ route('driver.login') }}" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded shadow">
-                👨‍✈️ دخول السائق
-            </a>
-            <a href="{{ route('driver.dashboard') }}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow">
-                🛠️ لوحة تحكم السائق
             </a>
         </div>
 
-        {{-- ⏱️ حالة الطلب إن وجدت --}}
+        {{-- ⏱️ الطلب النشط --}}
         @auth
             @if($activeOrder)
-                <div class="bg-white p-4 rounded shadow mb-10">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">🕒 حالة الطلب الحالية</h3>
+                <div class="bg-white p-4 rounded shadow mb-10 border-l-4 border-yellow-500">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">🕒 لديك طلب نشط</h3>
                     <p class="text-gray-700">السائق: <strong>{{ $activeOrder->driver_name }}</strong></p>
                     <p class="text-gray-700">الحالة: <strong>{{ $activeOrder->status }}</strong></p>
+
                     <a href="{{ route('taxi.order.status', ['id' => $activeOrder->id]) }}"
-                       class="mt-4 inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded shadow">
-                        🔍 تفاصيل الطلب
+                       class="mt-3 inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded shadow">
+                        🔍 متابعة الطلب
                     </a>
                 </div>
             @endif
@@ -53,29 +44,99 @@
 
     {{-- 🌍 خريطة Leaflet --}}
     <script>
-        var map = L.map('map').setView([{{ $userLat ?? 33.5 }}, {{ $userLng ?? 36.3 }}], 12);
+        let userMarker, nearestDriverMarker, routeLine;
+
+        var map = L.map('map').setView([{{ $userLat ?? 33.5 }}, {{ $userLng ?? 36.3 }}], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 18,
-            attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // ✅ موقع المستخدم
-        L.marker([{{ $userLat ?? 33.5 }}, {{ $userLng ?? 36.3 }}])
-            .addTo(map)
-            .bindPopup("📍 موقعك الحالي")
-            .openPopup();
+        let drivers = [
+            @foreach($drivers as $driver)
+                { id: {{ $driver->id }}, name: "{{ $driver->name }}", lat: {{ $driver->latitude }}, lng: {{ $driver->longitude }}, car: "{{ $driver->car_number }}" },
+            @endforeach
+        ];
 
-        // ✅ السائقين على الخريطة
-        @foreach($drivers as $driver)
-            L.marker([{{ $driver->lat }}, {{ $driver->lng }}], {
-                icon: L.icon({
-                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/2593/2593331.png',
-                    iconSize: [30, 30],
+        drivers.forEach(d => {
+            L.marker([d.lat, d.lng], {
+                icon: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/2593/2593331.png', iconSize: [34, 34] })
+            }).addTo(map).bindPopup(`<b>${d.name}</b><br>🚗 ${d.car}`);
+        });
+
+        function locateUser() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    let lat = pos.coords.latitude;
+                    let lng = pos.coords.longitude;
+
+                    if (userMarker) map.removeLayer(userMarker);
+
+                    userMarker = L.marker([lat, lng]).addTo(map).bindPopup("📍 موقعك").openPopup();
+                    map.setView([lat, lng], 14);
+                });
+            }
+        }
+
+        function submitTaxiOrder() {
+            if (!userMarker) {
+                alert("📍 الرجاء تحديد موقعك أولاً");
+                return;
+            }
+
+            let pos = userMarker.getLatLng();
+
+            fetch("{{ route('taxi.order.store') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user_id: {{ auth()->check() ? auth()->id() : 'null' }},
+                    pickup_latitude: pos.lat,
+                    pickup_longitude: pos.lng
                 })
             })
-            .addTo(map)
-            .bindPopup("<strong>{{ $driver->name }}</strong><br>🚗 {{ $driver->car_number }}");
-        @endforeach
+            .then(res => res.redirected ? window.location.href = res.url : res.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                }
+            });
+        }
+
+        function findNearestDriver() {
+            if (!userMarker) {
+                alert("📍 الرجاء تحديد موقعك أولاً");
+                return;
+            }
+
+            let userPos = userMarker.getLatLng();
+            let nearest = null;
+            let minDist = Infinity;
+
+            drivers.forEach(driver => {
+                let dist = map.distance([driver.lat, driver.lng], [userPos.lat, userPos.lng]);
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearest = driver;
+                }
+            });
+
+            if (nearest) {
+                if (nearestDriverMarker) map.removeLayer(nearestDriverMarker);
+                if (routeLine) map.removeLayer(routeLine);
+
+                nearestDriverMarker = L.marker([nearest.lat, nearest.lng]).addTo(map)
+                    .bindPopup(`🚗 ${nearest.name}<br>${nearest.car}`)
+                    .openPopup();
+
+                routeLine = L.polyline([[nearest.lat, nearest.lng], [userPos.lat, userPos.lng]], { color: 'yellow' }).addTo(map);
+
+                document.getElementById("requestRideBtn").classList.remove("hidden");
+            }
+        }
     </script>
+
 </x-app-layout>

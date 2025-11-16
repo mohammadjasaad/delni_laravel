@@ -1,5 +1,5 @@
-<header class="bg-white dark:bg-gray-900 shadow-sm relative z-[2000]">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+<header class="bg-white dark:bg-gray-900 shadow-sm relative z-[2000] !py-0">
+    <div class="max-w-7xl mx-auto px-4 py-1 flex items-center justify-between">
 
         {{-- ✅ أقصى اليمين: الشعار --}}
         <div class="flex items-center gap-2">
@@ -60,11 +60,11 @@
                     </button>
                 </form>
             @else
-                <a href="{{ route('login') }}"
-                   class="px-3 py-1.5 rounded bg-gray-100 dark:bg-gray-800 
-                          text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm">
-                    👤 {{ __('messages.login') }}
-                </a>
+<a href="{{ route('login') }}"
+   class="px-3 py-1.5 rounded bg-gray-100 dark:bg-gray-800 
+          text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm">
+    👤 {{ __('messages.login') }}
+</a>
             @endauth
 
             {{-- زر اللغة --}}
@@ -134,14 +134,16 @@
                 </button>
             </form>
         @else
-            <a href="{{ route('login') }}" class="block hover:text-yellow-500">👤 {{ __('messages.login') }}</a>
-        @endauth
+<a href="{{ route('login') }}" class="block hover:text-yellow-500">
+    👤 {{ __('messages.login') }}
+</a>
 
         <a href="{{ route('change.lang', app()->getLocale() === 'ar' ? 'en' : 'ar') }}"
            class="block hover:text-yellow-500">
             🌐 {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
         </a>
     </div>
+@endif
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {

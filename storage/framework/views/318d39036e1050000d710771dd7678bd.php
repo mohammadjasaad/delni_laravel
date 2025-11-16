@@ -1,5 +1,5 @@
-<header class="bg-white dark:bg-gray-900 shadow-sm relative z-[2000]">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+<header class="bg-white dark:bg-gray-900 shadow-sm relative z-[2000] !py-0">
+    <div class="max-w-7xl mx-auto px-4 py-1 flex items-center justify-between">
 
         
         <div class="flex items-center gap-2">
@@ -65,12 +65,12 @@
                     </button>
                 </form>
             <?php else: ?>
-                <a href="<?php echo e(route('login')); ?>"
-                   class="px-3 py-1.5 rounded bg-gray-100 dark:bg-gray-800 
-                          text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm">
-                    👤 <?php echo e(__('messages.login')); ?>
+<a href="<?php echo e(route('login')); ?>"
+   class="px-3 py-1.5 rounded bg-gray-100 dark:bg-gray-800 
+          text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm">
+    👤 <?php echo e(__('messages.login')); ?>
 
-                </a>
+</a>
             <?php endif; ?>
 
             
@@ -143,8 +143,10 @@
                 </button>
             </form>
         <?php else: ?>
-            <a href="<?php echo e(route('login')); ?>" class="block hover:text-yellow-500">👤 <?php echo e(__('messages.login')); ?></a>
-        <?php endif; ?>
+<a href="<?php echo e(route('login')); ?>" class="block hover:text-yellow-500">
+    👤 <?php echo e(__('messages.login')); ?>
+
+</a>
 
         <a href="<?php echo e(route('change.lang', app()->getLocale() === 'ar' ? 'en' : 'ar')); ?>"
            class="block hover:text-yellow-500">
@@ -152,6 +154,7 @@
 
         </a>
     </div>
+<?php endif; ?>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {

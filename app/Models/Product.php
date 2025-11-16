@@ -9,14 +9,18 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'store_id',
-        'name',
-        'description',
-        'price',
-        'image',
-        'status',
-    ];
+protected $fillable = [
+    'store_id',
+    'name',
+    'description',
+    'price',
+    'images', // ✅ بدل image
+    'status',
+];
+
+protected $casts = [
+    'images' => 'array', // ✅ مهم جداً
+];
 
     // كل منتج ينتمي لمتجر
     public function store()

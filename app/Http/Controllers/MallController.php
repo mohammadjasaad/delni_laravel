@@ -5,27 +5,37 @@ namespace App\Http\Controllers;
 use App\Models\Store;
 use App\Models\MallBanner; // ✅ استدعاء موديل بانرات المول
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class MallController extends Controller
 {
     // 🏬 عرض جميع المتاجر + بانرات المول
-    public function index(Request $request)
-    {
-        $query = Store::query();
+public function index(Request $request)
+{
+    $category = $request->category;
 
-        // ✅ فلترة حسب التصنيف
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
-        }
+    // ✅ المتاجر حسب القسم (إن وجد)
+    $stores = Store::when($category, function($q) use ($category) {
+        $q->where('category', $category);
+    })
+    ->orderBy('created_at', 'desc')
+    ->paginate(12);
 
-        // ✅ جلب المتاجر (12 بالصفحة)
-        $stores = $query->orderBy('created_at', 'desc')->paginate(12);
+    // ✅ المنتجات حسب القسم (صف عرض واحد)
+    $products = \App\Models\Product::when($category, function($q) use ($category) {
+        $q->whereHas('store', function($s) use ($category) {
+            $s->where('category', $category);
+        });
+    })
+    ->orderBy('created_at', 'desc')
+    ->take(20)
+    ->get();
 
-        // ✅ جلب بانرات المول (أحدث 5 بانرات مثلاً)
-$banners = MallBanner::latest()->take(5)->get();
-return view('mall.index', compact('stores', 'banners'));
+    // ✅ بانرات دلني مول
+    $banners = MallBanner::latest()->take(5)->get();
 
-    }
+    return view('mall.index', compact('stores', 'products', 'banners', 'category'));
+}
 
     // ➕ صفحة إنشاء متجر
     public function create()
@@ -33,32 +43,35 @@ return view('mall.index', compact('stores', 'banners'));
         return view('mall.create');
     }
 
-    // 💾 حفظ متجر جديد
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name'        => 'required|string|max:255',
-            'category'    => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'logo'        => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
-        ]);
+// 💾 حفظ متجر جديد
+public function store(Request $request)
+{
+    // ✅ جلب المفاتيح من ملف الإعدادات
+    $validKeys = array_keys(config('mall.categories'));
 
-        $logoPath = $request->file('logo')
-            ? $request->file('logo')->store('stores', 'public')
-            : null;
+    $request->validate([
+        'name'        => 'required|string|max:255',
+        'category'    => ['required','string', Rule::in($validKeys)], // ✅ التحقق من أن التصنيف من القائمة
+        'description' => 'nullable|string',
+        'logo'        => 'required|image|mimes:jpg,jpeg,png,gif|max:2048',
+    ]);
 
-        Store::create([
-            'name'        => $request->name,
-            'category'    => $request->category,
-            'description' => $request->description,
-            'logo'        => $logoPath,
-            'user_id'     => auth()->id(),
-            'status'      => 1,
-        ]);
+    $logoPath = $request->file('logo')
+        ? $request->file('logo')->store('stores', 'public')
+        : null;
 
-        return redirect()->route('mall.index')
-                         ->with('success', __('messages.store_added_success'));
-    }
+    Store::create([
+        'name'        => $request->name,
+        'category'    => $request->category,
+        'description' => $request->description,
+        'logo'        => $logoPath,
+        'user_id'     => auth()->id(),
+        'status'      => 1,
+    ]);
+
+    return redirect()->route('mall.index')
+                     ->with('success', __('messages.store_added_success'));
+}
 
     // 👁️ عرض تفاصيل متجر + منتجات + إعلانات مع فلترة وترتيب
     public function show(Store $store, Request $request)

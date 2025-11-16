@@ -34,7 +34,10 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\ForceUserToCompleteProfile::class,
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\UserLastSeen::class,
+            \App\Http\Middleware\CheckBannedUser::class,
 
             // ✅ TrackVisits شغّلناه فقط على web
         ],
@@ -62,6 +65,7 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'blockBanned' => \App\Http\Middleware\CheckBannedUser::class,
 
         // ✅ الميدل وير الخاص بالأدمن
         'admin' => \App\Http\Middleware\AdminMiddleware::class,

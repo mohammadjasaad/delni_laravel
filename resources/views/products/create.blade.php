@@ -41,11 +41,12 @@
                     <x-input id="price" type="number" step="0.01" name="price" value="{{ old('price') }}" required />
                 </div>
 
-                {{-- 🖼️ صورة --}}
-                <div>
-                    <x-label for="image" :value="__('mall.product_image')" />
-                    <input id="image" type="file" name="image" class="file-input">
-                </div>
+{{-- 🖼️ الصور (متعددة) --}}
+<div>
+    <x-label for="images" :value="__('mall.product_images')" />
+    <input id="images" type="file" name="images[]" class="file-input" multiple>
+    <p class="text-sm text-gray-400 mt-1">يمكنك تحديد أكثر من صورة</p>
+</div>
 
                 {{-- 🎯 الأزرار --}}
                 <div class="flex items-center justify-between">

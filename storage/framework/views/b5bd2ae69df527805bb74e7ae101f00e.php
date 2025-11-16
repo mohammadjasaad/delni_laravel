@@ -250,14 +250,14 @@
                 </a>
             </div>
 
-            <!-- 🟢 تسجيل عبر واتساب -->
-            <div class="mt-6">
-                <a href="https://wa.me/963988779548?text=مرحباً، أريد إنشاء حساب في Delni" target="_blank"
-                   class="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg shadow-md transition">
-                    💬 واتساب <?php echo e(__('messages.register')); ?>
+<!-- 🟢 إنشاء حساب عبر واتساب -->
+<div class="mt-6">
+    <a href="<?php echo e(route('login.phone')); ?>"
+       class="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg shadow-md transition">
+        💬 واتساب <?php echo e(__('messages.register')); ?>
 
-                </a>
-            </div>
+    </a>
+</div>
         </div>
     </div>
  <?php echo $__env->renderComponent(); ?>

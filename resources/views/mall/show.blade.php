@@ -6,9 +6,8 @@
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
             <div class="flex flex-col md:flex-row items-center md:items-start gap-6 p-6">
                 {{-- شعار المتجر --}}
-                <img src="{{ $store->logo ? asset('storage/'.$store->logo) : asset('storage/placeholder.png') }}"
-                     alt="{{ $store->name }}"
-                     class="w-32 h-32 rounded-full border border-gray-200 dark:border-gray-700 object-cover shadow-lg group-hover:scale-105 transition">
+<img src="{{ $store->logo ? asset('storage/'.$store->logo) : asset('storage/placeholder.png') }}"
+     class="w-32 h-32 rounded-full border object-cover shadow" alt="Store Logo">
 
                 {{-- بيانات المتجر --}}
                 <div class="flex-1 space-y-3">
@@ -30,67 +29,92 @@
                     </div>
                 </div>
 
-                {{-- أزرار المالك --}}
-                @auth
-                    @if(auth()->id() === $store->user_id)
-                        <div class="flex flex-col gap-2">
-                            <a href="{{ route('mall.edit', $store->id) }}" class="btn-yellow flex items-center gap-2">
-                                ✏️ {{ __('mall.edit_store') }}
-                            </a>
-                            <form action="{{ route('mall.destroy', $store->id) }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        onclick="return confirm('{{ __('mall.confirm_delete') }}')"
-                                        class="btn-red flex items-center gap-2">
-                                    🗑️ {{ __('mall.delete') }}
-                                </button>
-                            </form>
+{{-- أزرار المالك --}}
+@auth
+    @if(auth()->id() === $store->user_id)
+        <div class="flex flex-col gap-2">
 
-                            {{-- زر لوحة التحكم --}}
-                            <a href="{{ route('mall.dashboard', $store->id) }}" 
-                               class="btn-blue flex items-center gap-2">
-                               ⚙️ {{ __('mall.dashboard') }}
-                            </a>
-                        </div>
-                    @endif
-                @endauth
+            {{-- ✏️ تعديل المتجر --}}
+            <a href="{{ route('mall.edit', $store->id) }}" class="btn-yellow flex items-center gap-2">
+                ✏️ {{ __('mall.edit_store') }}
+            </a>
+
+            {{-- ➕ إضافة منتج جديد --}}
+            <a href="{{ route('mall.products.create', $store->id) }}" class="btn-green flex items-center gap-2">
+                ➕ {{ __('mall.add_product') }}
+            </a>
+
+            {{-- ⚙️ لوحة تحكم المتجر --}}
+            <a href="{{ route('mall.dashboard', $store->id) }}" class="btn-blue flex items-center gap-2">
+                ⚙️ {{ __('mall.dashboard') }}
+            </a>
+
+            {{-- 🗑️ حذف المتجر --}}
+            <form action="{{ route('mall.destroy', $store->id) }}" method="POST" onsubmit="return confirm('{{ __('mall.confirm_delete') }}');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn-red flex items-center gap-2">
+                    🗑️ {{ __('mall.delete') }}
+                </button>
+            </form>
+        </div>
+    @endif
+@endauth
             </div>
         </div>
 
-        {{-- 📦 منتجات المتجر --}}
-        <div>
-            <h2 class="section-title">📦 {{ __('mall.store_products') }}</h2>
+{{-- 📦 منتجات المتجر --}}
+<div>
+    <h2 class="section-title">📦 {{ __('mall.store_products') }}</h2>
 
-            @if($store->products->count())
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    @foreach($store->products as $product)
-                        <div class="ad-card group">
-                            <a href="{{ route('mall.products.show', [$store->id, $product->id]) }}">
-                                <img src="{{ $product->image ? asset('storage/'.$product->image) : asset('images/no-image.png') }}"
-                                     alt="{{ $product->name }}"
-                                     class="w-full h-40 object-cover rounded-t-xl group-hover:opacity-90 transition">
-                            </a>
-                            <div class="p-4 space-y-2">
-                                <h3 class="font-bold text-lg text-gray-800 dark:text-white truncate">
-                                    {{ $product->name }}
-                                </h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
-                                    {{ $product->description }}
-                                </p>
-                                <span class="price">{{ $product->price }} {{ __('mall.currency') }}</span>
-                                <a href="{{ route('mall.products.show', [$store->id, $product->id]) }}"
-                                   class="btn-blue mt-2">
-                                    👁️ {{ __('mall.view') }}
-                                </a>
-                            </div>
-                        </div>
-                    @endforeach
+    @if($store->products->count())
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+            @foreach($store->products as $product)
+
+                {{-- ✅ اختيار أول صورة من images --}}
+@php
+    $images = is_array($product->images)
+        ? $product->images
+        : json_decode($product->images, true);
+
+    $img = (!empty($images) && isset($images[0]))
+        ? asset('storage/' . $images[0])
+        : asset('images/no-image.png');
+@endphp
+
+                <div class="ad-card group">
+                    <a href="{{ route('mall.products.show', [$store->id, $product->id]) }}">
+                        <img src="{{ $img }}"
+                             alt="{{ $product->name }}"
+                             class="w-full h-44 object-cover rounded-lg group-hover:scale-105 transition duration-300">
+                    </a>
+
+                    <div class="p-4 space-y-2">
+                        <h3 class="font-bold text-lg text-gray-800 dark:text-white truncate">
+                            {{ $product->name }}
+                        </h3>
+
+                        <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                            {{ $product->description }}
+                        </p>
+
+                        <span class="price text-yellow-500 font-bold text-lg">
+                            {{ number_format($product->price) }} {{ __('mall.currency') }}
+                        </span>
+
+                        <a href="{{ route('mall.products.show', [$store->id, $product->id]) }}"
+                           class="btn-yellow mt-2 w-full block text-center">
+                            👁️ {{ __('mall.view') }}
+                        </a>
+                    </div>
                 </div>
-            @else
-                <p class="text-gray-500 dark:text-gray-400">{{ __('mall.no_products') }}</p>
-            @endif
+
+            @endforeach
         </div>
+    @else
+        <p class="text-gray-500 dark:text-gray-400">{{ __('mall.no_products') }}</p>
+    @endif
+</div>
 
         {{-- 📢 إعلانات المتجر --}}
         <div>

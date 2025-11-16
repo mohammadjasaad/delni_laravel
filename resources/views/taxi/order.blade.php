@@ -1,87 +1,78 @@
-<x-main-layout title="🚖 Delni Taxi - اطلب رحلتك الآن">
+@extends('layouts.app')
 
-    {{-- ✅ رأس الصفحة --}}
-    <section class="bg-yellow-400 text-center py-8 rounded-b-3xl shadow">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900">
-            🚖 اطلب رحلتك الآن مع <span class="text-black">Delni Taxi</span>
-        </h1>
-        <p class="text-gray-700 mt-2">حدد موقعك وسنجد لك أقرب سائق فوراً ⏱️</p>
-    </section>
+@section('head')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>#map{height:65vh;border-radius:16px}</style>
+@endsection
 
-    {{-- ✅ منطقة المحتوى --}}
-    <div class="max-w-3xl mx-auto mt-8 p-6 bg-white rounded-2xl shadow-lg space-y-6 text-center">
-
-        {{-- ✅ الخريطة --}}
-        <div id="map" class="w-full h-[400px] rounded-xl border border-gray-200 shadow"></div>
-
-        {{-- ✅ عرض الإحداثيات --}}
-        <div class="mt-4 bg-gray-50 p-3 rounded-lg shadow-inner text-gray-700">
-            📍 موقعك الحالي: 
-            <span id="coords" class="text-yellow-600 font-semibold">جارِ التحديد...</span>
-        </div>
-
-        {{-- ✅ الأزرار --}}
-        <div class="flex flex-col md:flex-row justify-center items-center gap-4 pt-4">
-            <button id="getLocation"
-                class="bg-white border-2 border-yellow-500 text-yellow-700 font-bold px-5 py-2 rounded-full hover:bg-yellow-100 transition">
-                📍 استخدم موقعي الحالي
-            </button>
-
-            <form id="requestForm" action="{{ route('taxi.request') }}" method="POST">
-                @csrf
-                <input type="hidden" id="lat" name="lat">
-                <input type="hidden" id="lng" name="lng">
-
-                <button type="submit"
-                    class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-6 py-3 rounded-full shadow-lg transition">
-                    🚕 تأكيد الطلب الآن
-                </button>
-            </form>
-        </div>
-
+@section('content')
+<div class="max-w-5xl mx-auto py-6 px-4">
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-xl font-semibold">طلب رقم #{{ $order->id }}</h2>
+    <span class="px-3 py-1 rounded-full text-sm border">
+      الحالة: <b id="status">{{ $order->status }}</b>
+    </span>
+  </div>
+  <div id="map" class="mb-3"></div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="p-3 rounded-xl border">
+      <div class="text-sm text-gray-500">المسافة</div>
+      <div class="text-2xl font-bold">{{ number_format($order->distance_km,2) }} كم</div>
     </div>
+    <div class="p-3 rounded-xl border">
+      <div class="text-sm text-gray-500">التكلفة</div>
+      <div class="text-2xl font-bold">{{ number_format($order->fare_syp) }} ل.س</div>
+    </div>
+    <div class="p-3 rounded-xl border">
+      <div class="text-sm text-gray-500">السائق</div>
+      <div class="text-lg font-semibold" id="driverName">{{ optional($order->driver)->name ?? '—' }}</div>
+    </div>
+  </div>
+</div>
+@endsection
 
-    {{-- ✅ سكربت الخريطة --}}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+@section('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const orderId = {{ $order->id }};
+const pickup  = [{{ $order->pickup_lat }}, {{ $order->pickup_lng }}];
+const dropoff = [{{ $order->dropoff_lat }}, {{ $order->dropoff_lng }}];
 
-    <script>
-        let map, marker;
+const map = L.map('map').setView(pickup, 13);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+  attribution: '&copy; OpenStreetMap, &copy; CARTO'
+}).addTo(map);
 
-        function initMap(lat = 33.5138, lng = 36.2765) {
-            map = L.map('map').setView([lat, lng], 14);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; Delni Taxi',
-            }).addTo(map);
+const pickupIcon  = L.circleMarker(pickup,  {radius:8, fillOpacity:1}).addTo(map).bindPopup('نقطة الانطلاق');
+const dropoffIcon = L.circleMarker(dropoff, {radius:8, fillOpacity:1}).addTo(map).bindPopup('الوجهة');
 
-            marker = L.marker([lat, lng]).addTo(map).bindPopup("📍 أنت هنا").openPopup();
-            document.getElementById('lat').value = lat;
-            document.getElementById('lng').value = lng;
-            document.getElementById('coords').textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-        }
+let driverMarker = null;
+let routeLine = null;
 
-        function updateLocation(lat, lng) {
-            if (marker) map.removeLayer(marker);
-            marker = L.marker([lat, lng]).addTo(map).bindPopup("📍 موقعك الحالي").openPopup();
-            map.setView([lat, lng], 15);
-            document.getElementById('lat').value = lat;
-            document.getElementById('lng').value = lng;
-            document.getElementById('coords').textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-        }
+// اعرض المسار لو متوفر
+@if($order->route_polyline)
+  const poly = {!! $order->route_polyline !!};
+  routeLine = L.polyline(poly, {weight:5, opacity:0.9}).addTo(map);
+  map.fitBounds(routeLine.getBounds(), {padding:[30,30]});
+@endif
 
-        document.addEventListener("DOMContentLoaded", function () {
-            initMap();
-
-            document.getElementById('getLocation').addEventListener('click', () => {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        pos => updateLocation(pos.coords.latitude, pos.coords.longitude),
-                        err => alert("⚠️ لم نتمكن من تحديد موقعك تلقائياً")
-                    );
-                } else {
-                    alert("⚠️ متصفحك لا يدعم تحديد الموقع.");
-                }
-            });
-        });
-    </script>
-</x-main-layout>
+// Laravel Echo (مفترض مهيّأ عندك)
+@if (config('broadcasting.default') !== 'null')
+window.Echo.channel('taxi-order.'+orderId)
+  .listen('.TaxiLocationUpdated', (e) => {
+      const latlng = [e.lat, e.lng];
+      if (!driverMarker) {
+        driverMarker = L.marker(latlng).addTo(map).bindPopup('السائق');
+      } else {
+        driverMarker.setLatLng(latlng);
+      }
+  })
+  .listen('.TaxiOrderStatusChanged', (e) => {
+      document.getElementById('status').textContent = e.order.status;
+      if (e.order.driver && e.order.driver.name) {
+        document.getElementById('driverName').textContent = e.order.driver.name;
+      }
+  });
+@endif
+</script>
+@endsection

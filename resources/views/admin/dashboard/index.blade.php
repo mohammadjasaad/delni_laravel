@@ -82,7 +82,12 @@
 
     {{-- 🖼️ إدارة بانرات المول --}}
     <x-admin.quick-link route="mall-banners.index" icon="🖼️" label="إدارة بانرات المول" color="pink"/>
+
+{{-- 🛠️ إدارة بانرات الخدمات --}}
+<x-admin.quick-link route="service-banners.index" icon="🛠️" label="إدارة بانرات الخدمات" color="teal"/>
+
 </div>
+
 
     {{-- 📊 Chart.js --}}
     @vite('resources/js/admin-dashboard.js')

@@ -1,5 +1,4 @@
 
-
 <?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
 <?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
@@ -54,39 +53,38 @@
     });
 </script>
 <div class="flex flex-wrap items-center justify-center gap-3 mb-6">
-    <a href="<?php echo e(route('ads.index', ['category' => 'realestate'])); ?>"
-       class="px-5 py-2 rounded-full text-sm font-semibold transition
-       <?php echo e(request('category') == 'realestate' ? 'bg-yellow-400 text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'); ?>">
+    <button data-category="realestate" 
+            class="category-btn px-5 py-2 rounded-full text-sm font-semibold transition bg-gray-200 hover:bg-yellow-400">
         <i class="fas fa-building"></i> <?php echo e(__('messages.real_estate')); ?>
 
-    </a>
-    <a href="<?php echo e(route('ads.index', ['category' => 'cars'])); ?>"
-       class="px-5 py-2 rounded-full text-sm font-semibold transition
-       <?php echo e(request('category') == 'cars' ? 'bg-yellow-400 text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'); ?>">
+    </button>
+
+    <button data-category="cars" 
+            class="category-btn px-5 py-2 rounded-full text-sm font-semibold transition bg-gray-200 hover:bg-yellow-400">
         <i class="fas fa-car"></i> <?php echo e(__('messages.cars')); ?>
 
-    </a>
-    <a href="<?php echo e(route('ads.index', ['category' => 'services'])); ?>"
-       class="px-5 py-2 rounded-full text-sm font-semibold transition
-       <?php echo e(request('category') == 'services' ? 'bg-yellow-400 text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'); ?>">
-        <i class="fas fa-tools"></i> <?php echo e(__('messages.services')); ?>
+    </button>
 
-    </a>
-<a href="<?php echo e(route('mall.index')); ?>"
-   class="px-5 py-2 rounded-full text-sm font-semibold transition
-   <?php echo e(request()->routeIs('mall.*') ? 'bg-yellow-400 text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'); ?>">
-    <i class="fas fa-store"></i> <?php echo e(__('messages.delni_mall')); ?>
+<a href="<?php echo e(route('services.index')); ?>" 
+   class="px-5 py-2 rounded-full text-sm font-semibold transition bg-gray-200 hover:bg-yellow-400">
+    <i class="fas fa-tools"></i> <?php echo e(__('messages.services')); ?>
 
 </a>
-    <a href="<?php echo e(route('delni.taxi')); ?>"
-       class="px-5 py-2 rounded-full text-sm font-semibold transition
-       <?php echo e(request()->routeIs('delni.taxi') ? 'bg-yellow-400 text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'); ?>">
+
+    <a href="<?php echo e(route('mall.index')); ?>"
+       class="px-5 py-2 rounded-full text-sm font-semibold transition bg-gray-200 hover:bg-yellow-400">
+        <i class="fas fa-store"></i> <?php echo e(__('messages.delni_mall')); ?>
+
+    </a>
+
+<a href="<?php echo e(route('taxi.index')); ?>"
+       class="px-5 py-2 rounded-full text-sm font-semibold transition bg-gray-200 hover:bg-yellow-400">
         <i class="fas fa-taxi"></i> <?php echo e(__('messages.delni_taxi')); ?>
 
     </a>
+
     <a href="<?php echo e(route('emergency_services.index')); ?>"
-       class="px-5 py-2 rounded-full text-sm font-semibold transition
-       <?php echo e(request()->routeIs('emergency_services.*') ? 'bg-yellow-400 text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'); ?>">
+       class="px-5 py-2 rounded-full text-sm font-semibold transition bg-gray-200 hover:bg-yellow-400">
        <i class="fas fa-ambulance"></i> <?php echo e(__('messages.delni_emergency')); ?>
 
     </a>
@@ -182,6 +180,12 @@
             <input type="text" name="service_type" placeholder="<?php echo e(__('messages.service_type')); ?>" class="input" value="<?php echo e(request('service_type')); ?>">
             <input type="text" name="provider_name" placeholder="<?php echo e(__('messages.provider_name')); ?>" class="input" value="<?php echo e(request('provider_name')); ?>">
         </div>
+
+<select name="currency" class="input">
+    <option value=""><?php echo e(__('messages.all_currencies') ?? 'كل العملات'); ?></option>
+    <option value="SYP" <?php echo e(request('currency') == 'SYP' ? 'selected' : ''); ?>>🇸🇾 الليرة السورية</option>
+    <option value="USD" <?php echo e(request('currency') == 'USD' ? 'selected' : ''); ?>>🇺🇸 الدولار الأمريكي</option>
+</select>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <select name="featured" class="input">
@@ -271,30 +275,98 @@ document.getElementById('toggleMap').addEventListener('click', () => {
     }
 });
 document.addEventListener("DOMContentLoaded", function () {
+    // 🗺️ إنشاء الخريطة
     window.map = L.map('adsMap').setView([34.8021, 38.9968], 7);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; Delni.co' }).addTo(map);
-        fetch("<?php echo e(route('ads.mapData')); ?>")
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; Delni.co' }).addTo(map);
+    let markersLayer = L.layerGroup().addTo(map);
+
+    // ⚡ دالة تحميل الإعلانات حسب التصنيف
+    function loadAds(category = null) {
+        markersLayer.clearLayers();
+        let url = "<?php echo e(route('ads.mapData')); ?>";
+        if (category) url += `?category=${category}`;
+
+        fetch(url)
             .then(res => res.json())
             .then(data => {
                 data.forEach(ad => {
                     if (ad.lat && ad.lng) {
-                        const marker = L.marker([ad.lat, ad.lng]).addTo(map);
-                        const popupContent = `
-                            <img src="${ad.first_image ?? '<?php echo e(asset('storage/placeholder.png')); ?>'}" style="width:100px;height:70px;object-fit:cover;border-radius:8px;margin-bottom:5px;">
-                            <strong>${ad.title}</strong><br>
-                            <i class='fas fa-map-marker-alt text-red-500'></i> ${ad.city}<br>
-                            <i class='fas fa-dollar-sign text-green-600'></i> ${ad.price} <?php echo e(__('messages.currency')); ?><br>
-                            <a href="/ads/${ad.slug}" class="text-blue-600 underline">
-                                <i class='fas fa-eye'></i> <?php echo e(__('messages.view_ad')); ?>
+                        const iconColor = ad.category === 'realestate' ? '#facc15' : 
+                                          ad.category === 'cars' ? '#3b82f6' : 
+                                          ad.category === 'services' ? '#22c55e' : '#6b7280';
+                        
+                        const marker = L.circleMarker([ad.lat, ad.lng], {
+                            color: iconColor,
+                            radius: 8,
+                            fillOpacity: 0.9
+                        }).addTo(markersLayer);
 
-                            </a>
+                        const dealLabel = ad.deal_type === 'rent' ? '🏠 إيجار' : '🏷️ بيع';
+                        const popupContent = `
+                            <div style="text-align:center;">
+                                <img src="${ad.first_image}" 
+                                     style="width:100px;height:70px;object-fit:cover;border-radius:8px;margin-bottom:5px;">
+                                <div style="font-weight:bold;">${ad.title}</div>
+                                <div style="color:${iconColor};font-weight:bold;">${dealLabel}</div>
+                                <div>${ad.city}</div>
+                                <div>${ad.price} <?php echo e(__('messages.currency')); ?></div>
+                                <a href="<?php echo e(url('/ads')); ?>/${ad.slug}" 
+                                   class="text-yellow-600 font-semibold hover:underline block mt-1">
+                                    <i class='fas fa-eye'></i> <?php echo e(__('messages.view_ad')); ?>
+
+                                </a>
+                            </div>
                         `;
                         marker.bindPopup(popupContent);
                     }
                 });
             })
             .catch(err => console.error("⚠️ خطأ بجلب بيانات الخريطة:", err));
+    }
+
+    // ✅ تحميل جميع الإعلانات مبدئيًا
+    loadAds();
+
+    // 🟡 عند الضغط على زر التصنيف
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const category = this.dataset.category;
+            loadAds(category);
+        });
     });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const adsContainer = document.getElementById('adsContainer');
+
+    categoryButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const category = this.dataset.category;
+
+            // ✅ تمييز الزر المحدد
+            categoryButtons.forEach(b => b.classList.remove('bg-yellow-400', 'text-black'));
+            this.classList.add('bg-yellow-400', 'text-black');
+
+            // ✅ تحديث بطاقات الإعلانات باستخدام AJAX
+            let url = "<?php echo e(route('ads.index')); ?>?category=" + category;
+
+            fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+                .then(res => res.text())
+                .then(data => {
+                    // 🔄 نحدث فقط جزء البطاقات دون إعادة تحميل الصفحة
+                    adsContainer.innerHTML = data;
+
+                    // ✅ إذا كانت الخريطة موجودة، حدّثها أيضاً
+                    if (typeof loadAds === 'function') {
+                        loadAds(category);
+                    }
+                })
+                .catch(err => console.error("⚠️ خطأ في تحميل الإعلانات:", err));
+        });
+    });
+});
 </script>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>

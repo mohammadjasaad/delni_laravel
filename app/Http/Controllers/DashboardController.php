@@ -274,4 +274,13 @@ public function favorites(Request $request)
         }
         return back()->with('success', __('messages.marked_as_read'));
     }
+// ✅ عرض تفاصيل الطلب داخل لوحة التحكم
+public function showOrder($id)
+{
+    $order = \App\Models\Order::with(['items.product'])
+        ->where('user_id', auth()->id())
+        ->findOrFail($id);
+
+    return view('dashboard.orders.show', compact('order'));
+}
 }

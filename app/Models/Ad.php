@@ -10,36 +10,50 @@ class Ad extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'title', 'description', 'price', 'city', 'category', 'images',
-        
-        // 🏠 عقارات
-        'rooms','bathrooms','area_total','area_net','floor','building_age',
-        'has_elevator','has_parking','heating_type','subcategory','property_type',
+protected $fillable = [
+    // أساسي
+    'title', 'description', 'price', 'currency', 'city', 'category', 'images',
+    'deal_type', 'type', 'slug', 'reference',
 
-        // 🚗 سيارات
-        'car_model','car_year','car_km','fuel','gearbox','car_color','is_new',
+    // 🔗 علاقات
+    'user_id','store_id',
 
-        // 🛠️ خدمات
-        'service_type','provider_name','vehicle_type','insurance_type',
-        'maintenance_type','bidding_type','support_type',
+    // ⭐ ميزات
+    'is_featured','is_urgent',
 
-        // 🌍 الموقع
-        'lat','lng',
+    // 🌍 موقع
+    'lat','lng',
 
-        // 🔗 العلاقات
-        'user_id','store_id',
+    // 🏠 عقارات
+    'rooms','bathrooms','area_total','area_net','floor','building_age',
+    'has_elevator','has_parking','heating_type','subcategory','property_type',
 
-        // ⭐ مميزات إضافية
-        'is_featured','is_urgent','type','slug'
-    ];
+    // 🚗 سيارات (هنا كان الخطأ ‼️)
+    'car_brand','car_model','car_year','car_km','fuel','gearbox','car_color',
+    'engine_size','doors','body_type','is_new',
 
-    protected $casts = [
-        'images'      => 'array',   // ✅ JSON → Array
-        'is_featured' => 'boolean',
-        'is_urgent'   => 'boolean',
-        'price'       => 'float',
-    ];
+    // 🛠 خدمات
+    'service_type','provider_name','vehicle_type','insurance_type',
+    'maintenance_type','bidding_type','support_type',
+
+    // 📞 رقم التواصل ← ✅ أضف هذا
+    'phone',
+];
+
+protected $casts = [
+    'images'       => 'array',
+    'is_featured'  => 'boolean',
+    'is_urgent'    => 'boolean',
+    'has_elevator' => 'boolean',
+    'has_parking'  => 'boolean',
+    'is_new'       => 'boolean',
+    'price'        => 'float',
+    'lat'          => 'float',
+    'lng'          => 'float',
+    'car_km'       => 'integer',
+    'engine_size'  => 'integer',
+    'doors'        => 'integer',
+];
 
     # ------------------- 🔗 العلاقات -------------------
 
@@ -99,15 +113,26 @@ class Ad extends Model
         return $query->where('category', $category);
     }
 
+public function ratings()
+{
+    return $this->hasMany(Rating::class);
+}
+
     # ------------------- 📝 Slug -------------------
 
     // 🟡 إنشاء slug تلقائي عند الإنشاء فقط
-    protected static function booted()
-    {
-        static::creating(function ($ad) {
-            if (empty($ad->slug)) {
-                $ad->slug = Str::slug($ad->title) . '-' . Str::random(6);
-            }
-        });
-    }
+protected static function booted()
+{
+    static::creating(function ($ad) {
+        // ✅ إنشاء slug تلقائي إذا لم يكن موجودًا
+        if (empty($ad->slug)) {
+            $ad->slug = \Str::slug($ad->title) . '-' . \Str::random(6);
+        }
+
+        // ✅ توليد رقم تسلسلي فريد للإعلان
+        $lastId = \App\Models\Ad::max('id') + 1;
+        $ad->reference = now()->format('Ymd') . str_pad($lastId, 4, '0', STR_PAD_LEFT);
+    });
+}
+
 }

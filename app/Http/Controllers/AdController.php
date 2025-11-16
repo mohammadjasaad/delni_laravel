@@ -37,6 +37,11 @@ public function index(Request $request)
     if ($request->filled('price_min')) $query->where('price', '>=', $request->price_min);
     if ($request->filled('price_max')) $query->where('price', '<=', $request->price_max);
 
+// 💵 فلترة حسب العملة
+if ($request->filled('currency')) {
+    $query->where('currency', $request->currency);
+}
+
     // 🏠 عقارات
     if ($request->category === 'realestate') {
         if ($request->filled('subcategory')) $query->where('subcategory', $request->subcategory);
@@ -116,7 +121,7 @@ public function store(Request $request)
         'images.*'    => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240',
     ]);
 
-    // 🖼️ الصور
+    // 🖼️ رفع الصور
     $images = [];
     if ($request->hasFile('images')) {
         foreach ($request->file('images') as $image) {
@@ -124,69 +129,87 @@ public function store(Request $request)
         }
     }
 
-    $ad = Ad::create([
+    $data = [
+        'user_id'     => auth()->id(),
         'title'       => $request->title,
         'description' => $request->description,
         'price'       => $request->price,
+        'currency'    => $request->currency ?? 'SYP',
         'city'        => $request->city,
         'category'    => $request->category,
         'images'      => $images,
-        'user_id'     => auth()->id(),
         'lat'         => $request->lat,
         'lng'         => $request->lng,
-        'is_featured' => $request->is_featured ?? false,
         'slug'        => Str::slug($request->title) . '-' . uniqid(),
+    ];
 
-        // 🏠 عقارات
-        'rooms'        => $request->rooms,
-        'bathrooms'    => $request->bathrooms,
-        'area_total'   => $request->area_total,
-        'area_net'     => $request->area_net,
-        'floor'        => $request->floor,
-        'building_age' => $request->building_age,
-        'has_elevator' => $request->has('has_elevator') ? 1 : 0,
-        'has_parking'  => $request->has('has_parking') ? 1 : 0,
-        'heating_type' => $request->heating_type,
-        'subcategory'  => $request->subcategory,
+    // 🏠 عقارات
+    if ($request->category === 'realestate') {
+        $data += [
+            'deal_type'    => $request->deal_type,
+            'subcategory'  => $request->subcategory,
+            'rooms'        => $request->rooms,
+            'bathrooms'    => $request->bathrooms,
+            'area_total'   => $request->area_total,
+            'area_net'     => $request->area_net,
+            'floor'        => $request->floor,
+            'building_age' => $request->building_age,
+            'heating_type' => $request->heating_type,
+            'has_elevator' => $request->has('has_elevator') ? 1 : 0,
+            'has_parking'  => $request->has('has_parking') ? 1 : 0,
+        ];
+    }
 
-        // 🚗 سيارات
-        'car_model'  => $request->car_model,
-        'car_year'   => $request->car_year,
-        'car_km'     => $request->car_km,
-        'fuel'       => $request->fuel,
-        'gearbox'    => $request->gearbox,
-        'car_color'  => $request->car_color,
-        'is_new'     => $request->has('is_new') ? 1 : 0,
+    // 🚗 سيارات
+    if ($request->category === 'cars') {
+        $data += [
+            'car_brand'   => $request->car_brand,
+            'car_model'   => $request->car_model,
+            'car_year'    => $request->car_year,
+            'car_km'      => $request->car_km,
+            'fuel'        => $request->fuel,
+            'gearbox'     => $request->gearbox,
+            'car_color'   => $request->car_color,
+            'engine_size' => $request->engine_size,
+            'doors'       => $request->doors,
+            'body_type'   => $request->body_type,
+            'deal_type'   => $request->deal_type,
+            'is_new'      => $request->has('is_new') ? 1 : 0,
+        ];
+    }
 
-        // 🛠️ خدمات
-        'service_type'  => $request->service_type,
-        'provider_name' => $request->provider_name,
+    // 🛠 خدمات (هنا كان الخطأ وتم إصلاحه ✅)
+    if ($request->category === 'services') {
+        $data += [
+            'service_type'  => $request->service_type,
+            'provider_name' => $request->provider_name,
+        ];
+    }
 
-        // 🛠️ خدمات إضافية
-        'vehicle_type'    => $request->vehicle_type,
-        'insurance_type'  => $request->insurance_type,
-        'maintenance_type'=> $request->maintenance_type,
-        'property_type'   => $request->property_type,
-        'bidding_type'    => $request->bidding_type,
-        'support_type'    => $request->support_type,
-    ]);
+    Ad::create($data);
 
-    return redirect()->route('ads.show', $ad->slug)
-                     ->with('success', __('messages.ad_added_successfully'));
+    return redirect()->route('dashboard.myads')
+                     ->with('success', '✅ تم إضافة الإعلان بنجاح!');
 }
 
     // 👁️ عرض إعلان (بالـ slug)
-    public function show($slug)
-    {
-        $ad = Ad::where('slug', $slug)->firstOrFail();
+public function show($slug)
+{
+    $ad = Ad::where('slug', $slug)->firstOrFail();
 
-        $relatedAds = Ad::where('id', '!=', $ad->id)
-                        ->where(fn($q) => $q->where('city', $ad->city)
-                                             ->orWhere('category', $ad->category))
-                        ->latest()->take(6)->get();
+    // ✅ تقييم مزوّد الخدمة
+    $providerRatingAvg = \App\Models\ServiceRating::where('user_id', $ad->user_id)->avg('stars') ?? 0;
+    $providerRatingCount = \App\Models\ServiceRating::where('user_id', $ad->user_id)->count();
 
-        return view('ads.show', compact('ad','relatedAds'));
-    }
+    $relatedAds = Ad::where('id', '!=', $ad->id)
+                    ->where(function($q) use ($ad) {
+                        $q->where('city', $ad->city)
+                          ->orWhere('category', $ad->category);
+                    })
+                    ->latest()->take(6)->get();
+
+    return view('ads.show', compact('ad','relatedAds','providerRatingAvg','providerRatingCount'));
+}
 
     // ✏️ تعديل إعلان
     public function edit($id)
@@ -241,13 +264,18 @@ $validated['heating_type'] = $request->heating_type;
 $validated['subcategory']  = $request->subcategory;
 
 // 🚗 سيارات
-$validated['car_model']  = $request->car_model;
-$validated['car_year']   = $request->car_year;
-$validated['car_km']     = $request->car_km;
-$validated['fuel']       = $request->fuel;
-$validated['gearbox']    = $request->gearbox;
-$validated['car_color']  = $request->car_color;
-$validated['is_new']     = $request->has('is_new') ? 1 : 0;
+$validated['car_brand']   = $request->car_brand;
+$validated['car_model']   = $request->car_model;
+$validated['car_year']    = $request->car_year;
+$validated['car_km']      = $request->car_km;
+$validated['fuel']        = $request->fuel;
+$validated['gearbox']     = $request->gearbox;
+$validated['car_color']   = $request->car_color;
+$validated['engine_size'] = $request->engine_size;
+$validated['doors']       = $request->doors;
+$validated['body_type']   = $request->body_type;
+$validated['deal_type']   = in_array($request->deal_type, ['rent', 'إيجار']) ? 'rent' : 'sale';
+$validated['is_new']      = $request->has('is_new') ? 1 : 0;
 
 // 🛠️ خدمات
 $validated['service_type']  = $request->service_type;
@@ -260,6 +288,8 @@ $validated['maintenance_type']= $request->maintenance_type;
 $validated['property_type']   = $request->property_type;
 $validated['bidding_type']    = $request->bidding_type;
 $validated['support_type']    = $request->support_type;
+
+$validated['currency'] = $request->currency ?? 'SYP';
 
     // ✅ تحديث الإعلان
     $ad->update($validated);
@@ -352,33 +382,38 @@ public function removeFavorite($slug)
     }
 
     // 🗺️ بيانات الخريطة
-    public function mapData()
-    {
-        $ads = Ad::select('id', 'title', 'price', 'city', 'lat', 'lng', 'images', 'slug')
-            ->whereNotNull('lat')
-            ->whereNotNull('lng')
-            ->get()
-            ->map(function ($ad) {
-                $images = is_array($ad->images) ? $ad->images : json_decode($ad->images, true);
-                if (!$images || count($images) === 0) {
-                    $images = ['placeholder.png'];
-                }
+public function mapData(Request $request)
+{
+    $query = Ad::select('id', 'title', 'price', 'city', 'lat', 'lng', 'images', 'slug', 'deal_type', 'category')
+        ->whereNotNull('lat')
+        ->whereNotNull('lng');
 
-                return [
-                    'id'          => $ad->id,
-                    'title'       => $ad->title,
-                    'price'       => $ad->price,
-                    'city'        => $ad->city,
-                    'lat'         => $ad->lat,
-                    'lng'         => $ad->lng,
-                    'images'      => $images,
-                    'first_image' => asset('storage/' . $images[0]),
-                    'url'         => route('ads.show', $ad->slug),
-                ];
-            });
-
-        return response()->json($ads);
+    // ✅ فلترة حسب التصنيف إذا تم تمريره من الجافاسكريبت
+    if ($request->filled('category')) {
+        $query->where('category', $request->category);
     }
+
+    $ads = $query->latest()->take(200)->get()->map(function ($ad) {
+        $images = is_array($ad->images) ? $ad->images : json_decode($ad->images, true);
+        $firstImage = !empty($images[0]) ? asset('storage/' . $images[0]) : asset('storage/placeholder.png');
+
+        return [
+            'id'          => $ad->id,
+            'slug'        => $ad->slug,
+            'title'       => $ad->title,
+            'price'       => number_format($ad->price, 0),
+            'city'        => $ad->city,
+            'lat'         => $ad->lat,
+            'lng'         => $ad->lng,
+            'deal_type'   => $ad->deal_type,
+            'category'    => $ad->category,
+            'first_image' => $firstImage,
+        ];
+    });
+
+    return response()->json($ads);
+}
+
 public function toggleFavorite($slug)
 {
     $ad = \App\Models\Ad::where('slug', $slug)->firstOrFail();

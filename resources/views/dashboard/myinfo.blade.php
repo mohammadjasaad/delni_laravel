@@ -27,12 +27,13 @@
         </div>
 
 {{-- 📱 رقم الموبايل --}}
-<div class="flex items-center justify-between border-b border-gray-700 pb-2">
-    <span class="flex items-center gap-2 text-gray-300">
-        <i class="fas fa-phone text-yellow-400"></i> {{ __('messages.phone') }}
+<div class="flex items-center justify-between border-b dark:border-gray-700 pb-4">
+    <span class="flex items-center gap-2 text-lg font-semibold text-gray-700 dark:text-gray-300">
+        <i class="fas fa-phone text-yellow-500"></i> {{ __('messages.phone') }}
     </span>
-    <span class="font-semibold text-white dark:text-gray-100">
-        {{ $user->phone ?? '-' }}
+
+    <span class="text-gray-800 dark:text-white font-bold tracking-wide">
+        {{ $user->phone ? '+'. ltrim($user->phone, '+') : '-' }}
     </span>
 </div>
 

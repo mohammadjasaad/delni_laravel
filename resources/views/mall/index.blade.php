@@ -51,80 +51,48 @@
     🛍️ {{ __('messages.delni_mall') }}
 </h1>
 
-{{-- ✅ زر إظهار/إخفاء التصنيفات --}}
-<div class="text-center mb-6">
-    <button id="toggleMallCategories" 
-            class="px-6 py-2 bg-yellow-400 text-black rounded-full font-semibold hover:bg-yellow-500 transition">
-<i class="fas fa-th-large"></i> {{ __('messages.mall_categories') }}
+{{-- ✅ زر إدارة المتجر أو إنشاء متجر جديد --}}
+{{-- ✅ أزرار (أضف متجر + أقسام دلني مول) جنب بعض --}}
+<div class="flex justify-center gap-3 mb-8">
+
+    @if(auth()->check())
+        @if(auth()->user()->store)
+            <a href="{{ route('mall.dashboard', auth()->user()->store->id) }}"
+               class="flex items-center gap-2 px-5 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-full font-semibold shadow transition">
+                🏪 متجري
+            </a>
+        @else
+            <a href="{{ route('mall.create') }}"
+               class="flex items-center gap-2 px-5 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-full font-semibold shadow transition">
+                ➕ أضف متجر
+            </a>
+        @endif
+    @endif
+
+    <button id="toggleMallCategories"
+        class="flex items-center gap-2 px-5 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-full font-semibold shadow transition">
+        <i class="fas fa-th-large"></i> {{ __('messages.mall_categories') }}
     </button>
+
 </div>
 
 {{-- ✅ التصنيفات (مخفية افتراضياً) --}}
+@php
+    $currentCategory = request('category');
+    $categories = config('mall.categories');
+@endphp
+
 <div id="mallCategories" class="hidden flex flex-wrap items-center justify-center gap-3 mb-6">
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-laptop"></i> {{ __('mall.electronics') }}
+@foreach($categories as $key => $label)
+    <a href="{{ route('mall.index', ['category' => $key]) }}"
+       class="px-5 py-2 rounded-full text-sm font-semibold transition
+       {{ $currentCategory == $key
+            ? 'bg-yellow-400 text-black shadow'
+            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+       }}">
+        {{ $label }}
     </a>
-
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-plug"></i> {{ __('mall.electricals') }}
-    </a>
-
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-tshirt"></i> {{ __('mall.fashion') }}
-    </a>
-
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-couch"></i> {{ __('mall.furniture') }}
-    </a>
-
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-car"></i> {{ __('mall.cars') }}
-    </a>
-
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-magic"></i> {{ __('mall.beauty') }}
-    </a>
-
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-spray-can"></i> {{ __('mall.perfumes') }}
-    </a>
-
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-book"></i> {{ __('mall.books') }}
-    </a>
-
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-puzzle-piece"></i> {{ __('mall.toys') }}
-    </a>
-
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-blender"></i> {{ __('mall.home_tools') }}
-    </a>
-
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-shopping-basket"></i> {{ __('mall.supermarket') }}
-    </a>
-
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-industry"></i> {{ __('mall.industrial') }}
-    </a>
-
-    <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold transition
-       bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
-        <i class="fas fa-hard-hat"></i> {{ __('mall.construction') }}
-    </a>
+@endforeach
 </div>
 
 <script>
@@ -133,24 +101,83 @@
   });
 </script>
 
-        {{-- ✅ أقسام المتاجر (Grid) --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            @foreach($stores as $store)
-                <div class="store-card">
-                    <a href="{{ route('mall.show', $store->id) }}">
-                        <img src="{{ $store->logo ? asset('storage/'.$store->logo) : asset('storage/placeholder.png') }}"
-                             alt="{{ $store->name }}">
-                        <h3>{{ $store->name }}</h3>
-                        <p>{{ Str::limit($store->description, 60) }}</p>
-                    </a>
-                </div>
-            @endforeach
-        </div>
+{{-- 🏪 عرض المتاجر --}}
+<h2 class="text-2xl font-bold text-gray-800 dark:text-white text-center mb-6">
+    🏪 المتاجر {{ $category ? 'في قسم: ' . $categories[$category] : '' }}
+</h2>
 
-        {{-- ✅ Pagination --}}
-        <div class="mt-6">
-            {{ $stores->links() }}
-        </div>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 pb-10">
+    @forelse($stores as $store)
+        <a href="{{ route('mall.show', $store->id) }}" 
+           class="block group rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-sm hover:shadow-xl transition">
 
+<img src="{{ $store->logo ? asset('storage/'.$store->logo) : asset('images/no-image.png') }}"
+     alt="{{ $store->name }}"
+     class="w-full h-40 object-cover rounded-xl shadow bg-gray-100">
+
+            <div class="p-3">
+                <h3 class="font-semibold text-gray-800 dark:text-white group-hover:text-yellow-500 transition">
+                    {{ $store->name }}
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ Str::limit($store->description, 45) }}</p>
+            </div>
+        </a>
+    @empty
+        <p class="text-gray-500 text-center col-span-full">لا توجد متاجر في هذا القسم.</p>
+    @endforelse
+</div>
+
+{{ $stores->links() }}
+
+{{-- 🛍️ منتجات من نفس القسم --}}
+@if(isset($products) && $products->count())
+<h2 class="text-2xl font-bold text-gray-800 dark:text-white text-center mt-10 mb-6">
+    🛍️ منتجات من نفس القسم
+</h2>
+
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 pb-20">
+    @foreach($products as $product)
+        <a href="{{ route('mall.products.show', ['store' => $product->store_id, 'product' => $product->id]) }}" 
+           class="block group rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-sm hover:shadow-xl transition">
+
+@php
+    // ✅ تحويل الصور من JSON إلى مصفوفة في حال كانت نص
+    $images = $product->images;
+
+    if (is_string($images) && str_starts_with($images, '[')) {
+        $images = json_decode($images, true);
+    }
+
+    if (!is_array($images)) {
+        $images = [];
+    }
+
+    // ✅ اختيار أول صورة متاحة
+    $firstImage = !empty($images) && isset($images[0])
+        ? asset('storage/' . ltrim($images[0], '/'))
+        : asset('images/no-image.png');
+@endphp
+
+<img src="{{ $firstImage }}"
+     alt="{{ $product->name }}"
+     class="w-full h-48 object-cover rounded-t-xl group-hover:scale-105 transition duration-300">
+
+            <div class="p-3">
+                <h3 class="font-semibold text-gray-800 dark:text-white group-hover:text-yellow-500 transition truncate">
+                    {{ $product->name }}
+                </h3>
+                <p class="text-sm font-bold text-yellow-600 dark:text-yellow-400 mt-1">
+                    {{ number_format($product->price) }} ل.س
+                </p>
+            </div>
+        </a>
+    @endforeach
+</div>
+@endif
+
+    {{-- ✅ Pagination --}}
+    <div class="max-w-7xl mx-auto px-4">
+        {{ $stores->links() }}
     </div>
+
 </x-app-layout>

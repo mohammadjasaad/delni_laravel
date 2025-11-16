@@ -13,7 +13,7 @@
         <a href="{{ route('ads.index', ['category' => 'services']) }}" class="tab-link {{ request('category')=='services' ? 'active':'' }}">
             <i class="fas fa-tools"></i> {{ __('messages.services') }}
         </a>
-        <a href="{{ route('delni.taxi') }}" class="tab-link {{ request()->routeIs('delni.taxi') ? 'active':'' }}">
+<a href="{{ route('taxi.index') }}" class="tab-link {{ request()->routeIs('taxi.index') ? 'active':'' }}">
             <i class="fas fa-taxi"></i> {{ __('messages.delni_taxi') }}
         </a>
         <a href="{{ route('emergency_services.index') }}" class="tab-link {{ request()->routeIs('emergency_services.*') ? 'active':'' }}">

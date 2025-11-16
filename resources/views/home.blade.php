@@ -35,7 +35,7 @@
                 <i class="fas fa-car"></i>
                 <span>{{ __('messages.car_parts') }}</span>
             </a>
-            <a href="{{ route('ads.index', ['category' => 'services']) }}" class="category-icon">
+            <a href="{{ route('services.index') }}" class="category-icon">
                 <i class="fas fa-tools"></i>
                 <span>{{ __('messages.services') }}</span>
             </a>

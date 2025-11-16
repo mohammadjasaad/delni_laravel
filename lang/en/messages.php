@@ -49,6 +49,9 @@ return [
 'price_low'  => 'Lowest Price',
 'user' => 'User',
 
+'deal_type' => 'Deal Type',
+'sale' => 'Sale',
+'rent' => 'Rent',
 
 
     // ✅ Order statuses

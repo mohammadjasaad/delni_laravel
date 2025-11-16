@@ -6,10 +6,20 @@ use App\Http\Controllers\Api\AdApiController;
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\BannerApiController;
 use App\Http\Controllers\Api\MallBannerApiController;
+use App\Http\Controllers\PhoneLoginController;
+use App\Http\Controllers\Taxi\TaxiMessageController;
+use App\Http\Controllers\Taxi\DriverApiController;
 
 // ✅ تسجيل الدخول والتسجيل API
 Route::post('/login',    [AuthApiController::class, 'login']);
 Route::post('/register', [AuthApiController::class, 'register']);
+
+// 📱 تسجيل الدخول عبر واتساب (API للموبايل)
+Route::post('/send-whatsapp-code', [PhoneLoginController::class, 'sendCode']);
+Route::post('/verify-whatsapp-code', [PhoneLoginController::class, 'verifyCode']);
+
+// ✅ تحديث اسم المستخدم بعد تسجيل الدخول عبر واتساب
+Route::post('/update-profile', [AuthApiController::class, 'updateProfile'])->middleware('auth:sanctum');
 
 // ✅ مستخدم عام (اختبار)
 Route::get('/user', fn() => response()->json(['message' => 'Public user endpoint']));
@@ -32,7 +42,6 @@ Route::get('/mall-banners', [MallBannerApiController::class, 'index']);
 /* ===========================
 | 💬 Delni Taxi Chat API
 |=========================== */
-use App\Http\Controllers\TaxiMessageController;
 
 // ✅ جلب جميع الرسائل لطلب محدد
 Route::get('/taxi/messages/{order_id}', [TaxiMessageController::class, 'index']);
@@ -42,3 +51,8 @@ Route::post('/taxi/messages', [TaxiMessageController::class, 'store']);
 
 // ✅ جلب الرسائل عند التحديث (احتياط)
 Route::post('/taxi/messages/fetch', [TaxiMessageController::class, 'fetch']);
+
+
+Route::get('/taxi/drivers', [DriverApiController::class, 'drivers']);
+Route::post('/taxi/driver/{id}/location', [DriverApiController::class, 'updateLocation']);
+

@@ -8,6 +8,20 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- ✅ Facebook Domain Verification -->
+<meta name="facebook-domain-verification" content="htc7zaxssdfu9svapezkx5h4mtp9wd" />
+    <!-- ✅ Facebook App ID -->
+    <meta property="fb:app_id" content="1584714839078603" />
+
+    <!-- ✅ Open Graph Tags (تظهر عند مشاركة الرابط) -->
+    <meta property="og:title" content="Delni.co - الإعلانات المبوبة في سوريا">
+    <meta property="og:description" content="Delni.co هي منصتك للإعلانات المبوبة في سوريا — بيع واشتري العقارات والسيارات والخدمات بسهولة.">
+    <meta property="og:image" content="https://delni.co/images/delnilogo.png">
+    <meta property="og:image:alt" content="Delni Logo">
+    <meta property="og:url" content="https://delni.co/">
+    <meta property="og:type" content="website">
+
     <title>{{ $title }}</title>
 
     {{-- ✅ ملفات CSS و JS --}}

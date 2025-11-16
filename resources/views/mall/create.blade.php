@@ -37,22 +37,20 @@
                              value="{{ old('name') }}" required autofocus />
                 </div>
 
-                {{-- 📂 التصنيف --}}
-                <div>
-                    <x-label for="category" :value="__('mall.category')" />
-                    <select id="category" name="category"
-                            class="select-input" required>
-                        <option value="electronics">{{ __('mall.electronics') }}</option>
-                        <option value="cars">{{ __('mall.cars') }}</option>
-                        <option value="clothes">{{ __('mall.clothes') }}</option>
-                        <option value="realestate">{{ __('mall.realestate') }}</option>
-                        <option value="books">{{ __('mall.books') }}</option>
-                        <option value="services">{{ __('mall.services') }}</option>
-                        <option value="furniture">{{ __('mall.furniture') }}</option>
-                        <option value="food">{{ __('mall.food') }}</option>
-                        <option value="others">{{ __('mall.others') }}</option>
-                    </select>
-                </div>
+{{-- 📂 التصنيف --}}
+<div>
+    <x-label for="category" :value="__('mall.category')" />
+
+    @php
+        $categories = config('mall.categories');
+    @endphp
+
+    <select id="category" name="category" class="select-input" required>
+        @foreach($categories as $key => $label)
+            <option value="{{ $key }}">{{ $label }}</option>
+        @endforeach
+    </select>
+</div>
 
                 {{-- 📝 الوصف --}}
                 <div>
@@ -60,13 +58,12 @@
                     <textarea id="description" name="description" rows="4" class="textarea-input">{{ old('description') }}</textarea>
                 </div>
 
-                {{-- 🖼️ شعار المتجر --}}
-                <div>
-                    <x-label for="logo" :value="__('mall.store_logo')" />
-                    <input type="file" name="logo" id="logo"
-                           class="file-input" />
-                </div>
-
+{{-- 🖼️ شعار المتجر --}}
+<div>
+    <x-label for="logo" :value="__('mall.store_logo')" />
+    <input type="file" name="logo" id="logo" accept="image/*"
+           class="block mt-1 w-full border border-gray-300 rounded-lg p-2" required>
+</div>
                 {{-- 🎯 الأزرار --}}
                 <div class="flex items-center justify-between">
                     <a href="{{ route('mall.index') }}" class="btn-secondary">

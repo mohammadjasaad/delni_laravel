@@ -10,8 +10,9 @@
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
 <div class="max-w-6xl mx-auto px-4 py-8">
+
     
-    <?php
+<?php
         $images = is_array($ad->images) ? $ad->images : json_decode($ad->images, true);
         $mainImage = !empty($images[0]) ? asset('storage/'.$images[0]) : asset('storage/placeholder.png');
     ?>
@@ -51,6 +52,17 @@
         <p class="text-xs text-gray-500 dark:text-gray-400">
             <?php echo e($ad->user->ads()->count()); ?> إعلان
         </p>
+        
+        <?php if(isset($providerRatingCount) && $providerRatingCount > 0): ?>
+            <div class="flex items-center gap-2 mt-2 text-yellow-500 text-sm">
+                ⭐ <?php echo e(number_format($providerRatingAvg, 1)); ?>
+
+                <span class="text-gray-500 text-xs">(<?php echo e($providerRatingCount); ?> تقييم)</span>
+            </div>
+        <?php else: ?>
+            <p class="text-gray-400 text-sm mt-1">لا توجد تقييمات بعد</p>
+        <?php endif; ?>
+
     </div>
 <a href="<?php echo e(route('user.ads', $ad->user->id)); ?>" 
    class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1.5 rounded-md shadow text-sm font-medium">
@@ -62,6 +74,19 @@
         
         <div>
             <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+
+<?php
+    $dealType = $ad->deal_type;
+    if (in_array($dealType, ['sale', 'بيع'])) $dealLabel = '🚩 بيع';
+    elseif (in_array($dealType, ['rent', 'إيجار'])) $dealLabel = '🏠 إيجار';
+    else $dealLabel = '-';
+?>
+
+<span class="inline-block bg-blue-100 text-blue-700 font-bold px-3 py-1 rounded-lg shadow-sm text-sm mb-3">
+    <?php echo e($dealLabel); ?>
+
+</span>
+
     <i class="fas fa-bullhorn"></i> <?php echo e($ad->title); ?>
 
 </h1>
@@ -69,7 +94,36 @@
     <i class="fas fa-map-marker-alt text-red-500"></i> <?php echo e($ad->city); ?>
 
 </p>
-            <p class="text-red-600 text-xl font-bold mb-4"><i class="fas fa-dollar-sign"></i> <?php echo e(number_format($ad->price)); ?> <?php echo e(__('messages.currency')); ?></p>
+
+
+<div class="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-300 mb-4">
+    <div class="flex items-center gap-1">
+        <i class="fas fa-hashtag text-yellow-500"></i>
+        <span>رقم الإعلان:</span>
+        <span class="font-semibold text-gray-800 dark:text-gray-100"><?php echo e($ad->reference ?? '—'); ?></span>
+    </div>
+    <div class="flex items-center gap-1">
+        <i class="fas fa-calendar-alt text-yellow-500"></i>
+        <span>تاريخ النشر:</span>
+        <span class="font-semibold text-gray-800 dark:text-gray-100"><?php echo e($ad->created_at->format('Y-m-d')); ?></span>
+    </div>
+</div>
+
+
+<div class="flex items-center gap-2 mb-4">
+    <?php if($ad->currency === 'USD'): ?>
+        <span class="bg-green-100 text-green-700 font-bold px-3 py-1 rounded-lg shadow-sm text-lg">
+            <i class="fas fa-dollar-sign"></i> <?php echo e(number_format($ad->price, 0)); ?>
+
+        </span>
+        <span class="text-gray-500 text-sm">دولار أمريكي</span>
+    <?php else: ?>
+        <span class="bg-yellow-100 text-yellow-700 font-bold px-3 py-1 rounded-lg shadow-sm text-lg">
+            <?php echo e(number_format($ad->price, 0)); ?> ل.س
+        </span>
+        <span class="text-gray-500 text-sm">الليرة السورية</span>
+    <?php endif; ?>
+</div>
             
             <?php if($ad->is_featured): ?>
                 <span class="inline-block bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full mb-4">
@@ -95,71 +149,172 @@
 
 </button>
                 </div>
-                
-                <div x-show="tab==='details'" class="space-y-4">
-                    
-                    <?php if($ad->category === 'عقارات' || $ad->category === 'realestate'): ?>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                            <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
-                                <i class="fas fa-home"></i> <?php echo e(__('messages.real_estate_details')); ?>
 
-                            </h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
-                                <p><i class="fas fa-tag text-gray-500"></i> <?php echo e(__('messages.subcategory')); ?>: <?php echo e($ad->subcategory ?? '-'); ?></p>
-                                <p><i class="fas fa-bed text-gray-500"></i> <?php echo e(__('messages.rooms')); ?>: <?php echo e($ad->rooms ?? '-'); ?></p>
-                                <p><i class="fas fa-bath text-gray-500"></i> <?php echo e(__('messages.bathrooms')); ?>: <?php echo e($ad->bathrooms ?? '-'); ?></p>
-<p><i class="fas fa-ruler-combined text-gray-500"></i> 
-   <?php echo e(__('messages.area_total')); ?>: <?php echo e($ad->area_total ?? '-'); ?> م²
-</p>
-<p><i class="fas fa-ruler-combined text-gray-500"></i> 
-   <?php echo e(__('messages.area_net')); ?>: <?php echo e($ad->area_net ?? '-'); ?> م²
-</p>
-                                <p><i class="fas fa-building text-gray-500"></i> <?php echo e(__('messages.floor')); ?>: <?php echo e($ad->floor ?? '-'); ?></p>
-                                <p><i class="fas fa-industry text-gray-500"></i> <?php echo e(__('messages.building_age')); ?>: <?php echo e($ad->building_age ?? '-'); ?></p>
-                                <p><i class="fas fa-elevator text-gray-500"></i> <?php echo e(__('messages.elevator')); ?>: <?php echo e($ad->has_elevator ? __('messages.yes') : __('messages.no')); ?></p>
-                                <p><i class="fas fa-parking text-gray-500"></i> <?php echo e(__('messages.parking')); ?>: <?php echo e($ad->has_parking ? __('messages.yes') : __('messages.no')); ?></p>
-                                <p><i class="fas fa-fire text-gray-500"></i> <?php echo e(__('messages.heating')); ?>: <?php echo e($ad->heating_type ?? '-'); ?></p>
-                            </div>
-                        </div>
-                    
-                    <?php elseif($ad->category === 'سيارات' || $ad->category === 'cars'): ?>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                            <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
-                                <i class="fas fa-car"></i> <?php echo e(__('messages.car_details')); ?>
+<div x-show="tab==='details'" class="space-y-4">
+<?php
+    $cat = strtolower(trim($ad->category ?? ''));
+?>
 
-                            </h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
-                                <p><i class="fas fa-car-side text-gray-500"></i> <?php echo e(__('messages.car_model')); ?>: <?php echo e($ad->car_model ?? '-'); ?></p>
-                                <p><i class="fas fa-calendar-alt text-gray-500"></i> <?php echo e(__('messages.car_year')); ?>: <?php echo e($ad->car_year ?? '-'); ?></p>
-                                <p><i class="fas fa-tachometer-alt text-gray-500"></i> <?php echo e(__('messages.car_km')); ?>: <?php echo e($ad->car_km ? $ad->car_km.' كم' : '-'); ?></p>
-                                <p><i class="fas fa-gas-pump text-gray-500"></i> <?php echo e(__('messages.fuel')); ?>: <?php echo e($ad->fuel ?? '-'); ?></p>
-                                <p><i class="fas fa-cogs text-gray-500"></i> <?php echo e(__('messages.gearbox')); ?>: <?php echo e($ad->gearbox ?? '-'); ?></p>
-                                <p><i class="fas fa-palette text-gray-500"></i> <?php echo e(__('messages.color')); ?>: <?php echo e($ad->car_color ?? '-'); ?></p>
-                                <p><i class="fas fa-check-circle text-gray-500"></i> <?php echo e(__('messages.condition')); ?>: <?php echo e($ad->is_new ? __('messages.new') : __('messages.used')); ?></p>
-                            </div>
-                        </div>
-                    
-                    <?php elseif($ad->category === 'خدمات' || $ad->category === 'services'): ?>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                            <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">
-                                <i class="fas fa-tools"></i> <?php echo e(__('messages.service_details')); ?>
 
-                            </h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
-                                <p><i class="fas fa-wrench text-gray-500"></i> <?php echo e(__('messages.service_type')); ?>: <?php echo e($ad->service_type ?? '-'); ?></p>
-                                <p><i class="fas fa-user-tie text-gray-500"></i> <?php echo e(__('messages.provider_name')); ?>: <?php echo e($ad->provider_name ?? '-'); ?></p>
-                                <p><i class="fas fa-car text-gray-500"></i> <?php echo e(__('messages.vehicle_type')); ?>: <?php echo e($ad->vehicle_type ?? '-'); ?></p>
-                                <p><i class="fas fa-shield-alt text-gray-500"></i> <?php echo e(__('messages.insurance_type')); ?>: <?php echo e($ad->insurance_type ?? '-'); ?></p>
-                                <p><i class="fas fa-tools text-gray-500"></i> <?php echo e(__('messages.maintenance_type')); ?>: <?php echo e($ad->maintenance_type ?? '-'); ?></p>
-                                <p><i class="fas fa-home text-gray-500"></i> <?php echo e(__('messages.property_type')); ?>: <?php echo e($ad->property_type ?? '-'); ?></p>
-                                <p><i class="fas fa-gavel text-gray-500"></i> <?php echo e(__('messages.bidding_type')); ?>: <?php echo e($ad->bidding_type ?? '-'); ?></p>
-                                <p><i class="fas fa-headset text-gray-500"></i> <?php echo e(__('messages.support_type')); ?>: <?php echo e($ad->support_type ?? '-'); ?></p>
-                            </div>
-                        </div>
-                    <?php else: ?>
-                        <p><i class="fas fa-folder-open text-gray-500"></i> <?php echo e($ad->category); ?></p>
-                    <?php endif; ?>
+<?php if(in_array($cat, ['عقارات','realestate','real estate'])): ?>
+    <?php
+        $dealTypeMap = ['sale'=>'بيع','rent'=>'إيجار','بيع'=>'بيع','إيجار'=>'إيجار',''=> '-', null => '-'];
+        $subcategoryMap = ['residential'=>'سكني','commercial'=>'تجاري','land'=>'أرض','villa'=>'فيلا','office'=>'مكتب','building'=>'بناء كامل'];
+        $floorMap = ['ground'=>'الأرضي','1'=>'الأول','2'=>'الثاني','3'=>'الثالث','4'=>'الرابع','5'=>'الخامس','6+'=>'أعلى من الخامس'];
+        $ageMap   = ['new'=>'جديد','1-5'=>'1 - 5 سنوات','6-10'=>'6 - 10 سنوات','10+'=>'أكثر من 10 سنوات'];
+        $heatingMap = ['مركزي'=>'مركزي','غاز'=>'غاز','كهرباء'=>'كهرباء','مازوت'=>'مازوت','بدون'=>'بدون تدفئة'];
+    ?>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-gray-900 dark:text-gray-100 border-b pb-2">
+            <i class="fas fa-home text-yellow-500"></i> تفاصيل العقار
+        </h2>
+
+        <?php
+            $fields = [
+                ['icon'=>'fa-tag','label'=>'نوع العرض','value'=>$dealLabel],
+                ['icon'=>'fa-list','label'=>'نوع العقار','value'=>$subcategoryMap[$ad->subcategory] ?? '-'],
+                ['icon'=>'fa-bed','label'=>'عدد الغرف','value'=>$ad->rooms ?? '-'],
+                ['icon'=>'fa-bath','label'=>'عدد الحمامات','value'=>$ad->bathrooms ?? '-'],
+                ['icon'=>'fa-ruler-combined','label'=>'المساحة الإجمالية','value'=>$ad->area_total ? $ad->area_total.' م²' : '-'],
+                ['icon'=>'fa-ruler','label'=>'المساحة الصافية','value'=>$ad->area_net ? $ad->area_net.' م²' : '-'],
+                ['icon'=>'fa-building','label'=>'الطابق','value'=>$floorMap[$ad->floor] ?? ($ad->floor ?? '-')],
+                ['icon'=>'fa-hourglass-half','label'=>'عمر البناء','value'=>$ageMap[$ad->building_age] ?? ($ad->building_age ?? '-')],
+                ['icon'=>'fa-fire','label'=>'نوع التدفئة','value'=>$heatingMap[$ad->heating_type] ?? ($ad->heating_type ?? '-')],
+                ['icon'=>'fa-elevator','label'=>'مصعد','value'=>$ad->has_elevator ? 'نعم' : 'لا'],
+                ['icon'=>'fa-parking','label'=>'موقف سيارات','value'=>$ad->has_parking ? 'نعم' : 'لا'],
+            ];
+        ?>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-2 text-sm">
+            <?php $__currentLoopData = $fields; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $f): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="flex items-center justify-between border-b border-gray-100 py-1">
+                    <div class="flex items-center gap-2">
+                        <i class="fas <?php echo e($f['icon']); ?> text-gray-500 w-5 text-center"></i>
+                        <span class="text-gray-900 font-medium"><?php echo e($f['label']); ?>:</span>
+                    </div>
+                    <span class="text-red-600 font-semibold"><?php echo e($f['value']); ?></span>
                 </div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </div>
+    </div>
+
+
+<?php elseif(in_array($cat, ['سيارات','سيارة','cars','car','vehicle'])): ?>
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mt-6">
+    <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-gray-900 dark:text-gray-100 border-b pb-2">
+        <i class="fas fa-car text-yellow-500"></i> تفاصيل السيارة
+    </h2>
+
+    <?php
+        $colors = [
+            'White'=>'أبيض','Black'=>'أسود','Gray'=>'رمادي','Silver'=>'فضي','Blue'=>'أزرق','Red'=>'أحمر',
+            'Gold'=>'ذهبي','Green'=>'أخضر','Brown'=>'بني','Beige'=>'بيج','Orange'=>'برتقالي','Yellow'=>'أصفر'
+        ];
+        $dealMap = ['sale'=>'بيع','rent'=>'إيجار','lease'=>'إيجار','بيع'=>'بيع','إيجار'=>'إيجار'];
+    ?>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-2 text-sm">
+        <?php
+            $fields = [
+                ['icon'=>'fa-industry','label'=>'الشركة المصنعة','value'=>$ad->car_brand ?? '-'],
+                ['icon'=>'fa-car-side','label'=>'الموديل','value'=>$ad->car_model ?? '-'],
+                ['icon'=>'fa-calendar-alt','label'=>'سنة الصنع','value'=>$ad->car_year ?? '-'],
+                ['icon'=>'fa-gas-pump','label'=>'نوع الوقود','value'=>match($ad->fuel ?? '') {
+                    'Petrol'=>'بنزين','Diesel'=>'ديزل','Electric'=>'كهرباء','Hybrid'=>'هجين', default=>$ad->fuel ?? '-'
+                }],
+                ['icon'=>'fa-cogs','label'=>'ناقل الحركة','value'=>match($ad->gearbox ?? '') {
+                    'Automatic'=>'أوتوماتيك','Manual'=>'عادي', default=>$ad->gearbox ?? '-'
+                }],
+                ['icon'=>'fa-palette','label'=>'اللون','value'=>$colors[$ad->car_color] ?? $ad->car_color ?? '-'],
+                ['icon'=>'fa-tachometer-alt','label'=>'عدد الكيلومترات','value'=>$ad->car_km ? number_format($ad->car_km).' كم' : '-'],
+                ['icon'=>'fa-bolt','label'=>'سعة المحرك','value'=>$ad->engine_size ? $ad->engine_size.' سم³' : '-'],
+                ['icon'=>'fa-door-closed','label'=>'عدد الأبواب','value'=>$ad->doors ?? '-'],
+                ['icon'=>'fa-car-crash','label'=>'نوع الهيكل','value'=>$ad->body_type ?? '-'],
+                ['icon'=>'fa-tags','label'=>'نوع العرض','value'=>$dealLabel],
+                ['icon'=>'fa-flag-checkered','label'=>'الحالة','value'=>$ad->is_new ? '🚗 جديدة' : '🔧 مستعملة'],
+            ];
+        ?>
+
+        <?php $__currentLoopData = $fields; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $f): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <div class="flex items-center justify-between border-b border-gray-100 py-1">
+            <div class="flex items-center gap-2">
+                <i class="fas <?php echo e($f['icon']); ?> text-gray-500 w-5 text-center"></i>
+                <span class="text-gray-900 font-medium"><?php echo e($f['label']); ?>:</span>
+            </div>
+            <span class="text-red-600 font-semibold"><?php echo e($f['value']); ?></span>
+        </div>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    </div>
+
+
+<?php elseif(in_array($cat, ['خدمات','services'])): ?>
+
+    <?php
+        $serviceTypes = [
+            'maintenance' => 'صيانة عامة',
+            'cleaning' => 'تنظيف منازل ومكاتب',
+            'moving' => 'نقل أثاث',
+            'gardening' => 'تنسيق حدائق',
+            'pets' => 'رعاية الحيوانات',
+
+            'car-mechanic' => 'ميكانيك سيارات',
+            'car-electric' => 'كهرباء سيارات',
+            'car-wash' => 'غسيل سيارات',
+            'cargo' => 'نقل بضائع',
+            'driver' => 'سائق خاص',
+
+            'private-lessons' => 'دروس خصوصية',
+            'programming' => 'كورسات برمجة',
+            'languages' => 'تعليم لغات',
+            'music' => 'تعليم موسيقى',
+            'fitness' => 'تدريب رياضي',
+
+            'dentists' => 'أطباء أسنان',
+            'clinics' => 'عيادات وصيدليات',
+            'barbers' => 'صالونات حلاقة',
+            'beauty' => 'مراكز تجميل',
+            'massage' => 'مساج وعلاج طبيعي',
+
+            'lawyers' => 'محاماة',
+            'accounting' => 'محاسبة',
+            'marketing' => 'تسويق رقمي',
+            'design' => 'تصميم وغرافيك',
+            'photography' => 'تصوير ومونتاج',
+
+            'university' => 'تسجيل جامعي',
+            'translation' => 'ترجمة',
+            'research' => 'كتابة أبحاث',
+            'documents' => 'تخليص معاملات',
+        ];
+
+        $serviceLabel = $serviceTypes[$ad->service_type] ?? 'خدمة';
+    ?>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-100 border-b pb-2">
+            <i class="fas fa-tools text-yellow-500"></i> تفاصيل الخدمة
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 text-sm text-gray-700 dark:text-gray-200">
+
+            <div class="flex items-center justify-between border-b border-gray-200 pb-1">
+                <span><i class="fas fa-wrench text-gray-500"></i> نوع الخدمة:</span>
+                <span class="font-bold text-red-600"><?php echo e($serviceLabel); ?></span>
+            </div>
+
+            <div class="flex items-center justify-between border-b border-gray-200 pb-1">
+                <span><i class="fas fa-user-tag text-gray-500"></i> اسم المزود:</span>
+                <span class="font-bold text-gray-800 dark:text-gray-100"><?php echo e($ad->provider_name ?? '-'); ?></span>
+            </div>
+        </div>
+    </div>
+
+
+<?php else: ?>
+    <p><i class="fas fa-folder-open text-gray-500"></i> <?php echo e($ad->category); ?></p>
+<?php endif; ?>
+</div>
                 
 <div x-show="tab==='description'" class="text-gray-700 dark:text-gray-200 leading-relaxed">
                     <?php echo e($ad->description ?: __('messages.no_description')); ?>

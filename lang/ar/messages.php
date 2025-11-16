@@ -48,6 +48,9 @@ return [
 
 'mall_categories' => 'أقسام دلني مول',
 
+'deal_sale' => 'بيع',
+'deal_rent' => 'إيجار',
+
     'insurance_type'  => 'نوع التأمين',
     'property_type'   => 'نوع العقار',
     'support_type'    => 'نوع الدعم',
@@ -69,6 +72,11 @@ return [
 
 'price_high' => 'السعر الأعلى',
 'price_low'  => 'السعر الأقل',
+
+
+'deal_type' => 'نوع العرض',
+'sale' => 'بيع',
+'rent' => 'إيجار',
 
     'my_normal_ads'     => 'إعلاناتي العادية',
     'all'               => 'الكل',
@@ -98,6 +106,41 @@ return [
 'change_password' => 'تغيير كلمة المرور',
 'update_password' => 'تحديث كلمة المرور',
 
+
+'cleaning' => 'تنظيف منازل ومكاتب',
+'maintenance' => 'صيانة عامة',
+'moving' => 'نقل أثاث',
+'gardening' => 'تنسيق حدائق',
+'pets' => 'رعاية الحيوانات',
+
+'car-mechanic' => 'ميكانيك سيارات',
+'car-electric' => 'كهرباء سيارات',
+'car-wash' => 'غسيل سيارات',
+'cargo' => 'نقل بضائع',
+'driver' => 'سائق خاص',
+
+'private-lessons' => 'دروس خصوصية',
+'programming' => 'كورسات برمجة',
+'languages' => 'دورات لغات',
+'music' => 'تعليم موسيقى',
+'fitness' => 'تدريب رياضي',
+
+'dentists' => 'أطباء أسنان',
+'clinics' => 'عيادات وصيدليات',
+'barbers' => 'صالونات حلاقة',
+'beauty' => 'مراكز تجميل',
+'massage' => 'مساج وعلاج طبيعي',
+
+'lawyers' => 'محاماة',
+'accounting' => 'محاسبة',
+'marketing' => 'تسويق رقمي',
+'design' => 'تصميم وغرافيك',
+'photography' => 'تصوير ومونتاج',
+
+'university' => 'تسجيل جامعي',
+'translation' => 'ترجمة',
+'research' => 'كتابة أبحاث',
+'documents' => 'تخليص معاملات',
 
     // ✅ حالات الطلب
     'pending'   => 'قيد الانتظار',

@@ -15,9 +15,8 @@
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
             <div class="flex flex-col md:flex-row items-center md:items-start gap-6 p-6">
                 
-                <img src="<?php echo e($store->logo ? asset('storage/'.$store->logo) : asset('storage/placeholder.png')); ?>"
-                     alt="<?php echo e($store->name); ?>"
-                     class="w-32 h-32 rounded-full border border-gray-200 dark:border-gray-700 object-cover shadow-lg group-hover:scale-105 transition">
+<img src="<?php echo e($store->logo ? asset('storage/'.$store->logo) : asset('storage/placeholder.png')); ?>"
+     class="w-32 h-32 rounded-full border object-cover shadow" alt="Store Logo">
 
                 
                 <div class="flex-1 space-y-3">
@@ -43,73 +42,100 @@
                     </div>
                 </div>
 
-                
-                <?php if(auth()->guard()->check()): ?>
-                    <?php if(auth()->id() === $store->user_id): ?>
-                        <div class="flex flex-col gap-2">
-                            <a href="<?php echo e(route('mall.edit', $store->id)); ?>" class="btn-yellow flex items-center gap-2">
-                                ✏️ <?php echo e(__('mall.edit_store')); ?>
 
-                            </a>
-                            <form action="<?php echo e(route('mall.destroy', $store->id)); ?>" method="POST">
-                                <?php echo csrf_field(); ?>
-                                <?php echo method_field('DELETE'); ?>
-                                <button type="submit"
-                                        onclick="return confirm('<?php echo e(__('mall.confirm_delete')); ?>')"
-                                        class="btn-red flex items-center gap-2">
-                                    🗑️ <?php echo e(__('mall.delete')); ?>
+<?php if(auth()->guard()->check()): ?>
+    <?php if(auth()->id() === $store->user_id): ?>
+        <div class="flex flex-col gap-2">
 
-                                </button>
-                            </form>
+            
+            <a href="<?php echo e(route('mall.edit', $store->id)); ?>" class="btn-yellow flex items-center gap-2">
+                ✏️ <?php echo e(__('mall.edit_store')); ?>
 
-                            
-                            <a href="<?php echo e(route('mall.dashboard', $store->id)); ?>" 
-                               class="btn-blue flex items-center gap-2">
-                               ⚙️ <?php echo e(__('mall.dashboard')); ?>
+            </a>
 
-                            </a>
-                        </div>
-                    <?php endif; ?>
-                <?php endif; ?>
+            
+            <a href="<?php echo e(route('mall.products.create', $store->id)); ?>" class="btn-green flex items-center gap-2">
+                ➕ <?php echo e(__('mall.add_product')); ?>
+
+            </a>
+
+            
+            <a href="<?php echo e(route('mall.dashboard', $store->id)); ?>" class="btn-blue flex items-center gap-2">
+                ⚙️ <?php echo e(__('mall.dashboard')); ?>
+
+            </a>
+
+            
+            <form action="<?php echo e(route('mall.destroy', $store->id)); ?>" method="POST" onsubmit="return confirm('<?php echo e(__('mall.confirm_delete')); ?>');">
+                <?php echo csrf_field(); ?>
+                <?php echo method_field('DELETE'); ?>
+                <button type="submit" class="btn-red flex items-center gap-2">
+                    🗑️ <?php echo e(__('mall.delete')); ?>
+
+                </button>
+            </form>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>
             </div>
         </div>
 
-        
-        <div>
-            <h2 class="section-title">📦 <?php echo e(__('mall.store_products')); ?></h2>
 
-            <?php if($store->products->count()): ?>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    <?php $__currentLoopData = $store->products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <div class="ad-card group">
-                            <a href="<?php echo e(route('mall.products.show', [$store->id, $product->id])); ?>">
-                                <img src="<?php echo e($product->image ? asset('storage/'.$product->image) : asset('images/no-image.png')); ?>"
-                                     alt="<?php echo e($product->name); ?>"
-                                     class="w-full h-40 object-cover rounded-t-xl group-hover:opacity-90 transition">
-                            </a>
-                            <div class="p-4 space-y-2">
-                                <h3 class="font-bold text-lg text-gray-800 dark:text-white truncate">
-                                    <?php echo e($product->name); ?>
+<div>
+    <h2 class="section-title">📦 <?php echo e(__('mall.store_products')); ?></h2>
 
-                                </h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
-                                    <?php echo e($product->description); ?>
+    <?php if($store->products->count()): ?>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+            <?php $__currentLoopData = $store->products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 
-                                </p>
-                                <span class="price"><?php echo e($product->price); ?> <?php echo e(__('mall.currency')); ?></span>
-                                <a href="<?php echo e(route('mall.products.show', [$store->id, $product->id])); ?>"
-                                   class="btn-blue mt-2">
-                                    👁️ <?php echo e(__('mall.view')); ?>
+                
+<?php
+    $images = is_array($product->images)
+        ? $product->images
+        : json_decode($product->images, true);
 
-                                </a>
-                            </div>
-                        </div>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    $img = (!empty($images) && isset($images[0]))
+        ? asset('storage/' . $images[0])
+        : asset('images/no-image.png');
+?>
+
+                <div class="ad-card group">
+                    <a href="<?php echo e(route('mall.products.show', [$store->id, $product->id])); ?>">
+                        <img src="<?php echo e($img); ?>"
+                             alt="<?php echo e($product->name); ?>"
+                             class="w-full h-44 object-cover rounded-lg group-hover:scale-105 transition duration-300">
+                    </a>
+
+                    <div class="p-4 space-y-2">
+                        <h3 class="font-bold text-lg text-gray-800 dark:text-white truncate">
+                            <?php echo e($product->name); ?>
+
+                        </h3>
+
+                        <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                            <?php echo e($product->description); ?>
+
+                        </p>
+
+                        <span class="price text-yellow-500 font-bold text-lg">
+                            <?php echo e(number_format($product->price)); ?> <?php echo e(__('mall.currency')); ?>
+
+                        </span>
+
+                        <a href="<?php echo e(route('mall.products.show', [$store->id, $product->id])); ?>"
+                           class="btn-yellow mt-2 w-full block text-center">
+                            👁️ <?php echo e(__('mall.view')); ?>
+
+                        </a>
+                    </div>
                 </div>
-            <?php else: ?>
-                <p class="text-gray-500 dark:text-gray-400"><?php echo e(__('mall.no_products')); ?></p>
-            <?php endif; ?>
+
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
+    <?php else: ?>
+        <p class="text-gray-500 dark:text-gray-400"><?php echo e(__('mall.no_products')); ?></p>
+    <?php endif; ?>
+</div>
 
         
         <div>

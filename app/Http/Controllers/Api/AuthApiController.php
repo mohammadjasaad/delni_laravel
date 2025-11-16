@@ -71,4 +71,26 @@ class AuthApiController extends Controller
             'message' => 'Logged out successfully',
         ]);
     }
+// ✅ تحديث ملف المستخدم (الاسم) بعد تسجيل الدخول عبر واتساب
+public function updateProfile(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:100'
+    ]);
+
+    $user = $request->user(); // المستخدم الحالي حسب التوكن
+    $user->update([
+        'name' => $request->name
+    ]);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ تم تحديث الاسم بنجاح',
+        'user' => [
+            'id'    => $user->id,
+            'name'  => $user->name,
+            'phone' => $user->phone,
+        ]
+    ]);
+}
 }

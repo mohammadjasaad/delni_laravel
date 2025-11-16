@@ -1,15 +1,19 @@
 <?php
 
-use App\Http\Controllers\TaxiTestController;
+use Illuminate\Support\Facades\Route;
+
+# ---------------- Controllers عامة ----------------
+use App\Http\Controllers\Auth\WhatsappAuthController;
+use App\Http\Controllers\PhoneLoginController;
+use App\Http\Controllers\ServiceRatingController;
 use App\Http\Controllers\MallController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\ProductController;
-use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\{
     AdController, ContactController, DashboardController,
     EmergencyServiceController, EmergencyReportController,
-    DriverController, TaxiDriverController, TaxiController,
-    TaxiOrderController, TaxiMessageController, TaxiChatController,
+    DriverController,
     OrderController, RatingController, MapController,
     FavoriteController, ReportController,
     AdminController,
@@ -22,6 +26,12 @@ use App\Http\Controllers\{
     EmergencyStatisticsController
 };
 
+# ---------------- 🚖 Delni Taxi ----------------
+use App\Http\Controllers\Taxi\TaxiController;
+use App\Http\Controllers\Taxi\TaxiOrderController;
+use App\Http\Controllers\Taxi\TaxiMessageController;
+use App\Http\Controllers\Taxi\TaxiChatController;
+use App\Http\Controllers\Taxi\DriverApiController;
 # ------------------ 🏠 الصفحة الرئيسية ------------------
 Route::get('/', [AdController::class, 'index'])->name('home');
 
@@ -34,26 +44,28 @@ Route::prefix('mall')->group(function () {
 
     # 🏬 متجر محدد
     Route::prefix('{store}')->group(function () {
+
         # 👁️ عرض المتجر
         Route::get('/', [MallController::class, 'show'])->name('mall.show');
 
-        # ---------------- 🛒 منتجات المتجر ----------------
-        Route::get('/products', [ProductController::class, 'index'])->name('mall.products.index');
-        Route::get('/products/{product}', [ProductController::class, 'show'])->name('mall.products.show');
-        
-        Route::middleware('auth')->group(function () {
-            Route::get('/products/create', [ProductController::class, 'create'])->name('mall.products.create');
-            Route::post('/products', [ProductController::class, 'store'])->name('mall.products.store');
-            Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('mall.products.edit');
-            Route::put('/products/{product}', [ProductController::class, 'update'])->name('mall.products.update');
-            Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('mall.products.destroy');
-        });
+# ---------------- 🛒 منتجات المتجر ----------------
+Route::get('/products', [ProductController::class, 'index'])->name('mall.products.index');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/products/create', [ProductController::class, 'create'])->name('mall.products.create');
+    Route::post('/products', [ProductController::class, 'store'])->name('mall.products.store');
+    Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('mall.products.edit');
+    Route::put('/products/{product}', [ProductController::class, 'update'])->name('mall.products.update');
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('mall.products.destroy');
+});
+
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('mall.products.show');
 
         # ---------------- 📢 إعلانات المتجر ----------------
         Route::get('/ads', [StoreController::class, 'ads'])->name('mall.ads.index');
         Route::get('/ads/{ad}', [StoreController::class, 'showAd'])->name('mall.ads.show');
 
-        Route::middleware('auth')->group(function () {
+            Route::middleware(['auth', 'blockBanned'])->group(function () {
             Route::get('/ads/create', [StoreController::class, 'createAd'])->name('mall.ads.create');
             Route::post('/ads', [StoreController::class, 'storeAd'])->name('mall.ads.store');
             Route::get('/ads/{ad}/edit', [StoreController::class, 'editAd'])->name('mall.ads.edit');
@@ -71,6 +83,24 @@ Route::prefix('mall')->group(function () {
     });
 });
 
+# ==================== 🛒 السلة ====================
+Route::middleware('auth')->group(function () {
+    Route::get('/cart', [\App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+
+    Route::post('/mall/{store}/{product}/add-to-cart', [\App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+
+    Route::post('/cart/{item}/increase', [\App\Http\Controllers\CartController::class, 'increase'])->name('cart.increase');
+    Route::post('/cart/{item}/decrease', [\App\Http\Controllers\CartController::class, 'decrease'])->name('cart.decrease');
+
+    Route::delete('/cart/{item}/remove', [\App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout', [\App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [\App\Http\Controllers\CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/checkout/success/{id}', [\App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
+});
+
 # ------------------ 📄 صفحات ثابتة ------------------
 Route::view('/about', 'about')->name('about');
 Route::view('/privacy', 'pages.privacy')->name('privacy');
@@ -84,6 +114,11 @@ Route::post('/contact', [ContactController::class, 'send'])->name('contact.send'
 # ------------------ 🔑 تسجيل الدخول والتسجيل ------------------
 require __DIR__.'/auth.php';
 Route::get('/logged-out', fn() => view('auth.logged-out'))->name('logged-out');
+
+# ✅ صفحة تسجيل الدخول الموحدة الجديدة (Delni)
+Route::get('/login', function () {
+    return view('auth.unified-login');
+})->name('login');
 
 # ------------------ 🌐 تغيير اللغة ------------------
 Route::get('/change-lang/{lang}', function ($lang) {
@@ -138,119 +173,57 @@ Route::get('/emergency/statistics', [EmergencyStatisticsController::class, 'inde
 Route::get('/emergency', [EmergencyServiceController::class, 'index'])->name('emergency.index');
 
 # بلاغات الطوارئ
-Route::middleware(['auth'])->prefix('emergency-reports')->group(function () {
+    Route::middleware(['auth', 'blockBanned'])->prefix('emergency-reports')->group(function () {
     Route::get('/', [EmergencyReportController::class, 'index'])->name('emergency_reports.index');
     Route::get('/{id}', [EmergencyReportController::class, 'show'])->name('emergency_reports.show');
     Route::delete('/{id}', [EmergencyReportController::class, 'destroy'])->name('emergency_reports.destroy');
 });
-Route::post('/emergency-reports', [EmergencyReportController::class, 'store'])->name('emergency_reports.store');
+    Route::post('/emergency-reports', [EmergencyReportController::class, 'store'])->name('emergency_reports.store');
 
 # =====================================================
-# 🚖 Delni Taxi - منظمة
+# 🚖 Delni Taxi (النسخة الصحيحة)
 # =====================================================
 
-# 🚖 Delni Taxi Landing (Landing Page)
-Route::get('/delni-taxi', function () {
-    return view('taxi.landing');
-})->name('delni.taxi');
+# الصفحة الرئيسية لخدمة التكسي
+Route::get('/delni-taxi', [TaxiController::class, 'index'])->name('taxi.index');
 
-# 1️⃣ User Routes
-Route::prefix('taxi')->group(function () {
-    Route::get('/', [TaxiController::class, 'index'])->name('taxi.index');
+# صفحة طلب التاكسي (النموذج الأولي)
+Route::get('/taxi/request', [TaxiController::class, 'requestRide'])->name('taxi.request');
 
-Route::get('/driver', function () {
-    return redirect()->route('driver.login');
-})->name('driver.index');
+# إنشاء طلب تاكسي
+Route::post('/taxi/order', [TaxiOrderController::class, 'store'])->name('taxi.order.store');
 
-# ✅ صفحة الراكب
-Route::get('/passenger', function () {
-    return view('taxi.passenger');
-})->name('taxi.passenger');
+# حالة الطلب
+Route::get('/taxi/order/{id}/status', [TaxiOrderController::class, 'showStatus'])->name('taxi.order.status');
 
-# ✅ صفحة السائق
-Route::get('/driver-page', function () {
-    return view('taxi.driver');
-})->name('taxi.driver.page');
+# تحديث Realtime
+Route::get('/taxi/order/{id}/realtime', [TaxiOrderController::class, 'updateRealtime'])->name('taxi.order.realtime');
 
-# ✅ صفحة طلب تاكسي (طلب جديد)
-Route::get('/request', function () {
-    return view('taxi.order'); // ← هنا التعديل الصحيح
-})->name('taxi.request.page');
+# بدء الرحلة
+Route::post('/taxi/order/{id}/start', [TaxiOrderController::class, 'startRide'])->name('taxi.order.start');
 
-    Route::post('/request', [OrderController::class, 'store'])->name('taxi.request');
-    Route::get('/order/{id}/status', [TaxiOrderController::class, 'showStatus'])->name('taxi.order.status');
-    Route::put('/order/{id}/status', [TaxiOrderController::class, 'updateStatus'])->name('taxi.order.status.update');
-# 🔄 تحديث Realtime لصفحة حالة الطلب
-    Route::get('/order/{id}/realtime', [TaxiOrderController::class, 'updateRealtime'])->name('taxi.order.realtime');
-    Route::get('/order/completed', [TaxiController::class, 'tripCompleted'])->name('taxi.order.completed');
-    Route::post('/rating', [RatingController::class, 'store'])->name('taxi.rating');
-    Route::post('/order/complete-with-rating', [TaxiOrderController::class, 'completeWithRating'])
-        ->name('taxi.order.complete.with.rating');
+# إنهاء الرحلة
+Route::post('/taxi/order/{id}/complete', [TaxiOrderController::class, 'complete'])->name('taxi.order.complete');
 
-    # محادثة الراكب
-    Route::get('/chat/{order_id}', [TaxiChatController::class, 'showPassengerChat'])->name('passenger.chat');
-# 💬 محادثة الطلب
-Route::get('/order/{id}/messages', [TaxiMessageController::class, 'fetch'])->name('taxi.messages.fetch');
-Route::post('/order/{id}/messages', [TaxiMessageController::class, 'store'])->name('taxi.messages.store');
+# إلغاء الطلب
+Route::post('/taxi/order/{id}/cancel', [TaxiOrderController::class, 'cancel'])->name('taxi.order.cancel');
 
-});
+# دردشة الراكب
+Route::get('/taxi/chat/{order_id}', [TaxiChatController::class, 'showPassengerChat'])->name('taxi.chat.passenger');
 
-# 2️⃣ Driver Routes
-Route::prefix('driver')->group(function () {
-    # ✅ تسجيل الدخول / تسجيل الخروج
-    Route::get('/login', [DriverController::class, 'loginForm'])->name('driver.login');
-    Route::post('/login', [DriverController::class, 'login'])->name('driver.login.submit');
-    Route::post('/logout', [DriverController::class, 'logout'])->name('driver.logout');
+# دردشة السائق
+Route::get('/driver/chat/{order_id}', [TaxiChatController::class, 'showDriverChat'])->name('taxi.chat.driver');
 
-    # ✅ لوحة التحكم
-    Route::get('/dashboard', [DriverController::class, 'dashboard'])->name('driver.dashboard');
+Route::post('/taxi/send-message', [TaxiChatController::class, 'sendMessage'])->name('taxi.message.send');
 
-    # ✅ تحديث الحالة
-    Route::post('/{id}/status', [DriverController::class, 'updateStatus'])->name('driver.status');
+# رسائل AJAX
+Route::get('/taxi/messages/{order_id}', [TaxiMessageController::class, 'index']);
+Route::post('/taxi/messages', [TaxiMessageController::class, 'store']);
+Route::post('/taxi/messages/fetch', [TaxiMessageController::class, 'fetch']);
 
-    # ✅ تحديث الموقع الجغرافي
-    Route::post('/{id}/location', function (\Illuminate\Http\Request $request, $id) {
-        $driver = \App\Models\Driver::findOrFail($id);
-        $driver->update([
-            'latitude' => $request->lat,
-            'longitude' => $request->lon,
-        ]);
-        return back()->with('success', '✅ Location updated successfully');
-    })->name('driver.location');
-
-    # ✅ محادثات السائق
-    Route::post('/message', [TaxiMessageController::class, 'store'])->name('driver.message.store');
-    Route::get('/messages', [TaxiMessageController::class, 'fetch'])->name('driver.message.fetch');
-    Route::get('/chat/{order}', [TaxiMessageController::class, 'driverChat'])->name('driver.chat');
-    Route::post('/chat/{order}', [TaxiMessageController::class, 'driverReply'])->name('driver.message.reply');
-});
-
-# 3️⃣ Admin Routes
-Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () {
-    Route::get('/taxi-orders', [TaxiOrderController::class, 'index'])->name('admin.taxi.orders');
-});
-
-# 4️⃣ API Routes
-Route::prefix('api/taxi')->group(function () {
-    Route::get('/drivers', fn () => \App\Models\Driver::all())->name('api.taxi.drivers');
-    Route::get('/driver-location/{id}', [TaxiController::class, 'driverLocation'])->name('api.taxi.driver.location');
-
-    # ✅ تحديث لحظي لبيانات الطلب (لصفحة order-status.blade.php)
-    Route::get('/order-status/{id}', function ($id) {
-        $order = \App\Models\TaxiOrder::find($id);
-        $driver = $order && $order->driver_id ? \App\Models\Driver::find($order->driver_id) : null;
-
-        return response()->json([
-            'order'  => $order,
-            'driver' => $driver,
-        ]);
-    })->name('api.taxi.order.status');
-
-});
-
-
-# 5️⃣ Test Routes
-Route::get('/taxi/test', [TaxiTestController::class, 'index'])->name('taxi.test');
+# API السائق
+Route::post('/api/taxi/driver/{id}/location', [DriverApiController::class, 'updateLocation']);
+Route::get('/api/taxi/drivers', [DriverApiController::class, 'drivers']);
 
 # ------------------ 👨‍✈️ تسجيل السائقين (للمشرف) ------------------
 Route::prefix('drivers')->middleware(['auth'])->group(function () {
@@ -264,20 +237,19 @@ Route::prefix('drivers')->middleware(['auth'])->group(function () {
     Route::get('/{id}', [DriverController::class, 'show'])->name('drivers.show');
 });
 
-Route::get('/drivers/map', [TaxiDriverController::class, 'index'])->name('drivers.map');
 
 # =====================================================
 
 # باقي المسارات (لوحة تحكم المستخدم / الدعم الفني / المشرف ... الخ) تبقى كما هي
 
 # ------------------ 📊 لوحة تحكم المستخدم ------------------
-Route::middleware(['auth'])->prefix('dashboard')->group(function () {
+    Route::middleware(['auth', 'blockBanned'])->prefix('dashboard')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
 
     # بياناتي
     Route::get('/myinfo', [DashboardController::class, 'myInfo'])->name('dashboard.myinfo');
     Route::get('/myinfo/edit', [DashboardController::class, 'editInfo'])->name('dashboard.myinfo.edit');
-    Route::post('/myinfo/update', [DashboardController::class, 'updateInfo'])->name('dashboard.myinfo.update');
+    Route::put('/myinfo/update', [DashboardController::class, 'updateInfo'])->name('dashboard.myinfo.update');
 
     # إعلاناتي
     Route::get('/myads', [DashboardController::class, 'myAds'])->name('dashboard.myads');
@@ -298,6 +270,7 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
 
     # طلباتي
     Route::get('/myorders', [DashboardController::class, 'myOrders'])->name('dashboard.myorders');
+    Route::get('/orders/{id}', [DashboardController::class, 'showOrder'])->name('dashboard.orders.show');
 
     # إحصائيات
     Route::get('/user-stats', [DashboardController::class, 'userStats'])->name('dashboard.userstats');
@@ -322,7 +295,7 @@ Route::post('/dashboard/save-view', function (\Illuminate\Http\Request $request)
 })->name('dashboard.saveView')->middleware('auth');
 
 # ------------------ 🎫 تذاكر الدعم الفني (المستخدم) ------------------
-Route::middleware(['auth'])->prefix('support')->group(function () {
+    Route::middleware(['auth', 'blockBanned'])->prefix('support')->group(function () {
     Route::get('/', [SupportTicketController::class, 'index'])->name('support.index');
     Route::get('/create', [SupportTicketController::class, 'create'])->name('support.create');
     Route::post('/', [SupportTicketController::class, 'store'])->name('support.store');
@@ -331,10 +304,12 @@ Route::middleware(['auth'])->prefix('support')->group(function () {
 });
 
 # ------------------ 🛠️ لوحة تحكم المشرف ------------------
-Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () {
+    Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/', [AdminDashboard::class, 'index'])->name('admin.dashboard');
     Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index');
     Route::post('/users/{id}/promote', [App\Http\Controllers\Admin\UserController::class, 'promote'])->name('admin.users.promote');
+    Route::post('/users/{id}/toggle-ban', [App\Http\Controllers\Admin\UserController::class, 'toggleBan'])
+    ->name('admin.users.toggleBan');
     Route::get('/visitors', [App\Http\Controllers\Admin\VisitorController::class, 'index'])->name('admin.visitors.index');
 
     # 🎯 إدارة البانرات
@@ -342,6 +317,9 @@ Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () {
 
 # 🖼️ إدارة بانرات المول
 Route::resource('mall-banners', \App\Http\Controllers\MallBannerController::class);
+
+# إدارة بانرات الخدمات
+Route::resource('service-banners', App\Http\Controllers\ServiceBannerController::class);
 
     # 🔔 إشعارات المشرف
     Route::get('/notifications', [AdminController::class, 'notifications'])->name('admin.notifications');
@@ -394,3 +372,34 @@ Route::get('/ads/cars', [AdController::class, 'cars'])->name('ads.cars');
 // 🛠️ خدمات
 Route::get('/ads/services', [AdController::class, 'services'])->name('ads.services');
 
+// صفحة قائمة الخدمات الرئيسية
+Route::get('/services', [\App\Http\Controllers\ServicesController::class, 'index'])
+    ->name('services.index');
+
+// عرض الخدمات حسب النوع
+Route::get('/services/type/{service_type}', [\App\Http\Controllers\ServiceController::class, 'byType'])
+    ->name('services.byType');
+
+// صفحة تفاصيل الخدمة
+Route::get('/services/{subcategory}', [\App\Http\Controllers\ServicesController::class, 'show'])
+    ->name('services.show');
+
+// حفظ التقييم (يتطلب تسجيل دخول)
+Route::post('/services/rate', [\App\Http\Controllers\ServiceRatingController::class, 'store'])
+    ->middleware('auth')
+    ->name('service.rating.store');
+
+Route::post('/services/rating/update', [\App\Http\Controllers\ServiceRatingController::class, 'update'])
+    ->name('service.rating.update');
+
+Route::get('/login-phone', [WhatsappAuthController::class, 'loginPage'])->name('login.phone');
+Route::post('/send-code', [WhatsappAuthController::class, 'sendCode'])->name('send.code');
+Route::get('/verify-code', [WhatsappAuthController::class, 'verifyPage'])->name('verify.code.page');
+Route::post('/verify-code', [WhatsappAuthController::class, 'verifyCode'])->name('verify.code');
+
+// تسجيل خروج
+Route::post('/logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+Route::get('/banned', function() {
+    return view('auth.banned');
+})->name('banned.message');

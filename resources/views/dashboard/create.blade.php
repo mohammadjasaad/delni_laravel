@@ -31,11 +31,17 @@
                 <textarea id="description" name="description" rows="4" class="w-full rounded border-gray-300">{{ old('description') }}</textarea>
             </div>
 
-            {{-- 💰 السعر --}}
-            <div>
-                <x-label for="price" :value="__('messages.price')" />
-                <x-input id="price" class="block mt-1 w-full" type="number" name="price" :value="old('price')" required />
-            </div>
+{{-- 💰 السعر + اختيار العملة --}}
+<div>
+    <x-label for="price" :value="__('messages.price')" />
+    <div class="flex gap-3 items-center">
+        <x-input id="price" class="block mt-1 w-1/2" type="number" name="price" :value="old('price')" required />
+        <select name="currency" class="block mt-1 w-1/2 border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500">
+            <option value="SYP" {{ old('currency') == 'SYP' ? 'selected' : '' }}>🇸🇾 ل.س (الليرة السورية)</option>
+            <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>🇺🇸 $ (الدولار الأمريكي)</option>
+        </select>
+    </div>
+</div>
 
             {{-- 🏙️ المدينة --}}
             <div>
@@ -47,6 +53,15 @@
                     @endforeach
                 </select>
             </div>
+
+{{-- 🏷️ نوع العرض --}}
+<div>
+    <x-label for="deal_type" :value="__('messages.deal_type')" />
+    <select id="deal_type" name="deal_type" class="block mt-1 w-full border-gray-300 rounded">
+        <option value="sale">{{ __('messages.sale') }}</option>
+        <option value="rent">{{ __('messages.rent') }}</option>
+    </select>
+</div>
 
             {{-- 📂 التصنيف --}}
             <div>
@@ -87,60 +102,94 @@
 </div>
 
 {{-- 🚗 خصائص السيارات --}}
-<div x-show="category === 'سيارات'" class="space-y-3">
-    <h2 class="font-bold text-lg">🚗 تفاصيل السيارة</h2>
-    <div class="grid grid-cols-2 gap-4">
+<div x-show="category === 'سيارات'" class="space-y-3 mt-6 bg-white shadow-md rounded-2xl p-6">
+    <h2 class="font-bold text-lg mb-4 flex items-center gap-2 text-gray-800">
+        <i class="fas fa-car text-yellow-500"></i> تفاصيل السيارة
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
         {{-- 🏷️ الشركة المصنعة --}}
-        <select name="car_brand" class="w-full p-3 border rounded-xl text-sm">
-            <option value="">اختر الشركة المصنعة</option>
-            @foreach([
-                'Abarth','Alfa Romeo','Aston Martin','Audi','Bentley','BMW','BYD','Cadillac','Chery','Chevrolet',
-                'Chrysler','Citroen','Cupra','Dacia','Daewoo','Daihatsu','Dodge','Ferrari','Fiat','Ford',
-                'Geely','Honda','Hyundai','Infiniti','Jaguar','Jeep','Kia','Lada','Lamborghini','Land Rover',
-                'Lexus','Lincoln','Maserati','Mazda','McLaren','Mercedes-Benz','Mini','Mitsubishi','Nissan',
-                'Opel','Peugeot','Porsche','Renault','Rolls-Royce','Saab','Seat','Skoda','Smart','Subaru',
-                'Suzuki','Tesla','Toyota','Volkswagen','Volvo'
-            ] as $brand)
-                <option value="{{ $brand }}" {{ old('car_brand') == $brand ? 'selected' : '' }}>{{ $brand }}</option>
-            @endforeach
-        </select>
+        <div>
+            <x-label for="car_brand" value="الشركة المصنعة" />
+            <select name="car_brand" id="car_brand" class="input w-full">
+                <option value="">اختر الشركة</option>
+                @foreach([
+                    'Abarth','Acura','Alfa Romeo','Aston Martin','Audi','Bentley','BMW','Bugatti','BYD',
+                    'Cadillac','Changan','Chery','Chevrolet','Chrysler','Citroen','Cupra','Dacia','Daewoo',
+                    'Daihatsu','Dodge','Ferrari','Fiat','Ford','Genesis','Geely','GMC','Great Wall','Haval',
+                    'Honda','Hummer','Hyundai','Infiniti','Isuzu','Jaguar','Jeep','Kia','Koenigsegg','Lada',
+                    'Lamborghini','Lancia','Land Rover','Lexus','Lincoln','Lotus','Maserati','Maybach','Mazda',
+                    'McLaren','Mercedes-Benz','Mini','Mitsubishi','Nissan','Opel','Pagani','Peugeot','Polestar',
+                    'Porsche','Proton','Renault','Rolls-Royce','Saab','Seat','Skoda','Smart','SsangYong','Subaru',
+                    'Suzuki','Tata','Tesla','Toyota','Volkswagen','Volvo','Wuling','Zotye'
+                ] as $brand)
+                    <option value="{{ $brand }}" {{ old('car_brand') == $brand ? 'selected' : '' }}>{{ $brand }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- 📦 الموديل --}}
+        <div>
+            <x-label for="car_model" value="الموديل" />
+            <x-input type="text" id="car_model" name="car_model" placeholder="مثال: Corolla أو E200" class="w-full" />
+        </div>
 
         {{-- 📅 سنة الصنع --}}
-        <select name="car_year" class="w-full p-3 border rounded-xl text-sm">
-            <option value="">اختر سنة الصنع</option>
-            @for ($y = date('Y'); $y >= 1980; $y--)
-                <option value="{{ $y }}" {{ old('car_year') == $y ? 'selected' : '' }}>{{ $y }}</option>
-            @endfor
-        </select>
-
-        {{-- 📏 المسافة المقطوعة --}}
-        <x-input type="number" name="car_km" placeholder="المسافة (كم)" value="{{ old('car_km') }}" />
+        <div>
+            <x-label for="car_year" value="سنة الصنع" />
+            <select name="car_year" id="car_year" class="input w-full">
+                <option value="">اختر السنة</option>
+                @for ($y = date('Y'); $y >= 1980; $y--)
+                    <option value="{{ $y }}" {{ old('car_year') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                @endfor
+            </select>
+        </div>
 
         {{-- ⛽ نوع الوقود --}}
-        <select name="fuel" class="w-full p-3 border rounded-xl text-sm">
-            <option value="">نوع الوقود</option>
-            <option value="بنزين" {{ old('fuel')=='بنزين'?'selected':'' }}>بنزين</option>
-            <option value="ديزل" {{ old('fuel')=='ديزل'?'selected':'' }}>ديزل</option>
-            <option value="كهرباء" {{ old('fuel')=='كهرباء'?'selected':'' }}>كهرباء</option>
-            <option value="هجين" {{ old('fuel')=='هجين'?'selected':'' }}>هجين</option>
-        </select>
+        <div>
+            <x-label for="fuel" value="نوع الوقود" />
+            <select name="fuel" id="fuel" class="input w-full">
+                <option value="">اختر نوع الوقود</option>
+                <option value="بنزين" {{ old('fuel')=='بنزين'?'selected':'' }}>بنزين</option>
+                <option value="ديزل" {{ old('fuel')=='ديزل'?'selected':'' }}>ديزل</option>
+                <option value="كهرباء" {{ old('fuel')=='كهرباء'?'selected':'' }}>كهرباء</option>
+                <option value="هجين" {{ old('fuel')=='هجين'?'selected':'' }}>هجين</option>
+            </select>
+        </div>
 
-        {{-- ⚙️ ناقل الحركة --}}
-        <select name="gearbox" class="w-full p-3 border rounded-xl text-sm">
-            <option value="">ناقل الحركة</option>
-            <option value="أوتوماتيك" {{ old('gearbox')=='أوتوماتيك'?'selected':'' }}>أوتوماتيك</option>
-            <option value="عادي" {{ old('gearbox')=='عادي'?'selected':'' }}>عادي</option>
-        </select>
+        {{-- ⚙️ نوع الجير --}}
+        <div>
+            <x-label for="gearbox" value="ناقل الحركة" />
+            <select name="gearbox" id="gearbox" class="input w-full">
+                <option value="">اختر ناقل الحركة</option>
+                <option value="أوتوماتيك" {{ old('gearbox')=='أوتوماتيك'?'selected':'' }}>أوتوماتيك</option>
+                <option value="عادي" {{ old('gearbox')=='عادي'?'selected':'' }}>عادي</option>
+            </select>
+        </div>
 
         {{-- 🎨 اللون --}}
-        <x-input type="text" name="car_color" placeholder="اللون" value="{{ old('car_color') }}" />
+        <div>
+            <x-label for="car_color" value="اللون" />
+            <select name="car_color" id="car_color" class="input w-full">
+                <option value="">اختر اللون</option>
+                @foreach(['أبيض','أسود','رمادي','فضي','أزرق','أحمر','ذهبي','زيتي','بني','أخضر','برتقالي','بيج'] as $color)
+                    <option value="{{ $color }}" {{ old('car_color') == $color ? 'selected' : '' }}>{{ $color }}</option>
+                @endforeach
+            </select>
+        </div>
 
-        {{-- ✅ حالة السيارة --}}
-        <label class="flex items-center">
-            <input type="checkbox" name="is_new" {{ old('is_new') ? 'checked' : '' }} class="mr-2">
-            🚘 جديد
-        </label>
+        {{-- 📏 عدد الكيلومترات --}}
+        <div>
+            <x-label for="car_km" value="عدد الكيلومترات (كم)" />
+            <x-input type="number" id="car_km" name="car_km" placeholder="مثال: 85000" class="w-full" />
+        </div>
+
+        {{-- 🚘 حالة السيارة --}}
+        <div class="flex items-center mt-6">
+            <input id="is_new" name="is_new" type="checkbox" value="1" class="rounded border-gray-300">
+            <label for="is_new" class="ml-2 text-gray-700">🚘 جديدة</label>
+        </div>
     </div>
 </div>
 

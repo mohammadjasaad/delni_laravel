@@ -1,4 +1,3 @@
-
 {{-- resources/views/ads/index.blade.php --}}
 <x-app-layout>
 <div class="w-full px-4 lg:px-24 xl:px-36 py-1">
@@ -45,34 +44,33 @@
     });
 </script>
 <div class="flex flex-wrap items-center justify-center gap-3 mb-6">
-    <a href="{{ route('ads.index', ['category' => 'realestate']) }}"
-       class="px-5 py-2 rounded-full text-sm font-semibold transition
-       {{ request('category') == 'realestate' ? 'bg-yellow-400 text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600' }}">
+    <button data-category="realestate" 
+            class="category-btn px-5 py-2 rounded-full text-sm font-semibold transition bg-gray-200 hover:bg-yellow-400">
         <i class="fas fa-building"></i> {{ __('messages.real_estate') }}
-    </a>
-    <a href="{{ route('ads.index', ['category' => 'cars']) }}"
-       class="px-5 py-2 rounded-full text-sm font-semibold transition
-       {{ request('category') == 'cars' ? 'bg-yellow-400 text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600' }}">
+    </button>
+
+    <button data-category="cars" 
+            class="category-btn px-5 py-2 rounded-full text-sm font-semibold transition bg-gray-200 hover:bg-yellow-400">
         <i class="fas fa-car"></i> {{ __('messages.cars') }}
-    </a>
-    <a href="{{ route('ads.index', ['category' => 'services']) }}"
-       class="px-5 py-2 rounded-full text-sm font-semibold transition
-       {{ request('category') == 'services' ? 'bg-yellow-400 text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600' }}">
-        <i class="fas fa-tools"></i> {{ __('messages.services') }}
-    </a>
-<a href="{{ route('mall.index') }}"
-   class="px-5 py-2 rounded-full text-sm font-semibold transition
-   {{ request()->routeIs('mall.*') ? 'bg-yellow-400 text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600' }}">
-    <i class="fas fa-store"></i> {{ __('messages.delni_mall') }}
+    </button>
+
+<a href="{{ route('services.index') }}" 
+   class="px-5 py-2 rounded-full text-sm font-semibold transition bg-gray-200 hover:bg-yellow-400">
+    <i class="fas fa-tools"></i> {{ __('messages.services') }}
 </a>
-    <a href="{{ route('delni.taxi') }}"
-       class="px-5 py-2 rounded-full text-sm font-semibold transition
-       {{ request()->routeIs('delni.taxi') ? 'bg-yellow-400 text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600' }}">
+
+    <a href="{{ route('mall.index') }}"
+       class="px-5 py-2 rounded-full text-sm font-semibold transition bg-gray-200 hover:bg-yellow-400">
+        <i class="fas fa-store"></i> {{ __('messages.delni_mall') }}
+    </a>
+
+<a href="{{ route('taxi.index') }}"
+       class="px-5 py-2 rounded-full text-sm font-semibold transition bg-gray-200 hover:bg-yellow-400">
         <i class="fas fa-taxi"></i> {{ __('messages.delni_taxi') }}
     </a>
+
     <a href="{{ route('emergency_services.index') }}"
-       class="px-5 py-2 rounded-full text-sm font-semibold transition
-       {{ request()->routeIs('emergency_services.*') ? 'bg-yellow-400 text-black' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600' }}">
+       class="px-5 py-2 rounded-full text-sm font-semibold transition bg-gray-200 hover:bg-yellow-400">
        <i class="fas fa-ambulance"></i> {{ __('messages.delni_emergency') }}
     </a>
 </div>
@@ -165,6 +163,12 @@
             <input type="text" name="service_type" placeholder="{{ __('messages.service_type') }}" class="input" value="{{ request('service_type') }}">
             <input type="text" name="provider_name" placeholder="{{ __('messages.provider_name') }}" class="input" value="{{ request('provider_name') }}">
         </div>
+{{-- 💵 اختيار العملة --}}
+<select name="currency" class="input">
+    <option value="">{{ __('messages.all_currencies') ?? 'كل العملات' }}</option>
+    <option value="SYP" {{ request('currency') == 'SYP' ? 'selected' : '' }}>🇸🇾 الليرة السورية</option>
+    <option value="USD" {{ request('currency') == 'USD' ? 'selected' : '' }}>🇺🇸 الدولار الأمريكي</option>
+</select>
         {{-- ⭐ حالة الإعلان + الترتيب --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <select name="featured" class="input">
@@ -250,28 +254,96 @@ document.getElementById('toggleMap').addEventListener('click', () => {
     }
 });
 document.addEventListener("DOMContentLoaded", function () {
+    // 🗺️ إنشاء الخريطة
     window.map = L.map('adsMap').setView([34.8021, 38.9968], 7);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; Delni.co' }).addTo(map);
-        fetch("{{ route('ads.mapData') }}")
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; Delni.co' }).addTo(map);
+    let markersLayer = L.layerGroup().addTo(map);
+
+    // ⚡ دالة تحميل الإعلانات حسب التصنيف
+    function loadAds(category = null) {
+        markersLayer.clearLayers();
+        let url = "{{ route('ads.mapData') }}";
+        if (category) url += `?category=${category}`;
+
+        fetch(url)
             .then(res => res.json())
             .then(data => {
                 data.forEach(ad => {
                     if (ad.lat && ad.lng) {
-                        const marker = L.marker([ad.lat, ad.lng]).addTo(map);
+                        const iconColor = ad.category === 'realestate' ? '#facc15' : 
+                                          ad.category === 'cars' ? '#3b82f6' : 
+                                          ad.category === 'services' ? '#22c55e' : '#6b7280';
+                        
+                        const marker = L.circleMarker([ad.lat, ad.lng], {
+                            color: iconColor,
+                            radius: 8,
+                            fillOpacity: 0.9
+                        }).addTo(markersLayer);
+
+                        const dealLabel = ad.deal_type === 'rent' ? '🏠 إيجار' : '🏷️ بيع';
                         const popupContent = `
-                            <img src="${ad.first_image ?? '{{ asset('storage/placeholder.png') }}'}" style="width:100px;height:70px;object-fit:cover;border-radius:8px;margin-bottom:5px;">
-                            <strong>${ad.title}</strong><br>
-                            <i class='fas fa-map-marker-alt text-red-500'></i> ${ad.city}<br>
-                            <i class='fas fa-dollar-sign text-green-600'></i> ${ad.price} {{ __('messages.currency') }}<br>
-                            <a href="/ads/${ad.slug}" class="text-blue-600 underline">
-                                <i class='fas fa-eye'></i> {{ __('messages.view_ad') }}
-                            </a>
+                            <div style="text-align:center;">
+                                <img src="${ad.first_image}" 
+                                     style="width:100px;height:70px;object-fit:cover;border-radius:8px;margin-bottom:5px;">
+                                <div style="font-weight:bold;">${ad.title}</div>
+                                <div style="color:${iconColor};font-weight:bold;">${dealLabel}</div>
+                                <div>${ad.city}</div>
+                                <div>${ad.price} {{ __('messages.currency') }}</div>
+                                <a href="{{ url('/ads') }}/${ad.slug}" 
+                                   class="text-yellow-600 font-semibold hover:underline block mt-1">
+                                    <i class='fas fa-eye'></i> {{ __('messages.view_ad') }}
+                                </a>
+                            </div>
                         `;
                         marker.bindPopup(popupContent);
                     }
                 });
             })
             .catch(err => console.error("⚠️ خطأ بجلب بيانات الخريطة:", err));
+    }
+
+    // ✅ تحميل جميع الإعلانات مبدئيًا
+    loadAds();
+
+    // 🟡 عند الضغط على زر التصنيف
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const category = this.dataset.category;
+            loadAds(category);
+        });
     });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const adsContainer = document.getElementById('adsContainer');
+
+    categoryButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const category = this.dataset.category;
+
+            // ✅ تمييز الزر المحدد
+            categoryButtons.forEach(b => b.classList.remove('bg-yellow-400', 'text-black'));
+            this.classList.add('bg-yellow-400', 'text-black');
+
+            // ✅ تحديث بطاقات الإعلانات باستخدام AJAX
+            let url = "{{ route('ads.index') }}?category=" + category;
+
+            fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+                .then(res => res.text())
+                .then(data => {
+                    // 🔄 نحدث فقط جزء البطاقات دون إعادة تحميل الصفحة
+                    adsContainer.innerHTML = data;
+
+                    // ✅ إذا كانت الخريطة موجودة، حدّثها أيضاً
+                    if (typeof loadAds === 'function') {
+                        loadAds(category);
+                    }
+                })
+                .catch(err => console.error("⚠️ خطأ في تحميل الإعلانات:", err));
+        });
+    });
+});
 </script>
 </x-app-layout>

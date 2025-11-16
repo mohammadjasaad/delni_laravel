@@ -21,6 +21,8 @@ class User extends Authenticatable
         'role', // 🆕 (user / admin)
         'phone',
         'avatar',
+    'whatsapp_code',
+    'code_sent_at',
     ];
 
     // 🟡 الحقول المخفية
@@ -30,10 +32,11 @@ class User extends Authenticatable
     ];
 
     // 🟡 التحويلات
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password'          => 'hashed',
-    ];
+protected $casts = [
+    'email_verified_at' => 'datetime',
+    'password'          => 'hashed',
+    'last_seen'         => 'datetime', // ✅ مهم
+];
 
     // 🏠 إعلانات
     public function ads()
@@ -81,5 +84,27 @@ class User extends Authenticatable
     public function isAdmin()
     {
         return $this->role === 'admin';
+    }
+
+public function serviceRatings()
+{
+    return $this->hasMany(\App\Models\ServiceRating::class);
+}
+
+    // 🟢 حالة المستخدم (متصل / غير متصل)
+    public function isOnline()
+    {
+        return \Cache::has('user-is-online-' . $this->id);
+    }
+
+    // 🚫 هل المستخدم محظور
+    public function isBanned()
+    {
+        return !is_null($this->banned_at);
+    }
+    // 🏪 كل مستخدم يملك متجر واحد
+    public function store()
+    {
+        return $this->hasOne(\App\Models\Store::class);
     }
 }

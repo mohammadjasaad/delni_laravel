@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Driver;
 use Illuminate\Support\Facades\Hash;
+use App\Events\TaxiDriverLocationUpdated;
 
 class DriverController extends Controller
 {
@@ -102,4 +103,16 @@ class DriverController extends Controller
         $driver = Driver::findOrFail($id);
         return view('taxi.drivers.show', compact('driver'));
     }
+public function updateLocation(Request $request)
+{
+    $driver = auth('driver')->user();
+
+    $driver->latitude = $request->latitude;
+    $driver->longitude = $request->longitude;
+    $driver->save();
+
+    broadcast(new TaxiDriverLocationUpdated($driver))->toOthers();
+
+    return response()->json(['status' => 'updated']);
+}
 }

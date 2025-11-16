@@ -23,14 +23,25 @@
                 </div>
             </div>
 
-            <div class="flex flex-col gap-2">
-                <a href="{{ route('mall.edit', $store->id) }}" class="btn-yellow">
-                    ✏️ {{ __('mall.edit_store') }}
-                </a>
-                <a href="{{ route('mall.index') }}" class="btn-gray">
-                    ⬅️ {{ __('mall.back') }}
-                </a>
-            </div>
+<div class="flex flex-col gap-2">
+
+    {{-- زر تعديل المتجر --}}
+    <a href="{{ route('mall.edit', $store->id) }}" class="btn-yellow">
+        ✏️ {{ __('mall.edit_store') }}
+    </a>
+
+    {{-- زر إضافة منتج جديد --}}
+    <a href="{{ route('mall.products.create', $store->id) }}" 
+       class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-center shadow">
+        ➕ {{ __('mall.add_product') }}
+    </a>
+
+    {{-- زر العودة --}}
+    <a href="{{ route('mall.index') }}" class="btn-gray">
+        ⬅️ {{ __('mall.back') }}
+    </a>
+
+</div>
         </div>
 
         {{-- ✅ رسالة نجاح --}}
@@ -98,8 +109,12 @@
         </section>
 
         {{-- 📦 المنتجات --}}
-        <section id="products" class="space-y-6">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">📦 {{ __('mall.products') }}</h2>
+<div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">📦 {{ __('mall.products') }}</h2>
+
+    @auth
+    @endauth
+</div>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @forelse ($store->products as $product)
                     <div class="ad-card group">

@@ -1,97 +1,129 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto px-4 py-10">
+<div class="max-w-7xl mx-auto px-4 pt-2 pb-8">
 
-        <h1 class="text-3xl font-bold text-center text-yellow-600 mb-10">
-            🛠️ {{ __('messages.services') }}
-        </h1>
-
-        {{-- 🏠 خدمات منزلية --}}
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">🏠 خدمات منزلية</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            <x-service-card icon="🧹" title="تنظيف منازل ومكاتب" desc="أعمال تنظيف ورعاية متكاملة"
-                link="{{ route('ads.services', ['subcategory' => 'cleaning']) }}"/>
-            <x-service-card icon="🔧" title="صيانة عامة" desc="كهرباء – سباكة – دهان"
-                link="{{ route('ads.services', ['subcategory' => 'maintenance']) }}"/>
-            <x-service-card icon="🛋️" title="نقل أثاث" desc="تحميل وتغليف ونقل داخلي"
-                link="{{ route('ads.services', ['subcategory' => 'moving']) }}"/>
-            <x-service-card icon="🌳" title="تنسيق حدائق" desc="زراعة وصيانة حدائق"
-                link="{{ route('ads.services', ['subcategory' => 'gardening']) }}"/>
-            <x-service-card icon="🐾" title="رعاية الحيوانات" desc="خدمات عناية بالحيوانات الأليفة"
-                link="{{ route('ads.services', ['subcategory' => 'pets']) }}"/>
+{{-- ✅ سلايدر صفحة الخدمات --}}
+<div class="w-full mb-6">
+    <div class="relative w-full overflow-hidden rounded-xl shadow-lg">
+        <div class="swiper servicesSwiper">
+            <div class="swiper-wrapper">
+                @forelse($service_banners as $banner)
+                    <div class="swiper-slide">
+                        <a href="{{ $banner->link ?? '#' }}">
+                            <img src="{{ asset('storage/'.$banner->image_desktop) }}"
+                                 alt="{{ $banner->title }}"
+                                 class="w-full h-48 md:h-72 object-cover">
+                        </a>
+                    </div>
+                @empty
+                    <div class="swiper-slide">
+                        <img src="{{ asset('images/services_default_banner.jpg') }}" class="w-full h-48 md:h-72 object-cover">
+                    </div>
+                @endforelse
+            </div>
+            <div class="swiper-pagination"></div>
         </div>
-
-        {{-- 🚗 خدمات سيارات ونقل --}}
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">🚗 خدمات سيارات ونقل</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            <x-service-card icon="🛠️" title="ميكانيك سيارات" desc="整修 سيارات ودراجات"
-                link="{{ route('ads.services', ['subcategory' => 'car-mechanic']) }}"/>
-            <x-service-card icon="🔋" title="كهرباء سيارات" desc="فحص وإصلاح كهرباء السيارات"
-                link="{{ route('ads.services', ['subcategory' => 'car-electric']) }}"/>
-            <x-service-card icon="🧴" title="غسيل سيارات" desc="غسيل وتلميع داخلي وخارجي"
-                link="{{ route('ads.services', ['subcategory' => 'car-wash']) }}"/>
-            <x-service-card icon="🚚" title="نقل بضائع" desc="شحن داخلي وبضائع كبيرة"
-                link="{{ route('ads.services', ['subcategory' => 'cargo']) }}"/>
-            <x-service-card icon="🚖" title="سائق خاص / تكسي" desc="سائقين موثوقين للتوصيل"
-                link="{{ route('ads.services', ['subcategory' => 'driver']) }}"/>
-        </div>
-
-        {{-- 🎓 تعليم وتدريب --}}
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">🎓 تعليم وتدريب</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            <x-service-card icon="📚" title="دروس خصوصية" desc="مدرسين مختصين في كافة المواد"
-                link="{{ route('ads.services', ['subcategory' => 'private-lessons']) }}"/>
-            <x-service-card icon="💻" title="كورسات برمجة" desc="تعلم برمجة وتصميم مواقع"
-                link="{{ route('ads.services', ['subcategory' => 'programming']) }}"/>
-            <x-service-card icon="🗣️" title="دورات لغات" desc="إنكليزي – تركي – فرنسي"
-                link="{{ route('ads.services', ['subcategory' => 'languages']) }}"/>
-            <x-service-card icon="🎶" title="تعليم موسيقى" desc="عود، غيتار، بيانو"
-                link="{{ route('ads.services', ['subcategory' => 'music']) }}"/>
-            <x-service-card icon="🏋️" title="تدريب رياضي" desc="مدرب شخصي ولياقة"
-                link="{{ route('ads.services', ['subcategory' => 'fitness']) }}"/>
-        </div>
-
-        {{-- 🧑‍⚕️ صحة وتجميل --}}
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">🧑‍⚕️ صحة وتجميل</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            <x-service-card icon="🦷" title="أطباء أسنان" desc="أفضل عيادات الأسنان"
-                link="{{ route('ads.services', ['subcategory' => 'dentists']) }}"/>
-            <x-service-card icon="🏥" title="عيادات وصيدليات" desc="خدمات طبية شاملة"
-                link="{{ route('ads.services', ['subcategory' => 'clinics']) }}"/>
-            <x-service-card icon="💇" title="صالونات حلاقة" desc="رجالي ونسائي"
-                link="{{ route('ads.services', ['subcategory' => 'barbers']) }}"/>
-            <x-service-card icon="💅" title="مراكز تجميل" desc="عناية بالشعر والبشرة"
-                link="{{ route('ads.services', ['subcategory' => 'beauty']) }}"/>
-            <x-service-card icon="🧖" title="مساج وعلاج طبيعي" desc="جلسات علاجية وراحة"
-                link="{{ route('ads.services', ['subcategory' => 'massage']) }}"/>
-        </div>
-
-        {{-- 📈 أعمال وخدمات --}}
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">📈 أعمال وخدمات</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            <x-service-card icon="⚖️" title="محاماة" desc="مكاتب محامين واستشارات"
-                link="{{ route('ads.services', ['subcategory' => 'lawyers']) }}"/>
-            <x-service-card icon="🏦" title="محاسبة" desc="إدارة الحسابات والضرائب"
-                link="{{ route('ads.services', ['subcategory' => 'accounting']) }}"/>
-            <x-service-card icon="📢" title="تسويق رقمي" desc="إعلانات إلكترونية"
-                link="{{ route('ads.services', ['subcategory' => 'marketing']) }}"/>
-            <x-service-card icon="🎨" title="تصميم وغرافيك" desc="شعارات، هويات بصرية"
-                link="{{ route('ads.services', ['subcategory' => 'design']) }}"/>
-            <x-service-card icon="📷" title="تصوير ومونتاج" desc="فيديو وصور احترافية"
-                link="{{ route('ads.services', ['subcategory' => 'photography']) }}"/>
-        </div>
-
-        {{-- 📑 خدمات طلابية وترجمة --}}
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">📑 خدمات طلابية وترجمة</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            <x-service-card icon="🎓" title="تسجيل جامعي" desc="خدمات طلابية محلية ودولية"
-                link="{{ route('ads.services', ['subcategory' => 'university']) }}"/>
-            <x-service-card icon="📝" title="ترجمة" desc="مترجمين معتمدين لجميع اللغات"
-                link="{{ route('ads.services', ['subcategory' => 'translation']) }}"/>
-            <x-service-card icon="📚" title="كتابة أبحاث" desc="مساعدة أكاديمية"
-                link="{{ route('ads.services', ['subcategory' => 'research']) }}"/>
-            <x-service-card icon="🏢" title="تخليص معاملات" desc="خدمات حكومية وتجارية"
-                link="{{ route('ads.services', ['subcategory' => 'documents']) }}"/>
-        </div>
-
     </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+  new Swiper(".servicesSwiper", {
+    pagination: { el: ".swiper-pagination", clickable: true },
+    autoplay: { delay: 4000 },
+    loop: true,
+  });
+</script>
+
+    <h1 class="text-4xl font-extrabold text-center text-gray-800 dark:text-gray-100 mb-4">
+        🛠️ {{ __('messages.services') }}
+    </h1>
+
+    <div class="max-w-md mx-auto mb-4">
+        <input
+            type="text"
+            id="serviceSearch"
+            placeholder="ابحث عن خدمة... مثل: حلاقة، محامي، تنظيف"
+            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-sm focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition"
+        >
+    </div>
+
+@php
+$groups = [
+    '🏠 خدمات منزلية' => [
+        ['title' => 'تنظيف منازل ومكاتب', 'sub' => 'cleaning', 'icon' => 'fa-broom'],
+        ['title' => 'صيانة عامة', 'sub' => 'maintenance', 'icon' => 'fa-screwdriver-wrench'],
+        ['title' => 'نقل أثاث', 'sub' => 'moving', 'icon' => 'fa-truck-moving'],
+        ['title' => 'تنسيق حدائق', 'sub' => 'gardening', 'icon' => 'fa-leaf'],
+        ['title' => 'رعاية الحيوانات', 'sub' => 'pets', 'icon' => 'fa-paw'],
+    ],
+
+    '🚗 خدمات سيارات' => [
+        ['title' => 'ميكانيك سيارات', 'sub' => 'car-mechanic', 'icon' => 'fa-engine-warning'],
+        ['title' => 'كهرباء سيارات', 'sub' => 'car-electric', 'icon' => 'fa-bolt'],
+        ['title' => 'غسيل سيارات', 'sub' => 'car-wash', 'icon' => 'fa-car-side'],
+        ['title' => 'نقل بضائع', 'sub' => 'cargo', 'icon' => 'fa-truck'],
+        ['title' => 'سائق خاص', 'sub' => 'driver', 'icon' => 'fa-id-card'],
+    ],
+
+    '🎓 تعليم وتدريب' => [
+        ['title' => 'دروس خصوصية', 'sub' => 'private-lessons', 'icon' => 'fa-chalkboard-user'],
+        ['title' => 'كورسات برمجة', 'sub' => 'programming', 'icon' => 'fa-code'],
+        ['title' => 'تعليم لغات', 'sub' => 'languages', 'icon' => 'fa-language'],
+        ['title' => 'تعليم موسيقى', 'sub' => 'music', 'icon' => 'fa-guitar'],
+        ['title' => 'تدريب رياضي', 'sub' => 'fitness', 'icon' => 'fa-dumbbell'],
+    ],
+
+    '💅 صحة وتجميل' => [
+        ['title' => 'أطباء أسنان', 'sub' => 'dentists', 'icon' => 'fa-tooth'],
+        ['title' => 'عيادات وصيدليات', 'sub' => 'clinics', 'icon' => 'fa-hospital'],
+        ['title' => 'صالونات حلاقة', 'sub' => 'barbers', 'icon' => 'fa-scissors'],
+        ['title' => 'مراكز تجميل', 'sub' => 'beauty', 'icon' => 'fa-spa'],
+        ['title' => 'مساج وعلاج طبيعي', 'sub' => 'massage', 'icon' => 'fa-hand-sparkles'],
+    ],
+
+    '📈 أعمال وخدمات' => [
+        ['title' => 'محاماة', 'sub' => 'lawyers', 'icon' => 'fa-scale-balanced'],
+        ['title' => 'محاسبة', 'sub' => 'accounting', 'icon' => 'fa-calculator'],
+        ['title' => 'تسويق رقمي', 'sub' => 'marketing', 'icon' => 'fa-bullhorn'],
+        ['title' => 'تصميم وغرافيك', 'sub' => 'design', 'icon' => 'fa-pen-nib'],
+        ['title' => 'تصوير ومونتاج', 'sub' => 'photography', 'icon' => 'fa-camera'],
+    ],
+];
+@endphp
+
+    @foreach($groups as $groupTitle => $cards)
+        <h2 class="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-6">{{ $groupTitle }}</h2>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-12">
+            @foreach($cards as $card)
+
+                <a href="{{ route('services.byType', $card['sub']) }}"
+                   class="service-card-item flex flex-col items-center p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition"
+                   data-title="{{ $card['title'] }}">
+
+                    <div class="w-16 h-16 flex items-center justify-center mb-3">
+                        <i class="fa-solid {{ $card['icon'] }} text-4xl text-yellow-600 dark:text-yellow-400"></i>
+                    </div>
+
+                    <div class="text-center text-sm font-medium text-gray-700 dark:text-gray-200">{{ $card['title'] }}</div>
+
+                </a>
+
+            @endforeach
+        </div>
+    @endforeach
+
+</div>
+
+<script>
+document.getElementById('serviceSearch').addEventListener('input', function () {
+    let search = this.value.toLowerCase().trim();
+    document.querySelectorAll('.service-card-item').forEach(card => {
+        card.style.display = card.dataset.title.toLowerCase().includes(search) ? '' : 'none';
+    });
+});
+</script>
+
 </x-app-layout>
